@@ -26,11 +26,45 @@
 	<string>Websites you visit may request your location.</string>
 	<key>UIAppFonts</key>
 	<array>
+		<string>CharisSILB.ttf</string>
+		<string>CharisSILBI.ttf</string>
+		<string>CharisSILI.ttf</string>
+		<string>CharisSILR.ttf</string>
+		<string>FiraMono-Bold.ttf</string>
+		<string>FiraMono-Medium.ttf</string>
+		<string>FiraMono-Regular.ttf</string>
+		<string>FiraSans-Bold.ttf</string>
+		<string>FiraSans-BoldItalic.ttf</string>
+		<string>FiraSans-Book.ttf</string>
+		<string>FiraSans-BookItalic.ttf</string>
+		<string>FiraSans-Eight.ttf</string>
+		<string>FiraSans-EightItalic.ttf</string>
+		<string>FiraSans-ExtraBold.ttf</string>
+		<string>FiraSans-ExtraBoldItalic.ttf</string>
+		<string>FiraSans-ExtraLight.ttf</string>
+		<string>FiraSans-ExtraLightItalic.ttf</string>
+		<string>FiraSans-Four.ttf</string>
+		<string>FiraSans-FourItalic.ttf</string>
+		<string>FiraSans-Hair.ttf</string>
+		<string>FiraSans-HairItalic.ttf</string>
+		<string>FiraSans-Heavy.ttf</string>
+		<string>FiraSans-HeavyItalic.ttf</string>
+		<string>FiraSans-Italic.ttf</string>
+		<string>FiraSans-Light.ttf</string>
+		<string>FiraSans-LightItalic.ttf</string>
+		<string>FiraSans-Medium.ttf</string>
+		<string>FiraSans-MediumItalic.ttf</string>
 		<string>FiraSans-Regular.ttf</string>
 		<string>FiraSans-SemiBold.ttf</string>
-		<string>FiraSans-Light.ttf</string>
+		<string>FiraSans-SemiBoldItalic.ttf</string>
+		<string>FiraSans-Thin.ttf</string>
+		<string>FiraSans-ThinItalic.ttf</string>
+		<string>FiraSans-Two.ttf</string>
+		<string>FiraSans-TwoItalic.ttf</string>
+		<string>FiraSans-Ultra.ttf</string>
+		<string>FiraSans-UltraItalic.ttf</string>
 		<string>FiraSans-UltraLight.ttf</string>
-		<string>FiraSans-Medium.ttf</string>
+		<string>FiraSans-UltraLightItalic.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
