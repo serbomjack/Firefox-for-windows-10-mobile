@@ -1,4 +1,4 @@
-github "Alamofire/Alamofire" "xcode-6.3"     # For Swift 1.2 compat.
+github "Alamofire/Alamofire" == 1.2.0
 github "Masonry/Snap"
 github "swisspol/GCDWebServer"
 github "kif-framework/KIF" == 3.1.2          # 3.2.0 gives build errors
