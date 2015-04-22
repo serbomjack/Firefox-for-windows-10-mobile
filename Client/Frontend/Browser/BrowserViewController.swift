@@ -1376,6 +1376,11 @@ extension BrowserViewController : UIViewControllerTransitioningDelegate {
 }
 
 extension BrowserViewController : Transitionable {
+    private func hideSubviewsFromAnimation(show: Bool) {
+        self.homePanelController?.view.hidden = show
+        self.header.hidden = show
+        self.footer.hidden = show
+    }
 
     func transitionablePreHide(transitionable: Transitionable, options: TransitionOptions) {
         // Move all the webview's off screen
@@ -1384,7 +1389,7 @@ extension BrowserViewController : Transitionable {
                 tab.webView.hidden = true
             }
         }
-        self.homePanelController?.view.hidden = true
+        self.hideSubviewsFromAnimation(true)
     }
 
     func transitionablePreShow(transitionable: Transitionable, options: TransitionOptions) {
@@ -1394,19 +1399,13 @@ extension BrowserViewController : Transitionable {
                 tab.webView.hidden = true
             }
         }
-        self.homePanelController?.view.hidden = true
+        self.hideSubviewsFromAnimation(true)
     }
 
     func transitionableWillShow(transitionable: Transitionable, options: TransitionOptions) {
-        view.alpha = 1
-        footer.transform = CGAffineTransformIdentity
-        header.transform = CGAffineTransformIdentity
     }
 
     func transitionableWillHide(transitionable: Transitionable, options: TransitionOptions) {
-        view.alpha = 0
-        footer.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, footer.frame.height)
-        header.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, header.frame.height)
     }
 
     func transitionableWillComplete(transitionable: Transitionable, options: TransitionOptions) {
@@ -1416,7 +1415,10 @@ extension BrowserViewController : Transitionable {
                 tab.webView.hidden = false
             }
         }
-        self.homePanelController?.view.hidden = false
+
+        self.updateViewConstraints()
+        self.hideSubviewsFromAnimation(false)
+
         if options.toView === self {
             startTrackingAccessibilityStatus()
         } else {
