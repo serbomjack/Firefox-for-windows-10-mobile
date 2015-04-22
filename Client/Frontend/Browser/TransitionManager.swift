@@ -9,6 +9,7 @@ class TransitionOptions {
     var fromView: UIViewController? = nil
     var toView: UIViewController? = nil
     var duration: NSTimeInterval? = nil
+    var cellFrame: CGRect? = nil
 }
 
 @objc
@@ -69,6 +70,8 @@ class TransitionManager: NSObject, UIViewControllerAnimatedTransitioning  {
     }
 
     func transitionDuration(transitionContext: UIViewControllerContextTransitioning) -> NSTimeInterval {
+//        return 2.0
+//        return 4.0
         return 0.4
     }
 }
