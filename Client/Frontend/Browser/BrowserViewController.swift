@@ -699,7 +699,7 @@ extension BrowserViewController: UIScrollViewDelegate {
         header.transform = CGAffineTransformMakeTranslation(0, newY)
 
         let percent = 1 - newY / -AppConstants.ToolbarHeight
-        urlBar.alpha = percent
+        urlBar.updateSubviewAlpha(percent)
         self.setNeedsStatusBarAppearanceUpdate()
     }
 

@@ -150,6 +150,12 @@ class URLBarView: UIView, BrowserLocationViewDelegate, AutocompleteTextFieldDele
         finishEditingAnimation(false)
     }
 
+    func updateSubviewAlpha(alpha: CGFloat) {
+        self.locationContainer.alpha = alpha
+        self.curveShape.alpha = alpha
+        self.tabsButton.alpha = alpha
+    }
+
     private func updateToolbarConstraints() {
         if toolbarIsShowing {
             backButton.snp_remakeConstraints { (make) -> () in
