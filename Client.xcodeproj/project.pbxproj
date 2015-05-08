@@ -1588,6 +1588,10 @@
 		282915DF1AF1A5F90006EEB5 /* Dead */ = {
 			isa = PBXGroup;
 			children = (
+				2FCAE27C1ABB533A00877008 /* TestFaviconsTable.swift */,
+				2FCAE27B1ABB533A00877008 /* TestBookmarks.swift */,
+				2FCAE27E1ABB533A00877008 /* TestJoinedFaviconTable.swift */,
+				2FCAE27F1ABB533A00877008 /* TestJoinedHistoryVisits.swift */,
 				2FCAE2831ABB533A00877008 /* TestVisitsTable.swift */,
 			);
 			name = Dead;
@@ -1874,12 +1878,8 @@
 			children = (
 				282915DF1AF1A5F90006EEB5 /* Dead */,
 				2FCAE2791ABB533A00877008 /* MockFiles.swift */,
-				2FCAE27B1ABB533A00877008 /* TestBookmarks.swift */,
-				2FCAE27C1ABB533A00877008 /* TestFaviconsTable.swift */,
 				2FCAE27D1ABB533A00877008 /* TestSQLiteHistory.swift */,
 				2FCAE2821ABB533A00877008 /* TestTableTable.swift */,
-				2FCAE27E1ABB533A00877008 /* TestJoinedFaviconTable.swift */,
-				2FCAE27F1ABB533A00877008 /* TestJoinedHistoryVisits.swift */,
 				2FCAE27A1ABB533A00877008 /* TestSQLiteRemoteClientsAndTabs.swift */,
 				D32CACEC1AE04DA1000658EB /* TestSwiftData.swift */,
 				2FCAE22B1ABB51F800877008 /* Supporting Files */,
