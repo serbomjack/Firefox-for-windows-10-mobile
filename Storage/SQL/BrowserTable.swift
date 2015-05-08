@@ -172,6 +172,7 @@ public class BrowserTable: Table {
 
         if from == 0 {
             // This is likely an upgrade from before Bug 1160399.
+            log.debug("Updating browser tables from zero. Assuming drop and recreate.")
             return drop(db) && create(db, version: to)
         }
 
@@ -198,7 +199,9 @@ public class BrowserTable: Table {
     }
 
     func drop(db: SQLiteDBConnection) -> Bool {
-        let queries = AllViews.map { "DROP VIEW \($0)" } + AllTables.map { "DROP TABLE \($0)" }
+        log.debug("Dropping all browser tables.")
+        let queries = AllViews.map { "DROP VIEW IF EXISTS \($0!)" } +
+                      AllTables.map { "DROP TABLE IF EXISTS \($0!)" }
         return self.run(db, queries: queries)
     }
 }

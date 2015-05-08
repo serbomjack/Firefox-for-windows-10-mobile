@@ -99,7 +99,8 @@ public class BrowserDB {
         }
 
         if !table.updateTable(db, from: from, to: table.version) {
-            // If the update failed, we'll bail without writing the change to the table-table
+            // If the update failed, we'll bail without writing the change to the table-table.
+            log.debug("Updating failed.")
             return false
         }
 
