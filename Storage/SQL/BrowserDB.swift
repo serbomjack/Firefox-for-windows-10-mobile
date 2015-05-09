@@ -105,7 +105,12 @@ public class BrowserDB {
         }
 
         var err: NSError? = nil
-        return schemaTable.update(db, item: table, err: &err) > 0
+
+        // Yes, we UPDATE OR INSERT… because we might be transferring ownership of a database table
+        // to a different Table. It'll trigger exists, and thus take the update path, but we won't
+        // necessarily have an existing schema entry -- i.e., we'll be updating from 0.
+        return schemaTable.update(db, item: table, err: &err) > 0 ||
+               schemaTable.insert(db, item: table, err: &err) > 0
     }
 
     // Utility for table classes. They should call this when they're initialized to force
