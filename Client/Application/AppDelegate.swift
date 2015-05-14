@@ -112,6 +112,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func setupWebServer() {
         let server = WebServer.sharedInstance
         ReaderModeHandlers.register(server)
+        ErrorPageHelper.register(server)
         server.start()
     }
 

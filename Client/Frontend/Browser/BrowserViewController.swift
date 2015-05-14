@@ -1139,15 +1139,36 @@ extension BrowserViewController: WKNavigationDelegate {
                     callExternal(url)
                     decisionHandler(WKNavigationActionPolicy.Cancel)
                 default:
+                    decisionHandler(WKNavigationActionPolicy.Cancel)
                     if UIApplication.sharedApplication().canOpenURL(url) {
                         openExternal(url)
+                        return
                     }
-                    decisionHandler(WKNavigationActionPolicy.Cancel)
+
+                    let userInfo: [NSObject: AnyObject]? = [
+                        NSLocalizedDescriptionKey: NSLocalizedString("Nothing installed can open the url <a href='\(url)'>\(url)</a>", comment: "Shown on error pages when nothing installed can open this url")
+                    ]
+                    let error = NSError(domain: NSURLErrorDomain, code: Int(CFNetworkErrors.CFURLErrorBadURL.rawValue), userInfo: userInfo)
+                    ErrorPageHelper().showPage(error, forUrl: url, inWebView: webView)
                 }
             }
         } else {
             decisionHandler(WKNavigationActionPolicy.Cancel)
+            let userInfo: [NSObject: AnyObject]? = [
+                NSLocalizedDescriptionKey: NSLocalizedString("Could not parse the url", comment: "Shown on error pages when the url for a request can't be found")
+            ]
+            let error = NSError(domain: NSURLErrorDomain, code: Int(CFNetworkErrors.CFURLErrorBadURL.rawValue), userInfo: userInfo)
+            ErrorPageHelper().showPage(error, forUrl: NSURL(string: "")!, inWebView: webView)
         }
+    }
+
+    func webView(webView: WKWebView, decidePolicyForNavigationResponse navigationResponse: WKNavigationResponse, decisionHandler: (WKNavigationResponsePolicy) -> Void) {
+        if navigationResponse.canShowMIMEType {
+            decisionHandler(WKNavigationResponsePolicy.Allow)
+            return
+        }
+
+        decisionHandler(WKNavigationResponsePolicy.Cancel)
     }
 
     func webView(webView: WKWebView, didCommitNavigation navigation: WKNavigation!) {
@@ -1298,34 +1319,17 @@ extension BrowserViewController: WKUIDelegate {
         presentViewController(alertController, animated: true, completion: nil)
     }
 
-    func errorToHTML(error: NSError) -> String {
-        var html = "<html>"
-        html += "<p>localizedDescription: \(error.localizedDescription)</p>"
-        html += "<p>localizedFailureReason: \(error.localizedFailureReason)</p>"
-        html += "<p>localizedRecoverySuggestion: \(error.localizedRecoverySuggestion)</p>"
-        html += "<p>localizedRecoveryOptions: \(error.localizedRecoveryOptions)</p>"
-        html += "</html>"
-        println(html)
-        return html
-    }
-
     /// Invoked when an error occurs during a committed main frame navigation.
     func webView(webView: WKWebView, didFailNavigation navigation: WKNavigation!, withError error: NSError) {
-        println("DIDFAILNAVIGATION:")
-        println(error)
-        println(error.userInfo)
         if let url = error.userInfo?["NSErrorFailingURLKey"] as? NSURL {
-            webView.loadHTMLString(errorToHTML(error), baseURL: url)
+            ErrorPageHelper().showPage(error, forUrl: url, inWebView: webView)
         }
     }
 
     /// Invoked when an error occurs while starting to load data for the main frame.
     func webView(webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: NSError) {
-        println("DIDFAILPROVISIONALNAVIGATION:")
-        println(error)
-        println(error.userInfo)
         if let url = error.userInfo?["NSErrorFailingURLKey"] as? NSURL {
-            webView.loadHTMLString(errorToHTML(error), baseURL: url)
+            ErrorPageHelper().showPage(error, forUrl: url, inWebView: webView)
         }
     }
 }
