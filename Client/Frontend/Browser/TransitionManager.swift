@@ -69,6 +69,6 @@ class TransitionManager: NSObject, UIViewControllerAnimatedTransitioning  {
     }
 
     func transitionDuration(transitionContext: UIViewControllerContextTransitioning) -> NSTimeInterval {
-        return 0.4
+        return 6
     }
 }

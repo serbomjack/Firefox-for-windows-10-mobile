@@ -4,6 +4,7 @@
 
 import Foundation
 import UIKit
+import SnapKit
 
 let TitleMargin = CGFloat(6)
 let CloseButtonInset = CGFloat(10)
@@ -61,6 +62,22 @@ class TabContentView: UIView {
         return closeButton
     }()
 
+    lazy var urlBar: URLBarView = {
+        let urlBar = URLBarView()
+        urlBar.setTranslatesAutoresizingMaskIntoConstraints(false)
+        return urlBar
+    }()
+
+    private var titleContainerHeight: Constraint?
+    private var urlBarTop: Constraint?
+
+    var expanded: Bool = false {
+        didSet {
+            self.titleContainerHeight?.updateOffset(self.expanded ? 0 : TabTrayControllerUX.TextBoxHeight)
+            self.urlBarTop?.updateOffset(self.expanded ? 0 : -AppConstants.ToolbarHeight)
+        }
+    }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
 
@@ -73,10 +90,11 @@ class TabContentView: UIView {
         self.titleContainer.addSubview(self.titleText)
         self.titleContainer.addSubview(self.favicon)
 
+        self.addSubview(self.urlBar)
         self.addSubview(self.background)
         self.addSubview(self.titleContainer)
 
-        self.setNeedsUpdateConstraints()
+        self.updateConstraints()
     }
 
     required init(coder aDecoder: NSCoder) {
@@ -90,9 +108,14 @@ class TabContentView: UIView {
             make.bottom.top.left.right.equalTo(self)
         }
 
+        self.urlBar.snp_remakeConstraints { make in
+            make.left.right.equalTo(self)
+            self.urlBarTop = make.top.equalTo(self).constraint
+        }
+
         self.titleContainer.snp_remakeConstraints { make in
-            make.top.left.right.equalTo(self)
-            make.height.equalTo(TabTrayControllerUX.TextBoxHeight)
+            make.left.right.top.equalTo(self)
+            self.titleContainerHeight = make.height.equalTo(TabTrayControllerUX.TextBoxHeight).constraint
         }
 
         self.favicon.snp_remakeConstraints { make in

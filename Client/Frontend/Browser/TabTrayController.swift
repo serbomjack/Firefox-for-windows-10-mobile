@@ -65,10 +65,7 @@ private class TabCell: UICollectionViewCell {
     private override func updateConstraints() {
         super.updateConstraints()
         self.tabView.snp_remakeConstraints { make in
-            make.top.equalTo(self.contentView).offset(10)
-            make.bottom.equalTo(self.contentView).offset(10)
-            make.right.equalTo(self.contentView).offset(10)
-            make.left.equalTo(self.contentView).offset(10)
+            make.top.bottom.left.right.equalTo(self.contentView)
         }
     }
 
@@ -126,8 +123,6 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
         collectionView.backgroundColor = TabTrayControllerUX.BackgroundColor
         return collectionView
     }()
-
-    var collectionViewTransitionSnapshot: UIView?
 
     // MARK: View Controller Overrides and Callbacks
     override func viewDidLoad() {
@@ -219,7 +214,6 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
         presentingViewController!.dismissViewControllerAnimated(true, completion: nil)
     }
 
-
     // MARK: Collection View Delegate/Data Source
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         let tab = tabManager[indexPath.item]
@@ -247,7 +241,6 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
 
         cell.tabView.closeButton.addTarget(cell,
             action: "SELdidPressClose", forControlEvents: UIControlEvents.TouchUpInside)
-
         return cell
     }
 
@@ -274,9 +267,10 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
 }
 
 extension TabTrayController: Transitionable {
-//    private func getTransitionCell(options: TransitionOptions, browser: Browser?) -> CustomCell {
-//        var transitionCell: CustomCell
-//        if let cell = options.moving as? CustomCell {
+
+//    private func getTransitionCell(options: TransitionOptions, browser: Browser?) -> TabCell {
+//        var transitionCell: TabCell
+//        if let cell = options.moving as? TabCell {
 //            transitionCell = cell
 //        } else {
 //            transitionCell = CustomCell(frame: options.container!.frame)
@@ -293,43 +287,27 @@ extension TabTrayController: Transitionable {
 //    }
 
     func transitionablePreShow(transitionable: Transitionable, options: TransitionOptions) {
-//        self.collectionView.layoutSubviews()
-//        self.collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: tabManager.selectedIndex, inSection: 0), atScrollPosition: .CenteredVertically, animated: false)
-//        if let container = options.container {
-//            let cell = getTransitionCell(options, browser: tabManager.selectedTab)
-//            cell.backgroundHolder.layer.cornerRadius = TabTrayControllerUX.CornerRadius
-//            cell.innerStroke.hidden = true
-//        }
-//
-//        navBar.hidden = true
-//        collectionView.backgroundColor = UIColor.clearColor()
-//
-//        collectionView.layoutIfNeeded()
-//        collectionViewTransitionSnapshot = snapshotTransitionView(collectionView)
-//        self.view.addSubview(collectionViewTransitionSnapshot!)
-//        collectionViewTransitionSnapshot?.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.9, 0.9)
-//        collectionViewTransitionSnapshot?.alpha = 0
-//
     }
 
     func transitionablePreHide(transitionable: Transitionable, options: TransitionOptions) {
-//        self.collectionView.layoutSubviews()
-//
-//        if let container = options.container {
-//            let cell = getTransitionCell(options, browser: tabManager.selectedTab)
-//            cell.backgroundHolder.layer.cornerRadius = 0
-//            cell.innerStroke.hidden = true
-//        }
-//
-//        navBar.hidden = true
-//        collectionView.backgroundColor = UIColor.clearColor()
-//
-//        collectionViewTransitionSnapshot = snapshotTransitionView(collectionView)
-//        self.view.addSubview(collectionViewTransitionSnapshot!)
-//
+        let attributes = self.collectionView.layoutAttributesForItemAtIndexPath(NSIndexPath(forItem: self.tabManager.selectedIndex, inSection: 0))
+        if var cellRect = attributes?.frame {
+            cellRect = self.collectionView.convertRect(cellRect, toView: self.view)
+            let selectedTabView = TabContentView()
+            selectedTabView.frame = cellRect
+            self.view.addSubview(selectedTabView)
+            options.moving = selectedTabView
+        }
     }
 
     func transitionableWillHide(transitionable: Transitionable, options: TransitionOptions) {
+        if let fakeTabView = options.moving as? TabContentView {
+            fakeTabView.frame = self.view.frame
+            fakeTabView.layer.cornerRadius = 0
+            fakeTabView.expanded = true
+            fakeTabView.layoutIfNeeded()
+        }
+
         // Create a fake cell that is shown fullscreen
 //        if let container = options.container {
 //            let cell = getTransitionCell(options, browser: tabManager.selectedTab)
@@ -396,16 +374,6 @@ extension TabTrayController: Transitionable {
 //            }
 //        }
     }
-
-    private func snapshotTransitionView(view: UIView) -> UIView {
-        let snapshot = view.snapshotViewAfterScreenUpdates(true)
-        snapshot.frame = view.frame
-
-        view.hidden = true
-
-        return snapshot
-    }
-
 }
 
 extension TabTrayController: SwipeAnimatorDelegate {
