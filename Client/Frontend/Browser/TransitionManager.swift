@@ -28,7 +28,6 @@ class TransitionManager: NSObject, UIViewControllerAnimatedTransitioning  {
         self.show = show
     }
 
-
     func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
 
         let fromView = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey)!
@@ -70,8 +69,6 @@ class TransitionManager: NSObject, UIViewControllerAnimatedTransitioning  {
     }
 
     func transitionDuration(transitionContext: UIViewControllerContextTransitioning) -> NSTimeInterval {
-//        return 2.0
-//        return 4.0
         return 0.4
     }
 }
