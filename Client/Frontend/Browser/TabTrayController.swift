@@ -26,14 +26,15 @@ public struct TabTrayControllerUX {
 
 private protocol TabCellDelegate: class {
     func tabCellDidClose(cell: TabCell)
-    func cellHeightForCurrentDevice() -> CGFloat
 }
 
 private class TabCell: UICollectionViewCell {
     static let Identifier = "TabCellIdentifier"
 
     lazy var tabView: TabContentView = {
-        return TabContentView()
+        let tabView = TabContentView()
+        tabView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        return tabView
     }()
 
     var animator: SwipeAnimator!
@@ -47,16 +48,15 @@ private class TabCell: UICollectionViewCell {
             UIAccessibilityCustomAction(name: NSLocalizedString("Close", comment: "Accessibility label for action denoting closing a tab in tab list (tray)"), target: self.animator, selector: "SELcloseWithoutGesture")
         ]
         
-        self.setNeedsUpdateConstraints()
+        self.setupConstraints()
     }
 
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private override func updateConstraints() {
-        super.updateConstraints()
-        self.tabView.snp_remakeConstraints { make in
+    private func setupConstraints() {
+        self.tabView.snp_makeConstraints { make in
             make.top.bottom.left.right.equalTo(self.contentView)
         }
     }
@@ -74,7 +74,20 @@ private class TabCell: UICollectionViewCell {
 class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     var tabManager: TabManager!
     var profile: Profile!
-    var numberOfColumns: Int!
+
+    lazy var numberOfColumns: Int = {
+        return self.numberOfColumnsForTraitCollection(self.traitCollection)
+    }()
+
+    var cellHeight: CGFloat {
+        if self.traitCollection.verticalSizeClass == .Compact {
+            return TabTrayControllerUX.TextBoxHeight * 5
+        } else if self.traitCollection.horizontalSizeClass == .Compact {
+            return TabTrayControllerUX.TextBoxHeight * 5
+        } else {
+            return TabTrayControllerUX.TextBoxHeight * 8
+        }
+    }
 
     lazy var navBar: UINavigationBar = {
         let navBar = UINavigationBar()
@@ -116,11 +129,9 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
     // MARK: View Controller Overrides and Callbacks
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        view.accessibilityLabel = NSLocalizedString("Tabs Tray", comment: "Accessibility label for the Tabs Tray view.")
         tabManager.addDelegate(self)
 
-        numberOfColumns = self.numberOfColumnsForTraitCollection(self.traitCollection)
+        view.accessibilityLabel = NSLocalizedString("Tabs Tray", comment: "Accessibility label for the Tabs Tray view.")
 
         self.view.addSubview(collectionView)
         self.view.addSubview(navBar)
@@ -156,9 +167,9 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
     }
 
     private func numberOfColumnsForTraitCollection(traitCollection: UITraitCollection) -> Int {
-        if traitCollection.verticalSizeClass == UIUserInterfaceSizeClass.Compact {
+        if traitCollection.verticalSizeClass == .Compact {
             return TabTrayControllerUX.NumberOfColumnsRegular
-        } else if traitCollection.horizontalSizeClass == UIUserInterfaceSizeClass.Compact {
+        } else if traitCollection.horizontalSizeClass == .Compact {
             return TabTrayControllerUX.NumberOfColumnsCompact
         } else {
             return TabTrayControllerUX.NumberOfColumnsRegular
@@ -168,9 +179,6 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
     override func willTransitionToTraitCollection(newCollection: UITraitCollection, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         super.willTransitionToTraitCollection(newCollection, withTransitionCoordinator: coordinator)
         self.numberOfColumns = self.numberOfColumnsForTraitCollection(newCollection)
-        coordinator.animateAlongsideTransition({ context in
-            self.collectionView.collectionViewLayout.invalidateLayout()
-        }, completion: nil)
     }
 
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
@@ -180,16 +188,6 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
 
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
         return UIStatusBarStyle.LightContent
-    }
-
-    func cellHeightForCurrentDevice() -> CGFloat {
-        if self.traitCollection.verticalSizeClass == .Compact {
-            return TabTrayControllerUX.TextBoxHeight * 5
-        } else if self.traitCollection.horizontalSizeClass == .Compact {
-            return TabTrayControllerUX.TextBoxHeight * 5
-        } else {
-            return TabTrayControllerUX.TextBoxHeight * 8
-        }
     }
 
     // MARK: Selectors
@@ -249,7 +247,7 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
 
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
         let cellWidth = (collectionView.bounds.width - TabTrayControllerUX.Margin * CGFloat(numberOfColumns + 1)) / CGFloat(numberOfColumns)
-        return CGSizeMake(cellWidth, self.cellHeightForCurrentDevice())
+        return CGSizeMake(cellWidth, self.cellHeight)
     }
 
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
@@ -299,6 +297,7 @@ extension TabTrayController: Transitionable {
 
             // Layout tab tray view to let the collection view get it's frame
             self.view.layoutIfNeeded()
+            self.collectionView.contentOffset = browserViewController.savedTabContentOffset ?? CGPointZero
 
             // Add in collection view snapshot for animation
             let imageView = UIImageView(image: browserViewController.tabTraySnapshot)
@@ -389,6 +388,7 @@ extension TabTrayController: Transitionable {
             // Store the snapshot in the BVC so we can use it when transitioning back
             if let browserViewController = options.toView as? BrowserViewController, let snapshot = containerSnapshot.image {
                 browserViewController.tabTraySnapshot = snapshot
+                browserViewController.savedTabContentOffset = self.collectionView.contentOffset
             }
         }
     }

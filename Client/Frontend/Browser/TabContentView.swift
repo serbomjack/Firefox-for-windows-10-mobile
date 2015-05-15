@@ -6,8 +6,10 @@ import Foundation
 import UIKit
 import SnapKit
 
-let TitleMargin = CGFloat(6)
-let CloseButtonInset = CGFloat(10)
+private class TabContentViewUX {
+    static let TitleMargin = CGFloat(6)
+    static let CloseButtonInset = CGFloat(10)
+}
 
 /**
 *  Used to display the content within a Tab cell that's shown in the TabTrayController
@@ -57,10 +59,10 @@ class TabContentView: UIView {
         let closeButton = UIButton()
         closeButton.setImage(UIImage(named: "stop"), forState: UIControlState.Normal)
         closeButton.imageEdgeInsets = UIEdgeInsets(
-            top: CloseButtonInset,
-            left: CloseButtonInset,
-            bottom: CloseButtonInset,
-            right: CloseButtonInset)
+            top: TabContentViewUX.CloseButtonInset,
+            left: TabContentViewUX.CloseButtonInset,
+            bottom: TabContentViewUX.CloseButtonInset,
+            right: TabContentViewUX.CloseButtonInset)
         return closeButton
     }()
 
@@ -73,6 +75,10 @@ class TabContentView: UIView {
     lazy var toolbar: BrowserToolbar = {
         let toolbar = BrowserToolbar()
         return toolbar
+    }()
+
+    private lazy var innerBorder: InnerStrokedView = {
+        return InnerStrokedView()
     }()
 
     private var titleContainerHeight: Constraint?
@@ -95,6 +101,7 @@ class TabContentView: UIView {
         self.addSubview(self.toolbar)
         self.addSubview(self.background)
         self.addSubview(self.titleContainer)
+        self.addSubview(self.innerBorder)
 
         self.setupConstraints()
     }
@@ -103,11 +110,15 @@ class TabContentView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func setupConstraints() {
+    private func setupConstraints() {
         self.background.snp_makeConstraints { make in
-            make.bottom.left.right.equalTo(self)
+            make.left.right.equalTo(self)
             self.backgroundTop = make.top.equalTo(self).constraint
             self.backgroundBottom = make.bottom.equalTo(self).constraint
+        }
+
+        self.innerBorder.snp_makeConstraints { make in
+            make.left.right.top.bottom.equalTo(self.background)
         }
 
         self.urlBar.snp_makeConstraints { make in
@@ -128,15 +139,15 @@ class TabContentView: UIView {
         }
 
         self.favicon.snp_makeConstraints { make in
-            make.left.equalTo(TitleMargin)
+            make.left.equalTo(self).offset(TabContentViewUX.TitleMargin)
             make.centerY.equalTo(self.titleContainer)
             make.size.equalTo(TabTrayControllerUX.FaviconSize)
         }
 
         self.titleText.snp_makeConstraints { make in
             make.centerY.equalTo(self.titleContainer)
-            make.left.equalTo(self.favicon.snp_right).offset(TitleMargin)
-            make.right.equalTo(self.closeButton.snp_left).offset(TitleMargin)
+            make.left.equalTo(self.favicon.snp_right).offset(TabContentViewUX.TitleMargin)
+            make.right.equalTo(self.closeButton.snp_left).offset(TabContentViewUX.TitleMargin)
             make.height.equalTo(self)
         }
 
@@ -153,6 +164,7 @@ class TabContentView: UIView {
         self.titleText.alpha = 0
         self.closeButton.alpha = 0
         self.favicon.alpha = 0
+        self.innerBorder.alpha = 0
 
         if !self.urlBar.toolbarIsShowing {
             self.backgroundBottom?.updateOffset(-AppConstants.ToolbarHeight)
@@ -167,6 +179,7 @@ class TabContentView: UIView {
         self.titleText.alpha = 1
         self.closeButton.alpha = 1
         self.favicon.alpha = 1
+        self.innerBorder.alpha = 1
 
         if !self.urlBar.toolbarIsShowing {
             self.backgroundBottom?.updateOffset(0)
@@ -178,28 +191,29 @@ class TabContentView: UIView {
 
 // A transparent view with a rectangular border with rounded corners, stroked
 // with a semi-transparent white border.
-//private class InnerStrokedView: UIView {
-//    override init(frame: CGRect) {
-//        super.init(frame: frame)
-//        self.backgroundColor = UIColor.clearColor()
-//    }
-//
-//    required init(coder aDecoder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//
-//    override func drawRect(rect: CGRect) {
-//        let strokeWidth = 1.0 as CGFloat
-//        let halfWidth = strokeWidth/2 as CGFloat
-//
-//        let path = UIBezierPath(roundedRect: CGRect(x: halfWidth,
-//            y: halfWidth,
-//            width: rect.width - strokeWidth,
-//            height: rect.height - strokeWidth),
-//            cornerRadius: TabTrayControllerUX.CornerRadius)
-//        
-//        path.lineWidth = strokeWidth
-//        UIColor.whiteColor().colorWithAlphaComponent(0.2).setStroke()
-//        path.stroke()
-//    }
-//}
+private class InnerStrokedView: UIView {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.backgroundColor = UIColor.clearColor()
+    }
+
+    required init(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func drawRect(rect: CGRect) {
+        super.drawRect(rect)
+        let strokeWidth = CGFloat(1)
+        let halfWidth = strokeWidth / 2
+
+        let path = UIBezierPath(roundedRect: CGRect(x: halfWidth,
+            y: halfWidth,
+            width: rect.width - strokeWidth,
+            height: rect.height - strokeWidth),
+            cornerRadius: TabTrayControllerUX.CornerRadius)
+        
+        path.lineWidth = strokeWidth
+        UIColor.whiteColor().colorWithAlphaComponent(0.2).setStroke()
+        path.stroke()
+    }
+}
