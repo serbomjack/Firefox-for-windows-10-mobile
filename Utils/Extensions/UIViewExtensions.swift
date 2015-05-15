@@ -14,7 +14,7 @@ extension UIView {
         let offset = offset ?? CGPointMake(0, 0)
 
         UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.mainScreen().scale * quality)
-        drawViewHierarchyInRect(CGRect(origin: offset, size: frame.size), afterScreenUpdates: false)
+        drawViewHierarchyInRect(CGRect(origin: offset, size: frame.size), afterScreenUpdates: true)
         var image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
 

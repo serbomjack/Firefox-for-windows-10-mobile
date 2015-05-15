@@ -297,10 +297,11 @@ extension TabTrayController: Transitionable {
 
             // Layout tab tray view to let the collection view get it's frame
             self.view.layoutIfNeeded()
-            self.collectionView.contentOffset = browserViewController.savedTabContentOffset ?? CGPointZero
+            self.collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: tabManager.selectedIndex, inSection: 0), atScrollPosition: .Top, animated: false)
 
             // Add in collection view snapshot for animation
-            let imageView = UIImageView(image: browserViewController.tabTraySnapshot)
+            let snapshot = self.collectionView.screenshot(self.collectionView.frame.size, offset: nil, quality: 1)
+            let imageView = UIImageView(image: snapshot)
             imageView.frame = self.scaledDownSnapshotFrame()
             imageView.alpha = 0
             self.collectionView.alpha = 0
@@ -384,12 +385,6 @@ extension TabTrayController: Transitionable {
             fakeTabView.removeFromSuperview()
             containerSnapshot.removeFromSuperview()
             self.collectionView.alpha = 1
-
-            // Store the snapshot in the BVC so we can use it when transitioning back
-            if let browserViewController = options.toView as? BrowserViewController, let snapshot = containerSnapshot.image {
-                browserViewController.tabTraySnapshot = snapshot
-                browserViewController.savedTabContentOffset = self.collectionView.contentOffset
-            }
         }
     }
 }

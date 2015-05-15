@@ -37,9 +37,6 @@ class BrowserViewController: UIViewController {
     private let snackBars = UIView()
     private let auralProgress = AuralProgressBar()
 
-    var tabTraySnapshot: UIImage? = nil
-    var savedTabContentOffset: CGPoint? = nil
-
     // This is public because the AppDelegate needs it when showing the settings. This is unfortunate
     // and we should find a way to better organize that code in the future.
     var tabManager: TabManager!
