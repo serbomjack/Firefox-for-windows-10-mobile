@@ -20,6 +20,7 @@ class TabContentView: UIView {
         browserImageView.clipsToBounds = true
         browserImageView.alignLeft = true
         browserImageView.alignTop = true
+        browserImageView.backgroundColor = UIColor.whiteColor()
         return browserImageView
     }()
 
@@ -40,6 +41,7 @@ class TabContentView: UIView {
         title.layer.shadowOpacity = 0.2
         title.layer.shadowOffset = CGSize(width: 0, height: 0.5)
         title.layer.shadowRadius = 0
+        title.clipsToBounds = true
         return title
     }()
 
@@ -69,12 +71,12 @@ class TabContentView: UIView {
     }()
 
     private var titleContainerHeight: Constraint?
-    private var urlBarTop: Constraint?
+    private var backgroundTop: Constraint?
 
     var expanded: Bool = false {
         didSet {
             self.titleContainerHeight?.updateOffset(self.expanded ? 0 : TabTrayControllerUX.TextBoxHeight)
-            self.urlBarTop?.updateOffset(self.expanded ? 0 : -AppConstants.ToolbarHeight)
+            self.backgroundTop?.updateOffset(self.expanded ? AppConstants.ToolbarHeight + AppConstants.StatusBarHeight : 0)
         }
     }
 
@@ -94,44 +96,45 @@ class TabContentView: UIView {
         self.addSubview(self.background)
         self.addSubview(self.titleContainer)
 
-        self.updateConstraints()
+        self.setupConstraints()
     }
 
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func updateConstraints() {
-        super.updateConstraints()
-
-        self.background.snp_remakeConstraints { make in
-            make.bottom.top.left.right.equalTo(self)
+    func setupConstraints() {
+        self.background.snp_makeConstraints { make in
+            make.bottom.left.right.equalTo(self)
+            self.backgroundTop = make.top.equalTo(self).constraint
         }
 
-        self.urlBar.snp_remakeConstraints { make in
-            make.left.right.equalTo(self)
-            self.urlBarTop = make.top.equalTo(self).constraint
-        }
-
-        self.titleContainer.snp_remakeConstraints { make in
+        self.urlBar.snp_makeConstraints { make in
             make.left.right.top.equalTo(self)
+
+            //TODO: URLBarView needs to be updated without status bar height included
+            make.height.equalTo(AppConstants.ToolbarHeight + AppConstants.StatusBarHeight)
+        }
+
+        self.titleContainer.snp_makeConstraints { make in
+            make.left.right.top.equalTo(background)
             self.titleContainerHeight = make.height.equalTo(TabTrayControllerUX.TextBoxHeight).constraint
         }
 
-        self.favicon.snp_remakeConstraints { make in
+        self.favicon.snp_makeConstraints { make in
             make.left.equalTo(TitleMargin)
             make.centerY.equalTo(self.titleContainer)
             make.size.equalTo(TabTrayControllerUX.FaviconSize)
         }
 
-        self.titleText.snp_remakeConstraints { make in
+        self.titleText.snp_makeConstraints { make in
             make.centerY.equalTo(self.titleContainer)
             make.left.equalTo(self.favicon.snp_right).offset(TitleMargin)
             make.right.equalTo(self.closeButton.snp_left).offset(TitleMargin)
             make.height.equalTo(self)
         }
 
-        self.closeButton.snp_remakeConstraints { make in
+        self.closeButton.snp_makeConstraints { make in
             make.right.equalTo(self.titleContainer)
             make.centerY.equalTo(self.titleContainer)
             make.size.equalTo(self.titleContainer.snp_height)
