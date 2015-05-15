@@ -24,10 +24,6 @@ public struct TabTrayControllerUX {
     static let NavButtonMargin = CGFloat(10)
 }
 
-private protocol TabCellDelegate: class {
-    func tabCellDidClose(cell: TabCell)
-}
-
 private class TabCell: UICollectionViewCell {
     static let Identifier = "TabCellIdentifier"
 
@@ -38,7 +34,6 @@ private class TabCell: UICollectionViewCell {
     }()
 
     var animator: SwipeAnimator!
-    weak var delegate: TabCellDelegate?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -64,10 +59,6 @@ private class TabCell: UICollectionViewCell {
     private override func layoutSubviews() {
         super.layoutSubviews()
         self.animator.originalCenter = self.tabView.center
-    }
-
-    @objc func SELdidPressClose() {
-        delegate?.tabCellDidClose(self)
     }
 }
 
@@ -207,6 +198,13 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
         presentingViewController!.dismissViewControllerAnimated(true, completion: nil)
     }
 
+    func SELdidPressClose(sender: AnyObject) {
+        let index = (sender as! UIButton).tag
+        if let tab = tabManager[index] {
+            tabManager.removeTab(tab)
+        }
+    }
+
     // MARK: Collection View Delegate/Data Source
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         let tab = tabManager[indexPath.item]
@@ -217,7 +215,6 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(TabCell.Identifier, forIndexPath: indexPath) as! TabCell
         cell.animator.delegate = self
-        cell.delegate = self
 
         if let tab = tabManager[indexPath.item] {
             cell.tabView.titleText.text = tab.displayTitle
@@ -232,8 +229,8 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
             cell.tabView.background.image = tab.screenshot
         }
 
-        cell.tabView.closeButton.addTarget(cell,
-            action: "SELdidPressClose", forControlEvents: UIControlEvents.TouchUpInside)
+        cell.tabView.closeButton.tag = indexPath.row
+        cell.tabView.closeButton.addTarget(self, action: "SELdidPressClose:", forControlEvents: .TouchUpInside)
         return cell
     }
 
@@ -283,7 +280,6 @@ extension TabTrayController: Transitionable {
         } else {
             tabView.urlBar.setShowToolbar(false)
         }
-
         tabView.frame = frame
         tabView.layoutIfNeeded()
         tabView.urlBar.updateConstraintsIfNeeded()
@@ -413,14 +409,5 @@ extension TabTrayController: TabManagerDelegate {
 
     func tabManager(tabManager: TabManager, didRemoveTab tab: Browser, atIndex index: Int) {
         self.collectionView.deleteItemsAtIndexPaths([NSIndexPath(forItem: index, inSection: 0)])
-    }
-}
-
-extension TabTrayController: TabCellDelegate {
-    private func tabCellDidClose(cell: TabCell) {
-        let indexPath = collectionView.indexPathForCell(cell)!
-        if let tab = tabManager[indexPath.item] {
-            tabManager.removeTab(tab)
-        }
     }
 }

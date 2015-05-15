@@ -195,6 +195,7 @@ private class InnerStrokedView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = UIColor.clearColor()
+        self.userInteractionEnabled = false
     }
 
     required init(coder aDecoder: NSCoder) {
