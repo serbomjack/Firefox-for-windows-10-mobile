@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import Foundation
 import UIKit
+import SnapKit
 
 public struct TabTrayControllerUX {
     static let CornerRadius = CGFloat(4.0)
@@ -21,10 +21,11 @@ public struct TabTrayControllerUX {
     static let CloseButtonEdgeInset = CGFloat(10)
     static let NumberOfColumnsCompact = 1
     static let NumberOfColumnsRegular = 3
+    static let NavButtonMargin = CGFloat(10)
 }
 
-private protocol CustomCellDelegate: class {
-    func customCellDidClose(cell: TabCell)
+private protocol TabCellDelegate: class {
+    func tabCellDidClose(cell: TabCell)
     func cellHeightForCurrentDevice() -> CGFloat
 }
 
@@ -35,17 +36,8 @@ private class TabCell: UICollectionViewCell {
         return TabContentView()
     }()
 
-    var tab: Browser? {
-        didSet {
-            self.tabView.titleText.text = tab?.title
-            if let favIcon = tab?.displayFavicon {
-                self.tabView.favicon.sd_setImageWithURL(NSURL(string: favIcon.url)!)
-            }
-        }
-    }
-
     var animator: SwipeAnimator!
-    weak var delegate: CustomCellDelegate?
+    weak var delegate: TabCellDelegate?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -71,17 +63,11 @@ private class TabCell: UICollectionViewCell {
 
     private override func layoutSubviews() {
         super.layoutSubviews()
-        self.animator.originalCenter = CGPoint(x: self.frame.width / 2, y: self.frame.height / 2)
-    }
-
-    private override func prepareForReuse() {
-        // Reset any close animations.
-        self.tabView.transform = CGAffineTransformIdentity
-        self.tabView.alpha = 1
+        self.animator.originalCenter = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMinY(self.frame))
     }
 
     @objc func SELdidPressClose() {
-        delegate?.customCellDidClose(self)
+        delegate?.tabCellDidClose(self)
     }
 }
 
@@ -124,6 +110,9 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
         return collectionView
     }()
 
+    private var settingsLeft: Constraint?
+    private var addTabRight: Constraint?
+
     // MARK: View Controller Overrides and Callbacks
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -138,28 +127,26 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
         self.view.addSubview(addTabButton)
         self.view.addSubview(settingsButton)
 
-        self.updateViewConstraints()
+        self.setupConstraints()
     }
 
-    override func updateViewConstraints() {
-        super.updateViewConstraints()
-
-        navBar.snp_remakeConstraints { make in
+    private func setupConstraints() {
+        navBar.snp_makeConstraints { make in
             let topLayoutGuide = self.topLayoutGuide as! UIView
             make.top.equalTo(topLayoutGuide.snp_bottom)
             make.left.right.equalTo(self.view)
         }
 
-        addTabButton.snp_remakeConstraints { make in
+        addTabButton.snp_makeConstraints { make in
             make.centerY.equalTo(self.navBar)
             make.size.equalTo(self.navBar.snp_height)
-            make.rightMargin.equalTo(10)
+            self.addTabRight = make.right.equalTo(self.navBar).offset(-TabTrayControllerUX.NavButtonMargin).constraint
         }
 
-        settingsButton.snp_remakeConstraints { make in
+        settingsButton.snp_makeConstraints { make in
             make.centerY.equalTo(self.navBar)
             make.size.equalTo(self.navBar.snp_height)
-            make.leftMargin.equalTo(10)
+            self.settingsLeft = make.left.equalTo(self.navBar).offset(TabTrayControllerUX.NavButtonMargin).constraint
         }
 
         collectionView.snp_makeConstraints { make in
@@ -268,13 +255,25 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
 
 extension TabTrayController: Transitionable {
 
-    private func tabViewFromBrowser(#frame: CGRect, titleText: String, backgroundImage: UIImage?, favIconString: String, hasToolbar: Bool) -> TabContentView {
+    private func tabViewFromBrowser(browser: Browser?, frame: CGRect) -> TabContentView {
         let tabView = TabContentView()
-        tabView.background.image = browser.screenshot
-        tabView.titleText.text = titleText
-        tabView.favicon.sd_setImageWithURL(NSURL(string: favIconString))
+        tabView.background.image = browser?.screenshot
+        tabView.titleText.text = browser?.displayTitle
+
+        if let favIconUrlString = browser?.displayFavicon?.url {
+            tabView.favicon.sd_setImageWithURL(NSURL(string: favIconUrlString))
+        }
+
+        // Show toolbar if we're on a smaller device, or else show it as part of the url bar
+        if self.traitCollection.verticalSizeClass == .Compact || self.traitCollection.horizontalSizeClass == .Regular {
+            tabView.urlBar.setShowToolbar(true)
+        } else {
+            tabView.urlBar.setShowToolbar(false)
+        }
+
         tabView.frame = frame
         tabView.layoutIfNeeded()
+        tabView.urlBar.updateConstraintsIfNeeded()
         return tabView
     }
 
@@ -283,14 +282,14 @@ extension TabTrayController: Transitionable {
            let container = options.container,
            let browser = tabManager.selectedTab {
 
-            let tabView = self.tabViewFromBrowser(
-                frame: browserViewController.view.frame,
-                browser.displayTitle,
-                backgroundImage: browser.screenshot,
-                favIconString: browser.displayFavicon
-                hasToolbar: false)
-
+            let tabView = self.tabViewFromBrowser(browser, frame: browserViewController.view.frame)
+            tabView.showExpanded()
             container.addSubview(tabView)
+
+            // Layout tab tray view to let the collection view get it's frame
+            self.view.layoutIfNeeded()
+            tabView.layoutIfNeeded()
+
             options.moving = tabView
         }
     }
@@ -299,6 +298,7 @@ extension TabTrayController: Transitionable {
         let attributes = self.collectionView.layoutAttributesForItemAtIndexPath(NSIndexPath(forItem: self.tabManager.selectedIndex, inSection: 0))
         if var cellRect = attributes?.frame, let browser = tabManager.selectedTab {
             cellRect = self.collectionView.convertRect(cellRect, toView: self.view)
+            let selectedTabView = self.tabViewFromBrowser(browser, frame: cellRect)
             self.view.addSubview(selectedTabView)
             options.moving = selectedTabView
         }
@@ -306,9 +306,13 @@ extension TabTrayController: Transitionable {
 
     func transitionableWillHide(transitionable: Transitionable, options: TransitionOptions) {
         if let fakeTabView = options.moving as? TabContentView {
+            addTabRight?.updateOffset(addTabButton.frame.size.width + TabTrayControllerUX.NavButtonMargin)
+            settingsLeft?.updateOffset(-(settingsButton.frame.size.width + TabTrayControllerUX.NavButtonMargin))
+            self.view.layoutIfNeeded()
+
             fakeTabView.frame = self.view.frame
             fakeTabView.layer.cornerRadius = 0
-            fakeTabView.expanded = true
+            fakeTabView.showExpanded()
             fakeTabView.layoutIfNeeded()
         }
     }
@@ -316,9 +320,14 @@ extension TabTrayController: Transitionable {
     func transitionableWillShow(transitionable: Transitionable, options: TransitionOptions) {
         let attributes = self.collectionView.layoutAttributesForItemAtIndexPath(NSIndexPath(forItem: self.tabManager.selectedIndex, inSection: 0))
         if var cellRect = attributes?.frame, let fakeTabView = options.moving as? TabContentView {
+            addTabRight?.updateOffset(-TabTrayControllerUX.NavButtonMargin)
+            settingsLeft?.updateOffset(TabTrayControllerUX.NavButtonMargin)
+            self.view.layoutIfNeeded()
+
+            cellRect = self.collectionView.convertRect(cellRect, toView: self.view)
             fakeTabView.frame = cellRect
             fakeTabView.layer.cornerRadius = TabTrayControllerUX.CornerRadius
-            fakeTabView.expanded = false
+            fakeTabView.showCollapsed()
             fakeTabView.layoutIfNeeded()
         }
     }
@@ -343,7 +352,6 @@ extension TabTrayController: SwipeAnimatorDelegate {
 
 extension TabTrayController: TabManagerDelegate {
     func tabManager(tabManager: TabManager, didSelectedTabChange selected: Browser?, previous: Browser?) {
-        // Our UI doesn't care about what's selected
     }
 
     func tabManager(tabManager: TabManager, didCreateTab tab: Browser) {
@@ -358,39 +366,11 @@ extension TabTrayController: TabManagerDelegate {
     }
 }
 
-extension TabTrayController: CustomCellDelegate {
-    private func customCellDidClose(cell: TabCell) {
+extension TabTrayController: TabCellDelegate {
+    private func tabCellDidClose(cell: TabCell) {
         let indexPath = collectionView.indexPathForCell(cell)!
         if let tab = tabManager[indexPath.item] {
             tabManager.removeTab(tab)
         }
     }
 }
-
-// A transparent view with a rectangular border with rounded corners, stroked
-// with a semi-transparent white border.
-//private class InnerStrokedView: UIView {
-//    override init(frame: CGRect) {
-//        super.init(frame: frame)
-//        self.backgroundColor = UIColor.clearColor()
-//    }
-//
-//    required init(coder aDecoder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//
-//    override func drawRect(rect: CGRect) {
-//        let strokeWidth = 1.0 as CGFloat
-//        let halfWidth = strokeWidth/2 as CGFloat
-//
-//        let path = UIBezierPath(roundedRect: CGRect(x: halfWidth,
-//            y: halfWidth,
-//            width: rect.width - strokeWidth,
-//            height: rect.height - strokeWidth),
-//            cornerRadius: TabTrayControllerUX.CornerRadius)
-//        
-//        path.lineWidth = strokeWidth
-//        UIColor.whiteColor().colorWithAlphaComponent(0.2).setStroke()
-//        path.stroke()
-//    }
-//}

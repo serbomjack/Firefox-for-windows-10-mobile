@@ -70,15 +70,14 @@ class TabContentView: UIView {
         return urlBar
     }()
 
+    lazy var toolbar: BrowserToolbar = {
+        let toolbar = BrowserToolbar()
+        return toolbar
+    }()
+
     private var titleContainerHeight: Constraint?
     private var backgroundTop: Constraint?
-
-    var expanded: Bool = false {
-        didSet {
-            self.titleContainerHeight?.updateOffset(self.expanded ? 0 : TabTrayControllerUX.TextBoxHeight)
-            self.backgroundTop?.updateOffset(self.expanded ? AppConstants.ToolbarHeight + AppConstants.StatusBarHeight : 0)
-        }
-    }
+    private var backgroundBottom: Constraint?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -93,6 +92,7 @@ class TabContentView: UIView {
         self.titleContainer.addSubview(self.favicon)
 
         self.addSubview(self.urlBar)
+        self.addSubview(self.toolbar)
         self.addSubview(self.background)
         self.addSubview(self.titleContainer)
 
@@ -107,6 +107,7 @@ class TabContentView: UIView {
         self.background.snp_makeConstraints { make in
             make.bottom.left.right.equalTo(self)
             self.backgroundTop = make.top.equalTo(self).constraint
+            self.backgroundBottom = make.bottom.equalTo(self).constraint
         }
 
         self.urlBar.snp_makeConstraints { make in
@@ -114,6 +115,11 @@ class TabContentView: UIView {
 
             //TODO: URLBarView needs to be updated without status bar height included
             make.height.equalTo(AppConstants.ToolbarHeight + AppConstants.StatusBarHeight)
+        }
+
+        self.toolbar.snp_makeConstraints { make in
+            make.left.right.bottom.equalTo(self)
+            make.height.equalTo(AppConstants.ToolbarHeight)
         }
 
         self.titleContainer.snp_makeConstraints { make in
@@ -140,4 +146,60 @@ class TabContentView: UIView {
             make.size.equalTo(self.titleContainer.snp_height)
         }
     }
+
+    func showExpanded() {
+        self.titleContainerHeight?.updateOffset(0)
+        self.backgroundTop?.updateOffset(AppConstants.ToolbarHeight + AppConstants.StatusBarHeight)
+        self.titleText.alpha = 0
+        self.closeButton.alpha = 0
+        self.favicon.alpha = 0
+
+        if !self.urlBar.toolbarIsShowing {
+            self.backgroundBottom?.updateOffset(-AppConstants.ToolbarHeight)
+        }
+
+        self.setNeedsLayout()
+    }
+
+    func showCollapsed() {
+        self.titleContainerHeight?.updateOffset(TabTrayControllerUX.TextBoxHeight)
+        self.backgroundTop?.updateOffset(0)
+        self.titleText.alpha = 1
+        self.closeButton.alpha = 1
+        self.favicon.alpha = 1
+
+        if !self.urlBar.toolbarIsShowing {
+            self.backgroundBottom?.updateOffset(0)
+        }
+
+        self.setNeedsLayout()
+    }
 }
+
+// A transparent view with a rectangular border with rounded corners, stroked
+// with a semi-transparent white border.
+//private class InnerStrokedView: UIView {
+//    override init(frame: CGRect) {
+//        super.init(frame: frame)
+//        self.backgroundColor = UIColor.clearColor()
+//    }
+//
+//    required init(coder aDecoder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
+//
+//    override func drawRect(rect: CGRect) {
+//        let strokeWidth = 1.0 as CGFloat
+//        let halfWidth = strokeWidth/2 as CGFloat
+//
+//        let path = UIBezierPath(roundedRect: CGRect(x: halfWidth,
+//            y: halfWidth,
+//            width: rect.width - strokeWidth,
+//            height: rect.height - strokeWidth),
+//            cornerRadius: TabTrayControllerUX.CornerRadius)
+//        
+//        path.lineWidth = strokeWidth
+//        UIColor.whiteColor().colorWithAlphaComponent(0.2).setStroke()
+//        path.stroke()
+//    }
+//}
