@@ -5,6 +5,7 @@
 @objc
 class TransitionOptions {
     var container: UIView? = nil
+    var containerSnapshot: UIImageView? = nil
     var moving: UIView? = nil
     var fromView: UIViewController? = nil
     var toView: UIViewController? = nil
@@ -69,6 +70,6 @@ class TransitionManager: NSObject, UIViewControllerAnimatedTransitioning  {
     }
 
     func transitionDuration(transitionContext: UIViewControllerContextTransitioning) -> NSTimeInterval {
-        return 6
+        return 0.4
     }
 }

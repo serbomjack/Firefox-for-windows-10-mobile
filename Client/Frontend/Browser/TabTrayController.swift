@@ -63,7 +63,7 @@ private class TabCell: UICollectionViewCell {
 
     private override func layoutSubviews() {
         super.layoutSubviews()
-        self.animator.originalCenter = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMinY(self.frame))
+        self.animator.originalCenter = self.tabView.center
     }
 
     @objc func SELdidPressClose() {
@@ -120,7 +120,7 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
         view.accessibilityLabel = NSLocalizedString("Tabs Tray", comment: "Accessibility label for the Tabs Tray view.")
         tabManager.addDelegate(self)
 
-        numberOfColumns = numberOfColumnsForCurrentSize()
+        numberOfColumns = self.numberOfColumnsForTraitCollection(self.traitCollection)
 
         self.view.addSubview(collectionView)
         self.view.addSubview(navBar)
@@ -155,29 +155,37 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
         }
     }
 
-    override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        numberOfColumns = numberOfColumnsForCurrentSize()
-    }
-
-    override func preferredStatusBarStyle() -> UIStatusBarStyle {
-        return UIStatusBarStyle.LightContent
-    }
-
-    private func numberOfColumnsForCurrentSize() -> Int {
-        if self.traitCollection.verticalSizeClass == UIUserInterfaceSizeClass.Compact {
+    private func numberOfColumnsForTraitCollection(traitCollection: UITraitCollection) -> Int {
+        if traitCollection.verticalSizeClass == UIUserInterfaceSizeClass.Compact {
             return TabTrayControllerUX.NumberOfColumnsRegular
-        } else if self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClass.Compact {
+        } else if traitCollection.horizontalSizeClass == UIUserInterfaceSizeClass.Compact {
             return TabTrayControllerUX.NumberOfColumnsCompact
         } else {
             return TabTrayControllerUX.NumberOfColumnsRegular
         }
     }
 
+    override func willTransitionToTraitCollection(newCollection: UITraitCollection, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        super.willTransitionToTraitCollection(newCollection, withTransitionCoordinator: coordinator)
+        self.numberOfColumns = self.numberOfColumnsForTraitCollection(newCollection)
+        coordinator.animateAlongsideTransition({ context in
+            self.collectionView.collectionViewLayout.invalidateLayout()
+        }, completion: nil)
+    }
+
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        self.collectionView.collectionViewLayout.invalidateLayout()
+    }
+
+    override func preferredStatusBarStyle() -> UIStatusBarStyle {
+        return UIStatusBarStyle.LightContent
+    }
+
     func cellHeightForCurrentDevice() -> CGFloat {
-        if self.traitCollection.verticalSizeClass == UIUserInterfaceSizeClass.Compact {
+        if self.traitCollection.verticalSizeClass == .Compact {
             return TabTrayControllerUX.TextBoxHeight * 5
-        } else if self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClass.Compact {
+        } else if self.traitCollection.horizontalSizeClass == .Compact {
             return TabTrayControllerUX.TextBoxHeight * 5
         } else {
             return TabTrayControllerUX.TextBoxHeight * 8
@@ -255,6 +263,13 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
 
 extension TabTrayController: Transitionable {
 
+    private func scaledDownSnapshotFrame() -> CGRect {
+        let originalCenter = CGPoint(x: CGRectGetMidX(self.collectionView.frame), y: CGRectGetMidY(self.collectionView.frame))
+        var scaledRect = CGRectApplyAffineTransform(self.collectionView.frame, CGAffineTransformMakeScale(0.9, 0.9))
+        scaledRect.center = originalCenter
+        return scaledRect
+    }
+
     private func tabViewFromBrowser(browser: Browser?, frame: CGRect) -> TabContentView {
         let tabView = TabContentView()
         tabView.background.image = browser?.screenshot
@@ -282,59 +297,99 @@ extension TabTrayController: Transitionable {
            let container = options.container,
            let browser = tabManager.selectedTab {
 
-            let tabView = self.tabViewFromBrowser(browser, frame: browserViewController.view.frame)
-            tabView.showExpanded()
-            container.addSubview(tabView)
-
             // Layout tab tray view to let the collection view get it's frame
             self.view.layoutIfNeeded()
-            tabView.layoutIfNeeded()
 
+            // Add in collection view snapshot for animation
+            let imageView = UIImageView(image: browserViewController.tabTraySnapshot)
+            imageView.frame = self.scaledDownSnapshotFrame()
+            imageView.alpha = 0
+            self.collectionView.alpha = 0
+            container.addSubview(imageView)
+
+            // Add fake tab to view hierarchy for animation
+            let tabView = self.tabViewFromBrowser(browser, frame: browserViewController.view.frame)
+            tabView.showExpanded()
+            tabView.layoutIfNeeded()
+            container.addSubview(tabView)
+
+            options.containerSnapshot = imageView
             options.moving = tabView
         }
     }
 
     func transitionablePreHide(transitionable: Transitionable, options: TransitionOptions) {
-        let attributes = self.collectionView.layoutAttributesForItemAtIndexPath(NSIndexPath(forItem: self.tabManager.selectedIndex, inSection: 0))
-        if var cellRect = attributes?.frame, let browser = tabManager.selectedTab {
-            cellRect = self.collectionView.convertRect(cellRect, toView: self.view)
-            let selectedTabView = self.tabViewFromBrowser(browser, frame: cellRect)
-            self.view.addSubview(selectedTabView)
-            options.moving = selectedTabView
+        if let container = options.container {
+            // Take a snapshot of the collection view so we can zoom/scale out the whole view
+            let snapshot = self.collectionView.screenshot(self.collectionView.frame.size, offset: nil, quality: 1)
+            let imageView = UIImageView(image: snapshot)
+            imageView.frame = self.collectionView.frame
+            container.addSubview(imageView)
+
+            self.collectionView.alpha = 0
+            options.containerSnapshot = imageView
+
+            // Insert a copy of the TabCell's content view for animation
+            let attributes = self.collectionView.layoutAttributesForItemAtIndexPath(NSIndexPath(forItem: self.tabManager.selectedIndex, inSection: 0))
+            if var cellRect = attributes?.frame, let browser = tabManager.selectedTab {
+                cellRect = self.collectionView.convertRect(cellRect, toView: self.view)
+                let selectedTabView = self.tabViewFromBrowser(browser, frame: cellRect)
+                container.addSubview(selectedTabView)
+                options.moving = selectedTabView
+            }
         }
     }
 
     func transitionableWillHide(transitionable: Transitionable, options: TransitionOptions) {
-        if let fakeTabView = options.moving as? TabContentView {
+        if let fakeTabView = options.moving as? TabContentView, let containerSnapshot = options.containerSnapshot {
+            // Animate nav buttons
             addTabRight?.updateOffset(addTabButton.frame.size.width + TabTrayControllerUX.NavButtonMargin)
             settingsLeft?.updateOffset(-(settingsButton.frame.size.width + TabTrayControllerUX.NavButtonMargin))
             self.view.layoutIfNeeded()
 
+            // Animate tab view to fill the screen
             fakeTabView.frame = self.view.frame
             fakeTabView.layer.cornerRadius = 0
             fakeTabView.showExpanded()
             fakeTabView.layoutIfNeeded()
+
+            // Animate the collection view snapshot
+            containerSnapshot.frame = self.scaledDownSnapshotFrame()
+            containerSnapshot.alpha = 0
         }
     }
 
     func transitionableWillShow(transitionable: Transitionable, options: TransitionOptions) {
         let attributes = self.collectionView.layoutAttributesForItemAtIndexPath(NSIndexPath(forItem: self.tabManager.selectedIndex, inSection: 0))
-        if var cellRect = attributes?.frame, let fakeTabView = options.moving as? TabContentView {
+        if var cellRect = attributes?.frame, let fakeTabView = options.moving as? TabContentView, let containerSnapshot = options.containerSnapshot {
+            // Animate nav buttons
             addTabRight?.updateOffset(-TabTrayControllerUX.NavButtonMargin)
             settingsLeft?.updateOffset(TabTrayControllerUX.NavButtonMargin)
             self.view.layoutIfNeeded()
 
+            // Animate the tab view to shrink to it's cell position
             cellRect = self.collectionView.convertRect(cellRect, toView: self.view)
             fakeTabView.frame = cellRect
             fakeTabView.layer.cornerRadius = TabTrayControllerUX.CornerRadius
             fakeTabView.showCollapsed()
             fakeTabView.layoutIfNeeded()
+
+            // Animate the collection view snapshot to full size
+            containerSnapshot.frame = self.collectionView.frame
+            containerSnapshot.alpha = 1
         }
     }
 
     func transitionableWillComplete(transitionable: Transitionable, options: TransitionOptions) {
-        if let fakeTabView = options.moving as? TabContentView {
+        if let fakeTabView = options.moving as? TabContentView, let containerSnapshot = options.containerSnapshot {
             fakeTabView.removeFromSuperview()
+            containerSnapshot.removeFromSuperview()
+            self.collectionView.alpha = 1
+
+            // Store the snapshot in the BVC so we can use it when transitioning back
+            if let browserViewController = options.toView as? BrowserViewController, let snapshot = containerSnapshot.image {
+                browserViewController.tabTraySnapshot = snapshot
+            }
         }
     }
 }
