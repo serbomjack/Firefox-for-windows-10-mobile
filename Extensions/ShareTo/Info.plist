@@ -21,7 +21,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>15</string>
+	<string>16</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionAttributes</key>
@@ -47,5 +47,7 @@
 		<string>FiraSans-UltraLight.ttf</string>
 		<string>FiraSans-Medium.ttf</string>
 	</array>
+	<key>LSApplicationCategoryType</key>
+	<string>Extensions/SendTo/Info.plist</string>
 </dict>
 </plist>
