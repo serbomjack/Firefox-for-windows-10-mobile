@@ -1,0 +1,9 @@
+/* For search suggestions prompt. This string should be short so it fits nicely on the prompt row. */
+"No" = "না";
+
+/* Prompt shown before enabling provider search queries */
+"Turn on search suggestions?" = "অনুসন্ধান পরামর্শ চালু করতে চান?";
+
+/* For search suggestions prompt. This string should be short so it fits nicely on the prompt row. */
+"Yes" = "হ্যাঁ";
+

@@ -1,0 +1,244 @@
+/* Label for search engine buttons. The argument corresponds to the name of the search engine. */
+"%@ search" = "Vyhľadávanie %@";
+
+/* Button for larger reader font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"+" = "+";
+
+/* Button for smaller reader font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"-" = "-";
+
+/* Button for reader mode font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"Aa" = "Aa";
+
+/* About settings section title */
+"About" = "Čo je";
+
+/* Accessibility label for address and search field, both words (Address, Search) are therefore nouns. */
+"Address and Search" = "Adresa a vyhľadávanie";
+
+/* Accessibility Label for the browser toolbar Back button */
+"Back" = "Naspäť";
+
+/* Accessibility Label for the browser toolbar Bookmark button */
+"Bookmark" = "Pridať medzi záložky";
+
+/* Panel accessibility label */
+"Bookmarks" = "Záložky";
+
+/* Alert Cancel Button
+   Authentication prompt cancel button
+   Button label to cancel entering a URL or search query
+   Cancel alert view
+   Cancel button
+   Cancel button in the 'disconnect firefox account' alert */
+"Cancel" = "Zrušiť";
+
+/* Copy the URL from the location bar */
+"Copy Address" = "Kopírovať adresu";
+
+/* Error message that is shown in settings when there was a problem connecting to Firefox Accounts */
+"Could not connect to Firefox Accounts." = "Nebolo možné pripojiť sa k účtu Firefox Account.";
+
+/* Dark theme setting in Reading View settings */
+"Dark" = "Tmavá";
+
+/* Accessibility label for default search engine setting.
+   Title for default search engine picker.
+   Title for default search engine settings section. */
+"Default Search Engine" = "Predvolený vyhľadávací modul";
+
+/* Button in settings screen to disconnect from your account
+   Disconnect button in the 'disconnect firefox account' alert */
+"Disconnect" = "Odpojiť";
+
+/* Title of the 'disconnect firefox account' alert */
+"Disconnect Firefox Account?" = "Odpojiť sa z účtu Firefox Account?";
+
+/* Prompt for saving a password. The first parameter is the username being saved. The second parameter is the hostname of the site. */
+"Do you want to save the password for %1$@ on %2$@?" = "Chcete uložiť heslo pre %1$@ na %2$@?";
+
+/* Prompt for updating a password. The first parameter is the username being saved. The second parameter is the hostname of the site. */
+"Do you want to update the password for %1$@ on %2$@?" = "Chcete aktualizovať heslo pre %1$@ na %2$@?";
+
+/* Done button on left side of the Settings view controller title bar */
+"Done" = "Hotovo";
+
+/* No comment provided by engineer. */
+"Double tap and hold to open history" = "Históriu otvoríte dvojitým ťuknutím a podržaním";
+
+/* Text message in the settings table view */
+"Enter your password to connect." = "Na pripojenie zadajte svoje heslo";
+
+/* Text of the 'disconnect firefox account' alert */
+"Firefox will stop syncing with your account, but won’t delete any of your browsing data on this device." = "Firefox sa už viac nebude synchronizovať s vašim účtom, ale neodstráni z toho zariadenia žiadne z údajov prehliadania.";
+
+/* Accessibility Label for the browser toolbar Forward button */
+"Forward" = "Dopredu";
+
+/* Panel accessibility label */
+"History" = "História";
+
+/* History tableview section header */
+"Last month" = "Posledný mesiac";
+
+/* Remote tabs last synced time */
+"Last synced: %@" = "Posledná synchronizácia: %@";
+
+/* History tableview section header */
+"Last week" = "Posledný týždeň";
+
+/* Light theme setting in Reading View settings */
+"Light" = "Svetlá";
+
+/* Name for Mark as read button in reader mode
+   Title for the button that marks a reading list item as read */
+"Mark as Read" = "Označiť ako prečítané";
+
+/* Name for Mark as unread button in reader mode
+   Title for the button that marks a reading list item as unread */
+"Mark as Unread" = "Označiť ako neprečítané";
+
+/* Error for a missing remote error number */
+"Missing error" = "Chýba číslo chyby";
+
+/* Error for a missing remote error message */
+"Missing message" = "Chýba chybová správa";
+
+/* Prompt title for application update */
+"New version available" = "Je dostupná nová verzia";
+
+/* Label for button to cancel application update prompt */
+"Not Now" = "Teraz nie";
+
+/* Button to not save the user's password */
+"Not now" = "Teraz nie";
+
+/* Alert OK Button
+   Label for OK button in the application update prompt
+   OK button */
+"OK" = "OK";
+
+/* Opening an external URL */
+"Opening %@" = "Otvára sa %@";
+
+/* Paste the URL into the location bar */
+"Paste" = "Prilepiť";
+
+/* Paste the URL into the location bar and visit */
+"Paste & Go" = "Prilepiť a prejsť";
+
+/* Title for quick-search engines settings section. */
+"Quick-search Engines" = "Moduly pre rýchle vyhľadávanie";
+
+/* Browser function that presents simplified version of the page with bigger text. */
+"Reader" = "Čítačka";
+
+/* Accessibility label for the reader mode button */
+"Reader Mode" = "Režim Čítačka";
+
+/* Panel accessibility label */
+"Reading list" = "Zoznam na prečítanie";
+
+/* Header for bookmarks list */
+"Recent Bookmarks" = "Najnovšie záložky";
+
+/* Accessibility Label for the browser toolbar Reload button */
+"Reload" = "Znova načítať";
+
+/* Title for the button that removes a reading list item */
+"Remove" = "Odstrániť";
+
+/* Font type setting in the reading view settings */
+"Sans-serif" = "Bezpätkové";
+
+/* Button to save the user's password */
+"Save" = "Uložiť";
+
+/* Navigation title for search settings.
+   Open search section of settings */
+"Search" = "Vyhľadávanie";
+
+/* Search settings section title */
+"Search Settings" = "Nastavenie vyhľadávania";
+
+/* The text shown in the URL bar on about:home */
+"Search or enter address" = "Zadajte vyhľadávanie alebo adresu";
+
+/* Accessibility label for the lock icon, which is only present if the connection is secure */
+"Secure connection" = "Bezpečné pripojenie";
+
+/* Sepia theme setting in Reading View settings */
+"Sepia" = "Sépia";
+
+/* Font type setting in the reading view settings */
+"Serif" = "Pätkové";
+
+/* Accessibility label for the Settings button in the Tab Tray.
+   Settings */
+"Settings" = "Nastavenia";
+
+/* Accessibility Label for the browser toolbar Share button */
+"Share" = "Zdieľať";
+
+/* Accessibility Label for the tabs button in the browser toolbar */
+"Show Tabs" = "Zobraziť karty";
+
+/* Label for show search suggestions setting. */
+"Show search suggestions" = "Zobrazovať návrhy vyhľadávania";
+
+/* Button that leads to Sign in section of the Settings sheet.
+   Text message / button in the settings table view */
+"Sign in" = "Prihlásiť sa";
+
+/* Accessibility Label for the browser toolbar Stop button */
+"Stop" = "Zastaviť";
+
+/* Panel accessibility label */
+"Synced tabs" = "Synchronizované karty";
+
+/* Accessibility label for the Tabs Tray view. */
+"Tabs Tray" = "Tray kariet";
+
+/* No comment provided by engineer. */
+"Tap to reload page" = "Ťuknutím znova načítate stránku";
+
+/* No comment provided by engineer. */
+"Tap to reload the page" = "Ťuknutím znova načítate stránku";
+
+/* No comment provided by engineer. */
+"Tap to stop loading the page" = "Ťuknutím zastavíte načítavanie stránky";
+
+/* Prompt message for application update */
+"There is a new version available of Firefox Aurora. Tap OK to go to the download page." = "Je dostupná nová verzia prehliadača Firefox Aurora. Ťuknutím na OK prejdete na stránku, kde si ju môžete prevziať.";
+
+/* Error displayed when reader mode cannot be enabled */
+"There was an error converting the page" = "Pri konverzii stránky sa vyskytla chyba";
+
+/* Opening an external app */
+"This will open in another application" = "Toto bude otvorené v ďalšej aplikácii";
+
+/* History tableview section header */
+"Today" = "Dnes";
+
+/* Panel accessibility label */
+"Top sites" = "Top stránky";
+
+/* Button to update the user's password */
+"Update" = "Aktualizovať";
+
+/* Text message in the settings table view */
+"Upgrade Firefox to connect." = "Aby ste sa mohli pripojiť, aktualizujte Firefox.";
+
+/* Text message in the settings table view */
+"Verify your email address." = "Overte svoju e-mailovú adresu.";
+
+/* Version number of Firefox shown in settings */
+"Version %1$@ (%2$@)" = "Verzia %1$@ (%2$@)";
+
+/* Accessibility label for the main web content view
+   Accessibility label for the web view */
+"Web content" = "Webový obsah";
+
+/* History tableview section header */
+"Yesterday" = "Včera";
+
