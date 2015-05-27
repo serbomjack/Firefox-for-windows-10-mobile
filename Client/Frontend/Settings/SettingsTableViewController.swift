@@ -398,9 +398,9 @@ private class ClearPrivateDataSetting: Setting {
     }
 
     override func onClick(navigationController: UINavigationController?) {
-        let clearable = EverythingClearable(profile: profile, tabmanager: tabManager)
+        let clearable = EverythingClearable(profile: profile, tabManager: tabManager)
 
-        var title: String { return NSLocalizedString("Clear Everything", tableName: "ClearPrivateData", comment: "Title of the Clear private data dialog.") }
+        var title: String { return NSLocalizedString("Clear Everything", tableName: "ClearPrivateData", comment: "Title of the Clear Private Data dialog.") }
         var message: String { return NSLocalizedString("Are you sure you want to clear all of your data? \n This will also close all open tabs.", tableName: "ClearPrivateData", comment: "Message shown in the dialog prompting users if they want to clear everything") }
 
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.ActionSheet)
