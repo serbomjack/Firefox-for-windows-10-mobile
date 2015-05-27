@@ -72,15 +72,7 @@ class PasswordsClearable : Clearable {
 // Clear the web cache. Note, this has to close all open tabs in order to ensure the data
 // cached in them isn't flushed to disk.
 class CacheClearable : Clearable {
-    let tabManager: TabManager
-    init(tabManager: TabManager) {
-        self.tabManager = tabManager
-    }
-
     func clear() -> Success {
-        // First ensure we close all open tabs first.
-        tabManager.removeAll()
-
         // Remove the basic cache.
         NSURLCache.sharedURLCache().removeAllCachedResponses()
 
@@ -99,18 +91,23 @@ class CacheClearable : Clearable {
     }
 }
 
-// Removes all site data stored for sites. This should include things like IndexedDB or websql storage.
-class SiteDataClearable : Clearable {
+class CloseTabsClearable: Clearable {
     let tabManager: TabManager
     init(tabManager: TabManager) {
         self.tabManager = tabManager
     }
 
     func clear() -> Success {
-        // First, close all tabs to make sure they don't hold any thing in memory.
+        // First, close all tabs to make sure they don't hold anything in memory.
         tabManager.removeAll()
+        return succeed()
+    }
+}
 
-        // Then we just wipe the WebKit directory from our Library.
+// Removes all site data stored for sites. This should include things like IndexedDB or websql storage.
+class SiteDataClearable: Clearable {
+    func clear() -> Success {
+        // Just wipe the WebKit directory from our Library.
         let manager = NSFileManager.defaultManager()
         let url = manager.URLsForDirectory(NSSearchPathDirectory.LibraryDirectory, inDomains: .UserDomainMask)[0] as! NSURL
         let file = url.path!.stringByAppendingPathComponent("WebKit")
@@ -122,17 +119,9 @@ class SiteDataClearable : Clearable {
 }
 
 // Remove all cookies stored by the site.
-class CookiesClearable : Clearable {
-    let tabManager: TabManager
-    init(tabManager: TabManager) {
-        self.tabManager = tabManager
-    }
-
+class CookiesClearable: Clearable {
     func clear() -> Success {
-        // First close all tabs to make sure they aren't holding anything in memory.
-        tabManager.removeAll()
-
-        // Now we wipe the system cookie store (for our app).
+        // Wipe the system cookie store (for our app).
         let storage = NSHTTPCookieStorage.sharedHTTPCookieStorage()
         if let cookies = storage.cookies {
             for cookie in cookies {
