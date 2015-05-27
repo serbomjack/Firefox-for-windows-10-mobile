@@ -161,12 +161,7 @@ class EverythingClearable: Clearable {
     }
 
     func clear() -> Success {
-        let deferred = Success()
-        all(clearables.map({ clearable in
-            clearable.clear()
-        })).upon({ result in
-            deferred.fill(Result(success: ()))
-        })
-        return deferred
+        // We ignore failures, but we run sequentially.
+        return walk(clearables, { $0.clear().bind { res in succeed() } })
     }
 }
