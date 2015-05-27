@@ -91,17 +91,20 @@ class TopSitesPanel: UIViewController, UICollectionViewDelegate, HomePanel {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        dataSource = TopSitesDataSource(profile: profile, data: Cursor(status: .Failure, msg: "Nothing loaded yet"))
 
         layout.registerClass(TopSitesSeparator.self, forDecorationViewOfKind: SeparatorKind)
 
         collection = TopSitesCollectionView(frame: self.view.frame, collectionViewLayout: layout)
+        dataSource = TopSitesDataSource(profile: profile, data: Cursor(status: .Failure, msg: "Nothing loaded yet"), collectionView: collection)
+
         collection.backgroundColor = AppConstants.PanelBackgroundColor
         collection.delegate = self
         collection.dataSource = dataSource
         collection.registerClass(ThumbnailCell.self, forCellWithReuseIdentifier: ThumbnailIdentifier)
         collection.registerClass(TwoLineCollectionViewCell.self, forCellWithReuseIdentifier: RowIdentifier)
         collection.keyboardDismissMode = .OnDrag
+
+
         view.addSubview(collection)
         collection.snp_makeConstraints { make in
             make.edges.equalTo(self.view)
@@ -254,10 +257,12 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
     lazy var suggestedSites: SuggestedSitesData<Tile> = {
         return SuggestedSitesData<Tile>()
     }()
+    weak var collection: UICollectionView?
 
-    init(profile: Profile, data: Cursor<Site>) {
+    init(profile: Profile, data: Cursor<Site>, collectionView: UICollectionView) {
         self.data = data
         self.profile = profile
+        self.collection = collectionView
     }
 
     @objc func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -295,6 +300,7 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
         cell.imagePadding = 0
         cell.isAccessibilityElement = true
         cell.accessibilityLabel = cell.textLabel.text
+        cell.animator.delegate = self
         return cell
     }
 
@@ -321,6 +327,7 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
         cell.imageView.contentMode = UIViewContentMode.ScaleAspectFit
         cell.isAccessibilityElement = true
         cell.accessibilityLabel = cell.textLabel.text
+        cell.animator.delegate = self
         return cell
     }
 
@@ -369,6 +376,23 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
     
     @objc func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
         return collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: SeparatorIdentifier, forIndexPath: indexPath) as! UICollectionReusableView
+    }
+}
+
+extension TopSitesDataSource: SwipeAnimatorDelegate {
+    func swipeAnimator(animator: SwipeAnimator, viewDidExitContainerBounds: UIView) {
+        let thumbnail = animator.container as! ThumbnailCell
+        if let collection = collection, let indexPath = collection.indexPathForCell(thumbnail) {
+            collection.performBatchUpdates({ _ in
+                collection.deleteItemsAtIndexPaths([indexPath])
+            }, completion: { finished in
+                    if finished {
+                        collection.invalidateIntrinsicContentSize()
+                        // Update the collection view's height since we might have removed enough to
+                        // adjust the height
+                    }
+            })
+        }
     }
 }
 

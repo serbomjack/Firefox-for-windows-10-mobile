@@ -20,14 +20,27 @@ class ThumbnailCell: UICollectionViewCell {
     let textLabel = UILabel()
     let imageView = UIImageViewAligned()
     let imageWrapper = UIView()
+    let container = UIView()
+
+    override var bounds: CGRect {
+        didSet {
+            contentView.frame = bounds
+            self.animator.originalCenter = contentView.center
+        }
+    }
+
+    lazy var animator: SwipeAnimator = {
+        return SwipeAnimator(animatingView: self.container, containerView: self)
+    }()
 
     override init(frame: CGRect) {
         imagePadding = CGFloat(0)
         super.init(frame: frame)
 
-        contentView.addSubview(textLabel)
-        contentView.addSubview(imageWrapper)
         imageWrapper.addSubview(imageView)
+        container.addSubview(textLabel)
+        container.addSubview(imageWrapper)
+        contentView.addSubview(container)
 
         imageWrapper.layer.borderColor = ThumbnailCellUX.BorderColor.CGColor
         imageWrapper.layer.borderWidth = 1
@@ -35,7 +48,7 @@ class ThumbnailCell: UICollectionViewCell {
         imageWrapper.clipsToBounds = true
 
         imageWrapper.snp_remakeConstraints({ make in
-            make.top.left.right.equalTo(self.contentView).insets(ThumbnailCellUX.Insets)
+            make.top.left.right.equalTo(self.container).insets(ThumbnailCellUX.Insets)
             make.width.equalTo(self.imageWrapper.snp_height).multipliedBy(ThumbnailCellUX.ImageAspectRatio)
         })
 
@@ -48,9 +61,13 @@ class ThumbnailCell: UICollectionViewCell {
         textLabel.textColor = ThumbnailCellUX.LabelColor
         textLabel.snp_remakeConstraints({ make in
             make.top.equalTo(self.imageWrapper.snp_bottom).offset(ThumbnailCellUX.TextOffset)
-            make.left.right.equalTo(self.contentView).insets(ThumbnailCellUX.Insets)
+            make.left.right.equalTo(self.container).insets(ThumbnailCellUX.Insets)
             return
         })
+
+        container.snp_makeConstraints { make in
+            make.top.left.bottom.right.equalTo(self)
+        }
     }
 
     required init(coder aDecoder: NSCoder) {
