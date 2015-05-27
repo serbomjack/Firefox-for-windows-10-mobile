@@ -149,13 +149,14 @@ class CookiesClearable: Clearable {
 class EverythingClearable: Clearable {
     private let clearables: [Clearable]
 
-    init(profile: Profile, tabmanager: TabManager) {
+    init(profile: Profile, tabManager: TabManager) {
         clearables = [
             HistoryClearable(profile: profile),
-            CacheClearable(tabManager: tabmanager),
-            CookiesClearable(tabManager: tabmanager),
-            SiteDataClearable(tabManager: tabmanager),
             PasswordsClearable(profile: profile),
+            CloseTabsClearable(tabManager: tabManager),
+            CacheClearable(),
+            CookiesClearable(),
+            SiteDataClearable(),
         ]
     }
 
