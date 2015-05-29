@@ -1,0 +1,244 @@
+/* Label for search engine buttons. The argument corresponds to the name of the search engine. */
+"%@ search" = "%@ buscar";
+
+/* Button for larger reader font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"+" = "+";
+
+/* Button for smaller reader font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"-" = "-";
+
+/* Button for reader mode font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"Aa" = "Aa";
+
+/* About settings section title */
+"About" = "Acerca de";
+
+/* Accessibility label for address and search field, both words (Address, Search) are therefore nouns. */
+"Address and Search" = "Búsqueda y dirección";
+
+/* Accessibility Label for the browser toolbar Back button */
+"Back" = "Atrás";
+
+/* Accessibility Label for the browser toolbar Bookmark button */
+"Bookmark" = "Marcador";
+
+/* Panel accessibility label */
+"Bookmarks" = "Marcadores";
+
+/* Alert Cancel Button
+   Authentication prompt cancel button
+   Button label to cancel entering a URL or search query
+   Cancel alert view
+   Cancel button
+   Cancel button in the 'disconnect firefox account' alert */
+"Cancel" = "Cancelar";
+
+/* Copy the URL from the location bar */
+"Copy Address" = "Copiar dirección";
+
+/* Error message that is shown in settings when there was a problem connecting to Firefox Accounts */
+"Could not connect to Firefox Accounts." = "No se pudo conectar a Cuentas de Firefox.";
+
+/* Dark theme setting in Reading View settings */
+"Dark" = "Oscuro";
+
+/* Accessibility label for default search engine setting.
+   Title for default search engine picker.
+   Title for default search engine settings section. */
+"Default Search Engine" = "Motor de búsqueda predeterminado.";
+
+/* Button in settings screen to disconnect from your account
+   Disconnect button in the 'disconnect firefox account' alert */
+"Disconnect" = "Desconectar";
+
+/* Title of the 'disconnect firefox account' alert */
+"Disconnect Firefox Account?" = "¿Desconectar cuenta de Firefox?";
+
+/* Prompt for saving a password. The first parameter is the username being saved. The second parameter is the hostname of the site. */
+"Do you want to save the password for %@ on %@?" = "¿Quieres guardar la contraseña de %1$@ en %2$@?";
+
+/* Prompt for updating a password. The first parameter is the username being saved. The second parameter is the hostname of the site. */
+"Do you want to update the password for %@ on %@?" = "¿Quieres actualizar la contraseña de %1$@ en %2$@?";
+
+/* Done button on left side of the Settings view controller title bar */
+"Done" = "Realizado";
+
+/* No comment provided by engineer. */
+"Double tap and hold to open history" = "Presione dos veces y mantenga para abrir el historial.";
+
+/* Text message in the settings table view */
+"Enter your password to connect." = "Introduzca su contraseña para conectar.";
+
+/* Text of the 'disconnect firefox account' alert */
+"Firefox will stop syncing with your account, but won’t delete any of your browsing data on this device." = "Firefox detendrá la sincronización con tu cuenta, pero no eliminará nada en tu historial de navegación en este dispositivo.";
+
+/* Accessibility Label for the browser toolbar Forward button */
+"Forward" = "Adelante";
+
+/* Panel accessibility label */
+"History" = "Historial";
+
+/* History tableview section header */
+"Last month" = "Último mes";
+
+/* Remote tabs last synced time */
+"Last synced: %@" = "Última sincronización: %@";
+
+/* History tableview section header */
+"Last week" = "Última semana";
+
+/* Light theme setting in Reading View settings */
+"Light" = "Claro";
+
+/* Name for Mark as read button in reader mode
+   Title for the button that marks a reading list item as read */
+"Mark as Read" = "Marcar como leído";
+
+/* Name for Mark as unread button in reader mode
+   Title for the button that marks a reading list item as unread */
+"Mark as Unread" = "Marcar como no leído";
+
+/* Error for a missing remote error number */
+"Missing error" = "Falta error";
+
+/* Error for a missing remote error message */
+"Missing message" = "Falta mensaje";
+
+/* Prompt title for application update */
+"New version available" = "Nueva versión disponible";
+
+/* Label for button to cancel application update prompt */
+"Not Now" = "Ahora no";
+
+/* Button to not save the user's password */
+"Not now" = "Ahora no";
+
+/* Alert OK Button
+   Label for OK button in the application update prompt
+   OK button */
+"OK" = "Aceptar";
+
+/* Opening an external URL */
+"Opening %@" = "Abriendo %@";
+
+/* Paste the URL into the location bar */
+"Paste" = "Pegar";
+
+/* Paste the URL into the location bar and visit */
+"Paste & Go" = "Pegar e ir";
+
+/* Title for quick-search engines settings section. */
+"Quick-search Engines" = "Motores de búsqueda rápida.";
+
+/* Browser function that presents simplified version of the page with bigger text. */
+"Reader" = "Lector";
+
+/* Accessibility label for the reader mode button */
+"Reader Mode" = "Modo de lector";
+
+/* Panel accessibility label */
+"Reading list" = "Lista de lectura";
+
+/* Header for bookmarks list */
+"Recent Bookmarks" = "Marcadores recientes";
+
+/* Accessibility Label for the browser toolbar Reload button */
+"Reload" = "Recargar";
+
+/* Title for the button that removes a reading list item */
+"Remove" = "Eliminar";
+
+/* Font type setting in the reading view settings */
+"Sans-serif" = "Sans-serif";
+
+/* Button to save the user's password */
+"Save" = "Guardar";
+
+/* Navigation title for search settings.
+   Open search section of settings */
+"Search" = "Búsqueda";
+
+/* Search settings section title */
+"Search Settings" = "Configuración de búsqueda";
+
+/* The text shown in the URL bar on about:home */
+"Search or enter address" = "Buscar o ingresar dirección";
+
+/* Accessibility label for the lock icon, which is only present if the connection is secure */
+"Secure connection" = "Conexión segura";
+
+/* Sepia theme setting in Reading View settings */
+"Sepia" = "Sepia";
+
+/* Font type setting in the reading view settings */
+"Serif" = "Serif";
+
+/* Accessibility label for the Settings button in the Tab Tray.
+   Settings */
+"Settings" = "Ajustes";
+
+/* Accessibility Label for the browser toolbar Share button */
+"Share" = "Compartir";
+
+/* Accessibility Label for the tabs button in the browser toolbar */
+"Show Tabs" = "Mostrar pestañas";
+
+/* Label for show search suggestions setting. */
+"Show search suggestions" = "Mostrar sugerencias de búsqueda";
+
+/* Button that leads to Sign in section of the Settings sheet.
+   Text message / button in the settings table view */
+"Sign in" = "Iniciar sesión";
+
+/* Accessibility Label for the browser toolbar Stop button */
+"Stop" = "Detener";
+
+/* Panel accessibility label */
+"Synced tabs" = "Pestañas sincronizadas";
+
+/* Accessibility label for the Tabs Tray view. */
+"Tabs Tray" = "Bandeja de pestañas";
+
+/* No comment provided by engineer. */
+"Tap to reload page" = "Tocar para recargar la página";
+
+/* No comment provided by engineer. */
+"Tap to reload the page" = "Tocar para recargar la página";
+
+/* No comment provided by engineer. */
+"Tap to stop loading the page" = "Tocar para detener la carda de la página";
+
+/* Prompt message for application update */
+"There is a new version available of Firefox Aurora. Tap OK to go to the download page." = "Hay una nueva versión de Firefox Aurora disponible. Tocar OK para ir a la página de descarga.";
+
+/* Error displayed when reader mode cannot be enabled */
+"There was an error converting the page" = "Hubo un error al convertir la página.";
+
+/* Opening an external app */
+"This will open in another application" = "Esto se abrirá en otra aplicación";
+
+/* History tableview section header */
+"Today" = "Hoy";
+
+/* Panel accessibility label */
+"Top sites" = "Sitios frecuentes.";
+
+/* Button to update the user's password */
+"Update" = "Actualizar";
+
+/* Text message in the settings table view */
+"Upgrade Firefox to connect." = "Actualizar Firefox para conectar";
+
+/* Text message in the settings table view */
+"Verify your email address." = "Verifica tu dirección de correo";
+
+/* Version number of Firefox shown in settings */
+"Version %@ (%@)" = "Versión %1$@ (%2$@)";
+
+/* Accessibility label for the main web content view
+   Accessibility label for the web view */
+"Web content" = "Contenido web";
+
+/* History tableview section header */
+"Yesterday" = "Ayer";
+

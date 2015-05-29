@@ -1,0 +1,244 @@
+/* Label for search engine buttons. The argument corresponds to the name of the search engine. */
+"%@ search" = "Cuardach %@";
+
+/* Button for larger reader font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"+" = "+";
+
+/* Button for smaller reader font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"-" = "-";
+
+/* Button for reader mode font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"Aa" = "Aa";
+
+/* About settings section title */
+"About" = "Maidir Leis";
+
+/* Accessibility label for address and search field, both words (Address, Search) are therefore nouns. */
+"Address and Search" = "Seoladh agus Cuardach";
+
+/* Accessibility Label for the browser toolbar Back button */
+"Back" = "Siar";
+
+/* Accessibility Label for the browser toolbar Bookmark button */
+"Bookmark" = "Leabharmharc";
+
+/* Panel accessibility label */
+"Bookmarks" = "Leabharmharcanna";
+
+/* Alert Cancel Button
+   Authentication prompt cancel button
+   Button label to cancel entering a URL or search query
+   Cancel alert view
+   Cancel button
+   Cancel button in the 'disconnect firefox account' alert */
+"Cancel" = "Cealaigh";
+
+/* Copy the URL from the location bar */
+"Copy Address" = "Cóipeáil Seoladh";
+
+/* Error message that is shown in settings when there was a problem connecting to Firefox Accounts */
+"Could not connect to Firefox Accounts." = "Níorbh fhéidir ceangal a bhunú le Cuntais Firefox.";
+
+/* Dark theme setting in Reading View settings */
+"Dark" = "Dorcha";
+
+/* Accessibility label for default search engine setting.
+   Title for default search engine picker.
+   Title for default search engine settings section. */
+"Default Search Engine" = "Inneall Cuardaigh Réamhshocraithe";
+
+/* Button in settings screen to disconnect from your account
+   Disconnect button in the 'disconnect firefox account' alert */
+"Disconnect" = "Dícheangail";
+
+/* Title of the 'disconnect firefox account' alert */
+"Disconnect Firefox Account?" = "Dícheangail do Chuntas Firefox?";
+
+/* Prompt for saving a password. The first parameter is the username being saved. The second parameter is the hostname of the site. */
+"Do you want to save the password for %@ on %@?" = "An bhfuil tú ag iarraidh an focal faire do %1$@ a shábháil ar %2$@?";
+
+/* Prompt for updating a password. The first parameter is the username being saved. The second parameter is the hostname of the site. */
+"Do you want to update the password for %@ on %@?" = "An bhfuil tú ag iarraidh an focal faire do %1$@ a nuashonrú ar %2$@?";
+
+/* Done button on left side of the Settings view controller title bar */
+"Done" = "Déanta";
+
+/* No comment provided by engineer. */
+"Double tap and hold to open history" = "Tapáil faoi dhó agus coinnigh síos é chun an stair a oscailt";
+
+/* Text message in the settings table view */
+"Enter your password to connect." = "Cuir isteach d\'fhocal faire le ceangal.";
+
+/* Text of the 'disconnect firefox account' alert */
+"Firefox will stop syncing with your account, but won’t delete any of your browsing data on this device." = "Stopfaidh Firefox sioncrónú le do chuntas, ach ní scriosfaimid aon sonraí brabhsála ar an ngléas seo.";
+
+/* Accessibility Label for the browser toolbar Forward button */
+"Forward" = "Ar Aghaidh";
+
+/* Panel accessibility label */
+"History" = "Stair";
+
+/* History tableview section header */
+"Last month" = "An mhí seo caite";
+
+/* Remote tabs last synced time */
+"Last synced: %@" = "Sioncrónú deireanach: %@";
+
+/* History tableview section header */
+"Last week" = "An tseachtain seo caite";
+
+/* Light theme setting in Reading View settings */
+"Light" = "Geal";
+
+/* Name for Mark as read button in reader mode
+   Title for the button that marks a reading list item as read */
+"Mark as Read" = "Marcáil “Léite”";
+
+/* Name for Mark as unread button in reader mode
+   Title for the button that marks a reading list item as unread */
+"Mark as Unread" = "Marcáil “Neamhléite”";
+
+/* Error for a missing remote error number */
+"Missing error" = "Earráid in easnamh";
+
+/* Error for a missing remote error message */
+"Missing message" = "Teachtaireacht in easnamh";
+
+/* Prompt title for application update */
+"New version available" = "Leagan nua ar fáil";
+
+/* Label for button to cancel application update prompt */
+"Not Now" = "Ní Anois";
+
+/* Button to not save the user's password */
+"Not now" = "Ní Anois";
+
+/* Alert OK Button
+   Label for OK button in the application update prompt
+   OK button */
+"OK" = "OK";
+
+/* Opening an external URL */
+"Opening %@" = "%@ á oscailt";
+
+/* Paste the URL into the location bar */
+"Paste" = "Greamaigh";
+
+/* Paste the URL into the location bar and visit */
+"Paste & Go" = "Greamaigh & Imigh";
+
+/* Title for quick-search engines settings section. */
+"Quick-search Engines" = "Innill Mhearchuardaigh";
+
+/* Browser function that presents simplified version of the page with bigger text. */
+"Reader" = "Léitheoir";
+
+/* Accessibility label for the reader mode button */
+"Reader Mode" = "Mód Léitheoireachta";
+
+/* Panel accessibility label */
+"Reading list" = "Liosta Léitheoireachta";
+
+/* Header for bookmarks list */
+"Recent Bookmarks" = "Na Leabharmharcanna Is Déanaí";
+
+/* Accessibility Label for the browser toolbar Reload button */
+"Reload" = "Athluchtaigh";
+
+/* Title for the button that removes a reading list item */
+"Remove" = "Bain";
+
+/* Font type setting in the reading view settings */
+"Sans-serif" = "Sans-serif";
+
+/* Button to save the user's password */
+"Save" = "Sábháil";
+
+/* Navigation title for search settings.
+   Open search section of settings */
+"Search" = "Cuardach";
+
+/* Search settings section title */
+"Search Settings" = "Socruithe Cuardaigh";
+
+/* The text shown in the URL bar on about:home */
+"Search or enter address" = "Cuardach nó seoladh Gréasáin";
+
+/* Accessibility label for the lock icon, which is only present if the connection is secure */
+"Secure connection" = "Ceangal slán";
+
+/* Sepia theme setting in Reading View settings */
+"Sepia" = "Donnrua";
+
+/* Font type setting in the reading view settings */
+"Serif" = "Serif";
+
+/* Accessibility label for the Settings button in the Tab Tray.
+   Settings */
+"Settings" = "Socruithe";
+
+/* Accessibility Label for the browser toolbar Share button */
+"Share" = "Comhroinn";
+
+/* Accessibility Label for the tabs button in the browser toolbar */
+"Show Tabs" = "Taispeáin Cluaisíní";
+
+/* Label for show search suggestions setting. */
+"Show search suggestions" = "Taispeáin moltaí cuardaigh";
+
+/* Button that leads to Sign in section of the Settings sheet.
+   Text message / button in the settings table view */
+"Sign in" = "Logáil isteach";
+
+/* Accessibility Label for the browser toolbar Stop button */
+"Stop" = "Stad";
+
+/* Panel accessibility label */
+"Synced tabs" = "Cluaisíní sioncrónaithe";
+
+/* Accessibility label for the Tabs Tray view. */
+"Tabs Tray" = "Tráidire na gCluaisíní";
+
+/* No comment provided by engineer. */
+"Tap to reload page" = "Tapáil leis an leathanach a athluchtú";
+
+/* No comment provided by engineer. */
+"Tap to reload the page" = "Tapáil leis an leathanach a athluchtú";
+
+/* No comment provided by engineer. */
+"Tap to stop loading the page" = "Tapáil chun lodáil an leathanaigh a stopadh";
+
+/* Prompt message for application update */
+"There is a new version available of Firefox Aurora. Tap OK to go to the download page." = "Tá leagan nua Firefox Aurora ar fáil. Tapáil OK chun dul chuig an leathanach íosluchtaithe.";
+
+/* Error displayed when reader mode cannot be enabled */
+"There was an error converting the page" = "Tharla earráid agus an leathanach á thiontú";
+
+/* Opening an external app */
+"This will open in another application" = "Osclófar i bhfeidhmchlár eile é seo";
+
+/* History tableview section header */
+"Today" = "Inniu";
+
+/* Panel accessibility label */
+"Top sites" = "Barrshuímh";
+
+/* Button to update the user's password */
+"Update" = "Nuashonraigh";
+
+/* Text message in the settings table view */
+"Upgrade Firefox to connect." = "Is gá Firefox a nuashonrú le ceangal.";
+
+/* Text message in the settings table view */
+"Verify your email address." = "Deimhnigh do sheoladh ríomhphoist.";
+
+/* Version number of Firefox shown in settings */
+"Version %@ (%@)" = "Leagan %1$@ (%2$@)";
+
+/* Accessibility label for the main web content view
+   Accessibility label for the web view */
+"Web content" = "Ábhar Gréasáin";
+
+/* History tableview section header */
+"Yesterday" = "Inné";
+

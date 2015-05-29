@@ -1,0 +1,6 @@
+/* Title of the dialog that allows you to send a tab to a different device */
+"Send To Device" = "Cuir gun uidheam";
+
+/* Text in a table view row that lets the user pick a device to which to send a tab to */
+"Send to %@" = "Cuir gu %@";
+

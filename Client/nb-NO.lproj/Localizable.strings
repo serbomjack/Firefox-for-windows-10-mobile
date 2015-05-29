@@ -1,0 +1,292 @@
+/* Label for search engine buttons. The argument corresponds to the name of the search engine. */
+"%@ search" = "%@ søk";
+
+/* Button for larger reader font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"+" = "+";
+
+/* Button for smaller reader font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"-" = "-";
+
+/* Authentication prompt message with no realm. Parameter is the hostname of the site */
+"A username and password are being requested by %@." = "Et brukernavn og passord blir forespurt av %@.";
+
+/* Authentication prompt message with a realm. First parameter is the hostname. Second is the realm string */
+"A username and password are being requested by %@. The site says: %@" = "Et brukernavn og passord blir forespurt av %1$@. Nettsiden sier: %2$@";
+
+/* Button for reader mode font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"Aa" = "Aa";
+
+/* About settings section title */
+"About" = "Om";
+
+/* Accessibility label for the Add Tab button in the Tab Tray. */
+"Add Tab" = "Legg til fane";
+
+/* Accessibility label for address and search field, both words (Address, Search) are therefore nouns. */
+"Address and Search" = "Adresse og søk";
+
+/* Authentication prompt title */
+"Authentication required" = "Krever godkjenning";
+
+/* Accessibility Label for the browser toolbar Back button */
+"Back" = "Tilbake";
+
+/* Accessibility Label for the browser toolbar Bookmark button */
+"Bookmark" = "Bokmerke";
+
+/* Panel accessibility label */
+"Bookmarks" = "Bokmerker";
+
+/* Alert Call Button */
+"Call" = "Ring";
+
+/* Alert Cancel Button
+   Authentication prompt cancel button
+   Button label to cancel entering a URL or search query
+   Cancel alert view
+   Cancel button
+   Cancel button in the 'disconnect firefox account' alert */
+"Cancel" = "Avbryt";
+
+/* Label used as an item in Settings. When touched it will open a dialog prompting the user to make sure they want to clear all of their private data. */
+"Clear private data" = "Slett private data";
+
+/* Accessibility label for action denoting closing a tab in tab list (tray) */
+"Close" = "Lukk";
+
+/* Copy the URL from the location bar */
+"Copy Address" = "Kopier adresse";
+
+/* Error message that is shown in settings when there was a problem connecting to Firefox Accounts */
+"Could not connect to Firefox Accounts." = "Kunne ikke koble til Firefox-kontoer.";
+
+/* Dark theme setting in Reading View settings */
+"Dark" = "Mørk";
+
+/* Debug option */
+"Debug: forget Sync auth state" = "Feilsøking: glem Sync autentiseringstilstand";
+
+/* Debug option */
+"Debug: require password" = "Feilsøking: krev passord";
+
+/* Debug option */
+"Debug: require upgrade" = "Feilsøking: krev oppgradering";
+
+/* Accessibility label for default search engine setting.
+   Title for default search engine picker.
+   Title for default search engine settings section. */
+"Default Search Engine" = "Standard søkemotor";
+
+/* Button in settings screen to disconnect from your account
+   Disconnect button in the 'disconnect firefox account' alert */
+"Disconnect" = "Koble fra";
+
+/* Title of the 'disconnect firefox account' alert */
+"Disconnect Firefox Account?" = "Koble fra Firefox-konto?";
+
+/* Prompt for saving a password. The first parameter is the username being saved. The second parameter is the hostname of the site. */
+"Do you want to save the password for %@ on %@?" = "Vil du lagre passordet for %1$@ på %2$@?";
+
+/* Prompt for updating a password. The first parameter is the username being saved. The second parameter is the hostname of the site. */
+"Do you want to update the password for %@ on %@?" = "Ønsker du å oppdatere passordet for %1$@ på %2$@?";
+
+/* Done button on left side of the Settings view controller title bar */
+"Done" = "Fullført";
+
+/* No comment provided by engineer. */
+"Double tap and hold to open history" = "Dobbeltrykk og hold for å åpne historikk";
+
+/* Text message in the settings table view */
+"Enter your password to connect." = "Skriv inn passord for å koble til.";
+
+/* Text of the 'disconnect firefox account' alert */
+"Firefox will stop syncing with your account, but won’t delete any of your browsing data on this device." = "Firefox vil stoppe synkroniseringen med kontoen din, men vil ikke slette noen av dine nettleserdata på denne enheten.";
+
+/* Accessibility Label for the browser toolbar Forward button */
+"Forward" = "Fremover";
+
+/* Panel accessibility label */
+"History" = "Historikk";
+
+/* History tableview section header */
+"Last month" = "Forrige måned";
+
+/* Remote tabs last synced time */
+"Last synced: %@" = "Siste synkronisering: %@";
+
+/* History tableview section header */
+"Last week" = "Forrige uke";
+
+/* Light theme setting in Reading View settings */
+"Light" = "Lys";
+
+/* Authentication prompt login button */
+"Login" = "Innloggning";
+
+/* Name for Mark as read button in reader mode
+   Title for the button that marks a reading list item as read */
+"Mark as Read" = "Merk som lest";
+
+/* Name for Mark as unread button in reader mode
+   Title for the button that marks a reading list item as unread */
+"Mark as Unread" = "Merk som ulest";
+
+/* Error for a missing remote error number */
+"Missing error" = "Manglende feil";
+
+/* Error for a missing remote error message */
+"Missing message" = "Manglende melding";
+
+/* Prompt title for application update */
+"New version available" = "Ny versjon tilgjengelig";
+
+/* Label for button to cancel application update prompt */
+"Not Now" = "Ikke nå";
+
+/* Button to not save the user's password */
+"Not now" = "Ikke nå";
+
+/* Alert OK Button
+   Label for OK button in the application update prompt
+   OK button */
+"OK" = "OK";
+
+/* Opening an external URL */
+"Opening %@" = "Åpner %@";
+
+/* Password textbox in Authentication prompt */
+"Password" = "Passord";
+
+/* Paste the URL into the location bar */
+"Paste" = "Lim inn";
+
+/* Paste the URL into the location bar and visit */
+"Paste & Go" = "Lim inn og åpne";
+
+/* Privacy section title */
+"Privacy" = "Personvern";
+
+/* Title for quick-search engines settings section. */
+"Quick-search Engines" = "Hurtigsøkemotorer";
+
+/* Browser function that presents simplified version of the page with bigger text. */
+"Reader" = "Leser";
+
+/* Accessibility label for the reader mode button */
+"Reader Mode" = "Lesemodus";
+
+/* Panel accessibility label */
+"Reading list" = "Leseliste";
+
+/* Header for bookmarks list */
+"Recent Bookmarks" = "Nyeste bokmerker";
+
+/* Accessibility Label for the browser toolbar Reload button */
+"Reload" = "Last på nytt";
+
+/* Title for the button that removes a reading list item */
+"Remove" = "Fjern";
+
+/* Font type setting in the reading view settings */
+"Sans-serif" = "Sans-serif";
+
+/* Button to save the user's password */
+"Save" = "Lagre";
+
+/* Navigation title for search settings.
+   Open search section of settings */
+"Search" = "Søk";
+
+/* Search settings section title */
+"Search Settings" = "Søkeinnstillinger";
+
+/* The text shown in the URL bar on about:home */
+"Search or enter address" = "Søk eller skriv inn adresse";
+
+/* Accessibility label for the lock icon, which is only present if the connection is secure */
+"Secure connection" = "Sikker tilkobling";
+
+/* Sepia theme setting in Reading View settings */
+"Sepia" = "Sepia";
+
+/* Font type setting in the reading view settings */
+"Serif" = "Serif";
+
+/* Accessibility label for the Settings button in the Tab Tray.
+   Settings */
+"Settings" = "Innstillinger";
+
+/* Accessibility Label for the browser toolbar Share button */
+"Share" = "Del";
+
+/* Accessibility Label for the tabs button in the browser toolbar */
+"Show Tabs" = "Vis faner";
+
+/* Label for show search suggestions setting. */
+"Show search suggestions" = "Vis søkeforslag";
+
+/* Button that leads to Sign in section of the Settings sheet.
+   Text message / button in the settings table view */
+"Sign in" = "Logg inn";
+
+/* Accessibility Label for the browser toolbar Stop button */
+"Stop" = "Stopp";
+
+/* Panel accessibility label */
+"Synced tabs" = "Synkroniserte faner";
+
+/* Accessibility label for the Tabs Tray view. */
+"Tabs Tray" = "Fanerad";
+
+/* No comment provided by engineer. */
+"Tap to reload page" = "Trykk for å laste om siden";
+
+/* No comment provided by engineer. */
+"Tap to reload the page" = "Trykk for å laste om siden";
+
+/* No comment provided by engineer. */
+"Tap to stop loading the page" = "Trykk for å stoppe lasting av siden";
+
+/* Prompt message for application update */
+"There is a new version available of Firefox Aurora. Tap OK to go to the download page." = "Det finnes en ny versjon av Firefox Aurora. Trykk OK for å gå til nedlastingssiden.";
+
+/* Error displayed when reader mode cannot be enabled */
+"There was an error converting the page" = "Det oppstod en feil under konvertering av siden";
+
+/* Opening an external app */
+"This will open in another application" = "Dette vil åpne i en annen app";
+
+/* History tableview section header */
+"Today" = "I dag";
+
+/* Panel accessibility label */
+"Top sites" = "Populære nettsider";
+
+/* Button to update the user's password */
+"Update" = "Oppdater";
+
+/* Text message in the settings table view */
+"Upgrade Firefox to connect." = "Oppgrader Firefox for å koble til.";
+
+/* Username textbox in Authentication prompt */
+"Username" = "Brukernavn";
+
+/* Text message in the settings table view */
+"Verify your email address." = "Bekreft din e-postadresse.";
+
+/* Version number of Firefox shown in settings */
+"Version %@ (%@)" = "Versjon %1$@ (%2$@)";
+
+/* Accessibility label for the main web content view
+   Accessibility label for the web view */
+"Web content" = "Nettinnhold";
+
+/* History tableview section header */
+"Yesterday" = "I går";
+
+/* Accessibility label for read article in reading list. It's a past participle - functions as an adjective. */
+"read" = "lest";
+
+/* Accessibility label for unread article in reading list. It's a past participle - functions as an adjective. */
+"unread" = "ulest";
+
