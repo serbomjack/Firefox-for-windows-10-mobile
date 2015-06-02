@@ -13,8 +13,10 @@ private struct URLBarViewUX {
     static let TextFieldActiveBorderColor = UIColor(rgb: 0x4A90E2)
     static let LocationLeftPadding = 5
     static let LocationHeight = 30
+    static let LocationTextOffset = 8
     static let TextFieldCornerRadius: CGFloat = 3
     static let TextFieldBorderWidth: CGFloat = 1
+    static let TextFieldTextOffset = UIOffsetMake(CGFloat(LocationTextOffset) + TextFieldBorderWidth, 5)
     // offset from edge of tabs button
     static let URLBarCurveOffset: CGFloat = 14
     // buffer so we dont see edges when animation overshoots with spring
@@ -56,6 +58,7 @@ class URLBarView: UIView {
         locationView.setTranslatesAutoresizingMaskIntoConstraints(false)
         locationView.readerModeState = ReaderModeState.Unavailable
         locationView.delegate = self
+        locationView.locationLabelOffset = URLBarViewUX.LocationTextOffset
         return locationView
     }()
 
@@ -75,6 +78,8 @@ class URLBarView: UIView {
         editTextField.hidden = true
         editTextField.accessibilityLabel = NSLocalizedString("Address and Search", comment: "Accessibility label for address and search field, both words (Address, Search) are therefore nouns.")
         editTextField.attributedPlaceholder = BrowserLocationView.PlaceholderText
+        editTextField.editingRectInset = URLBarViewUX.TextFieldTextOffset
+        editTextField.textRectInset = URLBarViewUX.TextFieldTextOffset
         return editTextField
     }()
 
@@ -649,13 +654,16 @@ private class CurveView: UIView {
 }
 
 private class ToolbarTextField: AutocompleteTextField {
+    var textRectInset: UIOffset = UIOffsetZero
+    var editingRectInset: UIOffset = UIOffsetZero
+
     override func textRectForBounds(bounds: CGRect) -> CGRect {
         let rect = super.textRectForBounds(bounds)
-        return rect.rectByInsetting(dx: 5, dy: 5)
+        return rect.rectByInsetting(dx: textRectInset.horizontal, dy: textRectInset.vertical)
     }
 
     override func editingRectForBounds(bounds: CGRect) -> CGRect {
         let rect = super.editingRectForBounds(bounds)
-        return rect.rectByInsetting(dx: 5, dy: 5)
+        return rect.rectByInsetting(dx:editingRectInset.horizontal, dy: editingRectInset.vertical)
     }
 }

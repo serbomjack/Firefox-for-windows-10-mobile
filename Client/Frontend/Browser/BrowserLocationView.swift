@@ -20,6 +20,8 @@ class BrowserLocationView : UIView, UIGestureRecognizerDelegate {
     private var readerModeButton: ReaderModeButton!
     var readerModeButtonWidthConstraint: NSLayoutConstraint?
 
+    var locationLabelOffset = 0
+
     static var PlaceholderText: NSAttributedString {
         let placeholderText = NSLocalizedString("Search or enter address", comment: "The text shown in the URL bar on about:home")
         return NSAttributedString(string: placeholderText, attributes: [NSForegroundColorAttributeName: UIColor.grayColor()])
@@ -70,22 +72,22 @@ class BrowserLocationView : UIView, UIGestureRecognizerDelegate {
 
         lockImageView.snp_remakeConstraints { make in
             make.centerY.equalTo(container)
-            make.leading.equalTo(container).offset(8)
+            make.leading.equalTo(container).offset(locationLabelOffset)
             make.width.equalTo(self.lockImageView.intrinsicContentSize().width)
         }
 
         locationLabel.snp_remakeConstraints { make in
             make.centerY.equalTo(container.snp_centerY)
             if self.url?.scheme == "https" {
-                make.leading.equalTo(self.lockImageView.snp_trailing).offset(8)
+                make.leading.equalTo(self.lockImageView.snp_trailing).offset(locationLabelOffset)
             } else {
-                make.leading.equalTo(container).offset(8)
+                make.leading.equalTo(container).offset(locationLabelOffset)
             }
 
             if self.readerModeButton.readerModeState == ReaderModeState.Unavailable {
-                make.trailing.equalTo(self).offset(-8)
+                make.trailing.equalTo(self).offset(-locationLabelOffset)
             } else {
-                make.trailing.equalTo(self.readerModeButton.snp_leading).offset(-8)
+                make.trailing.equalTo(self.readerModeButton.snp_leading).offset(-locationLabelOffset)
             }
         }
 
