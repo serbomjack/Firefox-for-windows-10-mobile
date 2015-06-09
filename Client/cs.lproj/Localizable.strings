@@ -1,0 +1,325 @@
+/* Button for larger reader font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"+" = "+";
+
+/* Button for smaller reader font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"-" = "-";
+
+/* Authentication prompt message with no realm. Parameter is the hostname of the site */
+"A username and password are being requested by %@." = "Server %@ požaduje uživatelské jméno a heslo.";
+
+/* Authentication prompt message with a realm. First parameter is the hostname. Second is the realm string */
+"A username and password are being requested by %@. The site says: %@" = "Server %@ požaduje uživatelské jméno a heslo. Sděluje: %2$@";
+
+/* Button for reader mode font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"Aa" = "Aa";
+
+/* About settings section title */
+"About" = "O aplikaci";
+
+/* Accessibility label for the Add Tab button in the Tab Tray. */
+"Add Tab" = "Přidat panel";
+
+/* Name for button adding current article to reading list in reader mode */
+"Add to Reading List" = "Přidat do Seznamu pro čtení";
+
+/* Accessibility label for address and search field, both words (Address, Search) are therefore nouns. */
+"Address and Search" = "Adresa a vyhledávání";
+
+/* Authentication prompt title */
+"Authentication required" = "Vyžadována autentizace";
+
+/* Accessibility Label for the browser toolbar Back button */
+"Back" = "Zpět";
+
+/* Accessibility Label for the browser toolbar Bookmark button */
+"Bookmark" = "Přidat do záložek";
+
+/* Panel accessibility label */
+"Bookmarks" = "Záložky";
+
+/* Accessibility label for brightness adjustment slider in Reader Mode display settings */
+"Brightness" = "Jas";
+
+/* Alert Call Button */
+"Call" = "Volat";
+
+/* Alert Cancel Button
+   Authentication prompt cancel button
+   Button label to cancel entering a URL or search query
+   Cancel alert view
+   Cancel button
+   Cancel button in the 'disconnect firefox account' alert */
+"Cancel" = "Zrušit";
+
+/* Accessibility hint for the color theme setting buttons in reader mode display settings */
+"Changes color theme." = "Změní barevné schéma.";
+
+/* Accessibility hint for the font type buttons in reader mode display settings */
+"Changes font type." = "Změní typ písma.";
+
+/* Label used as an item in Settings. When touched it will open a dialog prompting the user to make sure they want to clear all of their private data. */
+"Clear private data" = "Vymazat soukromá data";
+
+/* Accessibility label for action denoting closing a tab in tab list (tray) */
+"Close" = "Zavřít";
+
+/* Copy the URL from the location bar */
+"Copy Address" = "Zkopírovat adresu";
+
+/* Error message that is shown in settings when there was a problem connecting to Firefox Accounts */
+"Could not connect to Firefox Accounts." = "Nepodařilo se připojit k účtu Firefox Account.";
+
+/* Dark theme setting in Reading View settings */
+"Dark" = "Tmavé";
+
+/* Debug option */
+"Debug: forget Sync auth state" = "Ladění: zapomenout stav autentizace Sync";
+
+/* Debug option */
+"Debug: require password" = "Ladění: vyžadováno heslo";
+
+/* Debug option */
+"Debug: require upgrade" = "Ladění: vyžadována aktualizace";
+
+/* Accessibility label for button decreasing font size in display settings of reader mode */
+"Decrease text size" = "Zmenšit velikost písma";
+
+/* Accessibility label for default search engine setting.
+   Title for default search engine picker.
+   Title for default search engine settings section. */
+"Default Search Engine" = "Výchozí vyhledávací modul";
+
+/* Button in settings screen to disconnect from your account
+   Disconnect button in the 'disconnect firefox account' alert */
+"Disconnect" = "Odpojit";
+
+/* Title of the 'disconnect firefox account' alert */
+"Disconnect Firefox Account?" = "Odpojit od účtu Firefox Account?";
+
+/* Name for display settings button in reader mode. Display in the meaning of presentation, not monitor. */
+"Display Settings" = "Nastavení zobrazení";
+
+/* Prompt for saving a password. The first parameter is the username being saved. The second parameter is the hostname of the site. */
+"Do you want to save the password for %@ on %@?" = "Chcete uložit heslo pro %1$@ na %2$@?";
+
+/* Prompt for updating a password. The first parameter is the username being saved. The second parameter is the hostname of the site. */
+"Do you want to update the password for %@ on %@?" = "Chcete aktualizovat uložené heslo pro „%S“?";
+
+/* Done button on left side of the Settings view controller title bar */
+"Done" = "Hotovo";
+
+/* No comment provided by engineer. */
+"Double tap and hold to open history" = "Historii otevřete dvojklepnutím a podržením";
+
+/* Text message in the settings table view */
+"Enter your password to connect." = "Pro připojení vložte své heslo.";
+
+/* Text of the 'disconnect firefox account' alert */
+"Firefox will stop syncing with your account, but won’t delete any of your browsing data on this device." = "Firefox ukončí synchronizaci s tímto účtem, ale neodstraní žádnou historii prohlížení na tomto zařízení.";
+
+/* Accessibility Label for the browser toolbar Forward button */
+"Forward" = "Vpřed";
+
+/* Panel accessibility label */
+"History" = "Historie";
+
+/* Accessibility label for button increasing font size in display settings of reader mode */
+"Increase text size" = "Zvětšit velikost písma";
+
+/* History tableview section header */
+"Last month" = "Poslední měsíc";
+
+/* Remote tabs last synced time */
+"Last synced: %@" = "Poslední synchronizace: %@";
+
+/* History tableview section header */
+"Last week" = "Poslední týden";
+
+/* Light theme setting in Reading View settings */
+"Light" = "Světlý";
+
+/* Authentication prompt login button */
+"Login" = "Přihlášení";
+
+/* Name for Mark as read button in reader mode
+   Title for the button that marks a reading list item as read */
+"Mark as Read" = "Označit jako přečtené";
+
+/* Name for Mark as unread button in reader mode
+   Title for the button that marks a reading list item as unread */
+"Mark as Unread" = "Označit jako nepřečtené";
+
+/* Error for a missing remote error number */
+"Missing error" = "Chybějící kód chyby";
+
+/* Error for a missing remote error message */
+"Missing message" = "Chybějící zpráva";
+
+/* Prompt title for application update */
+"New version available" = "Je dostupná nová verze";
+
+/* Label for button to cancel application update prompt */
+"Not Now" = "Teď ne";
+
+/* Button to not save the user's password */
+"Not now" = "Teď ne";
+
+/* Alert OK Button
+   Label for OK button in the application update prompt
+   OK button */
+"OK" = "OK";
+
+/* Opening an external URL */
+"Opening %@" = "Otevřít %@";
+
+/* Password textbox in Authentication prompt */
+"Password" = "Heslo";
+
+/* Paste the URL into the location bar */
+"Paste" = "Vložit";
+
+/* Paste the URL into the location bar and visit */
+"Paste & Go" = "Vložit a přejít";
+
+/* Privacy section title */
+"Privacy" = "Soukromí";
+
+/* Title for quick-search engines settings section. */
+"Quick-search Engines" = "Moduly pro rychlé vyhledávání";
+
+/* Browser function that presents simplified version of the page with bigger text. */
+"Reader" = "Čtečka";
+
+/* Accessibility label for the reader mode button */
+"Reader Mode" = "Režim pro čtení";
+
+/* Panel accessibility label */
+"Reading list" = "Seznam ke čtení";
+
+/* Header for bookmarks list */
+"Recent Bookmarks" = "Poslední záložky";
+
+/* Accessibility Label for the browser toolbar Reload button */
+"Reload" = "Obnovit";
+
+/* Title for the button that removes a reading list item */
+"Remove" = "Odebrat";
+
+/* Name for button removing current article from reading list in reader mode */
+"Remove from Reading List" = "Odebrat ze Seznamu pro čtení";
+
+/* Font type setting in the reading view settings */
+"Sans-serif" = "Sans-serif";
+
+/* Button to save the user's password */
+"Save" = "Uložit";
+
+/* Navigation title for search settings.
+   Open search section of settings */
+"Search" = "Vyhledávání";
+
+/* Search settings section title */
+"Search Settings" = "Nastavení vyhledávání";
+
+/* The text shown in the URL bar on about:home */
+"Search or enter address" = "Hledat nebo vložit adresu";
+
+/* Accessibility label for the lock icon, which is only present if the connection is secure */
+"Secure connection" = "Zabezpečené spojení";
+
+/* Sepia theme setting in Reading View settings */
+"Sepia" = "Sépia";
+
+/* Font type setting in the reading view settings */
+"Serif" = "Serif";
+
+/* Accessibility label for the Settings button in the Tab Tray.
+   Settings */
+"Settings" = "Nastavení";
+
+/* Accessibility Label for the browser toolbar Share button */
+"Share" = "Sdílet";
+
+/* Accessibility label for the tabs button in the (top) browser toolbar
+   Accessibility Label for the tabs button in the browser toolbar */
+"Show Tabs" = "Zobrazit panely";
+
+/* Show the on-boarding screen again from the settings */
+"Show introduction again" = "Zobrazit znovu úvod";
+
+/* Label for show search suggestions setting. */
+"Show search suggestions" = "Zobrazovat našeptávač";
+
+/* Button that leads to Sign in section of the Settings sheet.
+   Text message / button in the settings table view */
+"Sign in" = "Přihlášení";
+
+/* Accessibility Label for the browser toolbar Stop button */
+"Stop" = "Zastavit";
+
+/* Support section title */
+"Support" = "Podpora";
+
+/* Panel accessibility label */
+"Synced tabs" = "Synchronizované panely";
+
+/* Accessibility label for the Tabs Tray view. */
+"Tabs Tray" = "Tray panelů";
+
+/* No comment provided by engineer. */
+"Tap to reload page" = "Klepněte pro opětovné načtení stránky";
+
+/* No comment provided by engineer. */
+"Tap to reload the page" = "Klepněte pro opětovné načtení stránky";
+
+/* No comment provided by engineer. */
+"Tap to stop loading the page" = "Klepněte pro ukončení načítání stránky";
+
+/* Prompt message for application update */
+"There is a new version available of Firefox Aurora. Tap OK to go to the download page." = "Je k dispozici nová verze Firefoxu Aurora. Chcete ji stáhnout?";
+
+/* Error displayed when reader mode cannot be enabled */
+"There was an error converting the page" = "Nepodařilo se převést stránku do režimu pro čtení";
+
+/* Opening an external app */
+"This will open in another application" = "Provede otevření v jiné aplikaci";
+
+/* History tableview section header */
+"Today" = "Dnes";
+
+/* Panel accessibility label */
+"Top sites" = "Top stránky";
+
+/* Button to update the user's password */
+"Update" = "Aktualizovat";
+
+/* Text message in the settings table view */
+"Upgrade Firefox to connect." = "Pro připojení aktualizujte Firefox.";
+
+/* Username textbox in Authentication prompt */
+"Username" = "Uživatelské jméno";
+
+/* Text message in the settings table view */
+"Verify your email address." = "Ověřte svou e-mailovou adresu.";
+
+/* Version number of Firefox shown in settings */
+"Version %@ (%@)" = "Verze %1$@ (%2$@)";
+
+/* Accessibility label for the main web content view */
+"Web content" = "Webový obsah";
+
+/* History tableview section header */
+"Yesterday" = "Včera";
+
+/* Accessibility label for Desktop Computer (PC) image in remote tabs list */
+"computer" = "počítač";
+
+/* Accessibility label for Mobile Device image in remote tabs list */
+"mobile device" = "mobilní zařízení";
+
+/* Accessibility label for read article in reading list. It's a past participle - functions as an adjective. */
+"read" = "přečteno";
+
+/* Accessibility label for unread article in reading list. It's a past participle - functions as an adjective. */
+"unread" = "nepřečteno";
+
