@@ -1,0 +1,24 @@
+/* The part between brackets is highlighted in styled text as if it is a link. */
+"<Show me how> to connect my other Firefox-enabled devices. This needs proper copy. Do not translate." = "<Anzeigen> wie ich meine anderen Geräte mit Firefox verbinden kann.";
+
+/* The part between brackets is highlighted in styled text as if it is a link. */
+"<Show me how> to login to my Firefox Account.  This needs proper copy. Do not translate." = "<Anzeigen> wie ich mich bei meinem Firefox-Konto anmelden kann.";
+
+/* Header for the list of devices table */
+"Available devices:" = "Verfügbare Geräte:";
+
+/* Close button in top navigation bar */
+"Close" = "Schließen";
+
+/* Navigation bar button to Send the current page to a device */
+"Send" = "Senden";
+
+/* Title of the dialog that allows you to send a tab to a different device */
+"Send Tab" = "Tab senden";
+
+/* No comment provided by engineer. */
+"You are not logged in to your Firefox Account. This needs proper copy. Do not translate." = "Sie sind nicht bei Ihrem Firefox-Konto angemeldet.";
+
+/* No comment provided by engineer. */
+"You currently don’t have any other devices currently connected to Firefox Sync. This needs proper copy. Do not translate." = "Derzeit sind keine anderen Geräte mit Firefox Sync verbunden.";
+
