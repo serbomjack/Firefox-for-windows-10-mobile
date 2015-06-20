@@ -85,6 +85,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
+    func callbackToApp(timer: NSTimer) {
+        if let callbackDict = timer.userInfo as? [String:NSURL] {
+            if let callbackURL = callbackDict["callback"] {
+                UIApplication.sharedApplication().openURL(callbackURL)
+            }
+        }
+    }
+
     func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject?) -> Bool {
         if let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: false) where components.scheme == "firefox" && components.host == "open-url" {
             if let query = components.query, item = components.queryItems?.first as? NSURLQueryItem {
@@ -92,6 +100,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     if let newURL = NSURL(string: item.value!) {
                         let tab = self.tabManager.addTab(request: NSURLRequest(URL: newURL))
                         self.tabManager.selectTab(tab)
+                        return true
+                    }
+                }
+            }
+        } else if let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: false) where components.scheme == "firefox" && components.host == "x-callback-url" {
+            if let query = components.query, items = components.queryItems as? [NSURLQueryItem] {
+                if items[0].name == "x-source" && items[0].value != nil && items[1].name == "url" && items[1].value != nil {
+                    if let newURL = NSURL(string: items[1].value!) {
+                        //do something with UI here to add callback functionality
+                        let tab = self.tabManager.addTab(request: NSURLRequest(URL: newURL))
+                        self.tabManager.selectTab(tab)
+                        var callbackDict: [String:NSURL] = [String:NSURL]()
+                        callbackDict["callback"] = NSURL(string: items[0].value!)
+                        NSTimer.scheduledTimerWithTimeInterval(5.0, target: self, selector: "callbackToApp:", userInfo: callbackDict, repeats: false)
                         return true
                     }
                 }
