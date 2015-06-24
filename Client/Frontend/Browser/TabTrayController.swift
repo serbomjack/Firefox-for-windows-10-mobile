@@ -207,6 +207,12 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
     var tabManager: TabManager!
     private let CellIdentifier = "CellIdentifier"
     var collectionView: UICollectionView!
+    private lazy var addTabGesture: UILongPressGestureRecognizer = {
+        return UILongPressGestureRecognizer(target: self, action: "SELdidLongPress:")
+    }()
+    private var addedTab: CustomCell?
+    private var prevPosition: CGPoint?
+
     var profile: Profile!
     var numberOfColumns: Int {
         let compactLayout = profile.prefs.boolForKey("CompactTabLayout") ?? true
@@ -222,6 +228,10 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
     var navBar: UIView!
     var addTabButton: UIButton!
     var settingsButton: UIButton!
+    var cellSize: CGSize {
+        let cellWidth = (collectionView.bounds.width - TabTrayControllerUX.Margin * CGFloat(numberOfColumns + 1)) / CGFloat(numberOfColumns)
+        return CGSizeMake(cellWidth, self.cellHeightForCurrentDevice())
+    }
 
     var statusBarFrame: CGRect {
         return UIApplication.sharedApplication().statusBarFrame
@@ -231,6 +241,29 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
 
     func SELstatusBarFrameDidChange(notification: NSNotification) {
         self.view.setNeedsUpdateConstraints()
+    }
+
+    func SELdidLongPress(gesture: UILongPressGestureRecognizer) {
+        if gesture.state == .Began {
+            let location = gesture.locationInView(self.collectionView)
+            var tabFrame = CGRect(origin: CGPointZero, size: cellSize)
+            tabFrame.center = location
+
+            let tab = CustomCell(frame: tabFrame)
+
+            // Start off small
+            let scaledDown = CGAffineTransformMakeScale(0.1, 0.1)
+            tab.transform = scaledDown
+            addedTab = tab
+            self.collectionView.addSubview(tab)
+            UIView.animateWithDuration(0.3, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 8, options: nil, animations: { () -> Void in
+                tab.transform = CGAffineTransformIdentity
+            }) { completed in
+            }
+        } else if gesture.state == .Changed {
+            let location = gesture.locationInView(self.collectionView)
+            addedTab?.center = location
+        }
     }
 
     override func viewDidLoad() {
@@ -274,6 +307,7 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
         collectionView.registerClass(CustomCell.self, forCellWithReuseIdentifier: CellIdentifier)
 
         collectionView.backgroundColor = TabTrayControllerUX.BackgroundColor
+        collectionView.addGestureRecognizer(addTabGesture)
 
         view.addSubview(collectionView)
         view.addSubview(navBar)
@@ -397,8 +431,7 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
     }
 
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        let cellWidth = (collectionView.bounds.width - TabTrayControllerUX.Margin * CGFloat(numberOfColumns + 1)) / CGFloat(numberOfColumns)
-        return CGSizeMake(cellWidth, self.cellHeightForCurrentDevice())
+        return cellSize
     }
 
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
