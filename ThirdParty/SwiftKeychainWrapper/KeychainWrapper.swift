@@ -68,11 +68,8 @@ public class KeychainWrapper {
     /// - returns: True if a value exists for the key. False otherwise.
     public class func hasValueForKey(keyName: String) -> Bool {
         let keychainData: NSData? = self.dataForKey(keyName)
-        if let data = keychainData {
-            return true
-        } else {
-            return false
-        }
+        guard let _ = keychainData else { return false }
+        return true
     }
 
     /// Returns a string value for a specified key.

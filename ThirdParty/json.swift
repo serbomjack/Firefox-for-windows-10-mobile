@@ -69,12 +69,14 @@ extension JSON {
     /// constructs JSON object from the content of NSURL
     public convenience init(nsurl:NSURL) {
         var enc:NSStringEncoding = NSUTF8StringEncoding
-        let err:NSError?
-        let str =
-        String(try! NSString(
-            contentsOfURL:nsurl, usedEncoding:&enc))
-        if err != nil { self.init(err!) }
-        else { self.init(string:str) }
+        do {
+            let str =
+            String(try NSString(
+                contentsOfURL:nsurl, usedEncoding:&enc))
+            self.init(string:str)
+        } catch let err as NSError {
+            self.init(err)
+        }
     }
     /// fetch the JSON string from NSURL and parse it
     /// same as JSON(nsurl:NSURL)
@@ -100,14 +102,13 @@ extension JSON {
     }
     /// does what JSON.stringify in ES5 does.
     /// when the 2nd argument is set to true it pretty prints
-    public class func stringify(obj:AnyObject, pretty:Bool=false) -> String! {
+    public class func stringify(obj:AnyObject, pretty:Bool=false) throws -> String! {
         if !NSJSONSerialization.isValidJSONObject(obj) {
-            JSON(NSError(
+            throw NSError(
                 domain:"JSONErrorDomain",
                 code:422,
                 userInfo:[NSLocalizedDescriptionKey: "not an JSON object"]
-                ))
-            return nil
+                )
         }
         return JSON(obj).toString(pretty)
     }
@@ -117,7 +118,7 @@ extension JSON {
     /// access the element like array
     public subscript(idx:Int) -> JSON {
         switch _value {
-        case let err as NSError:
+        case  _ as NSError:
             return self
         case let ary as NSArray:
             if 0 <= idx && idx < ary.count {
@@ -138,7 +139,7 @@ extension JSON {
     /// access the element like dictionary
     public subscript(key:String)->JSON {
         switch _value {
-        case let err as NSError:
+        case _ as NSError:
             return self
         case let dic as NSDictionary:
             if let val:AnyObject = dic[key] { return JSON(val) }
@@ -417,15 +418,18 @@ extension JSON : CustomStringConvertible {
         case let o as NSString:
             return o.debugDescription
         default:
-            let opts = pretty
-                ? NSJSONWritingOptions.PrettyPrinted : nil
-            if let data = NSJSONSerialization.dataWithJSONObject(
-                _value, options:opts) as NSData? {
-                    if let result = NSString(
-                        data:data, encoding:NSUTF8StringEncoding
-                        ) as? String {
-                            return result
-                    }
+            let opts = pretty ? NSJSONWritingOptions.PrettyPrinted : NSJSONWritingOptions(rawValue: 0)
+            do {
+                if let data = try NSJSONSerialization.dataWithJSONObject(
+                    _value, options:opts) as NSData? {
+                        if let result = NSString(
+                            data:data, encoding:NSUTF8StringEncoding
+                            ) as? String {
+                                return result
+                        }
+                }
+            } catch {
+                print("ERROR:")
             }
             return "YOU ARE NOT SUPPOSED TO SEE THIS!"
         }
