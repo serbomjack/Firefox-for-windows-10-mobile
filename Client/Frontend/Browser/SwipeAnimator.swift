@@ -80,8 +80,8 @@ extension SwipeAnimator {
         let totalRotationInRadians = CGFloat(params.totalRotationInDegrees / 180.0 * M_PI)
 
         // Determine rotation / scaling amounts by the distance to the edge
-        var rotation = (translation / halfWidth) * totalRotationInRadians
-        var scale = 1 - (abs(translation) / halfWidth) * (1 - params.totalScale)
+        let rotation = (translation / halfWidth) * totalRotationInRadians
+        let scale = 1 - (abs(translation) / halfWidth) * (1 - params.totalScale)
 
         let rotationTransform = CGAffineTransformMakeRotation(rotation)
         let scaleTransform = CGAffineTransformMakeScale(scale, scale)

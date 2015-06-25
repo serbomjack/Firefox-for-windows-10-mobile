@@ -34,7 +34,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
 
     private func onModelFailure(e: Any) {
-        println("Error: failed to get data: \(e)")
+        print("Error: failed to get data: \(e)")
     }
 
     override func reloadData() {

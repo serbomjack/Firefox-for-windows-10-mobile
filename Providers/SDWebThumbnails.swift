@@ -25,7 +25,7 @@ public class SDWebThumbnails: Thumbnails {
     }
 
     public class func getKey(url: NSURL) -> String {
-        return getKey(url.absoluteString!)
+        return getKey(url.absoluteString)
     }
 
     public class func getKey(url: String) -> String {

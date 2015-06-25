@@ -40,7 +40,7 @@ class TransitionManager: NSObject, UIViewControllerAnimatedTransitioning  {
             container.insertSubview(toView.view, aboveSubview: fromView.view)
         }
 
-        var options = TransitionOptions()
+        let options = TransitionOptions()
         options.container = container
         options.fromView = fromView
         options.toView = toView
@@ -56,7 +56,7 @@ class TransitionManager: NSObject, UIViewControllerAnimatedTransitioning  {
                 to.transitionablePreShow(to, options: options)
                 from.transitionablePreHide(from, options: options)
 
-                UIView.animateWithDuration(duration, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0, options: UIViewAnimationOptions.AllowUserInteraction |  UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
+                UIView.animateWithDuration(duration, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0, options: [UIViewAnimationOptions.AllowUserInteraction, UIViewAnimationOptions.CurveEaseInOut], animations: { () -> Void in
                         to.transitionableWillShow(to, options: options)
                         from.transitionableWillHide(from, options: options)
                     }, completion: { finished in
@@ -69,7 +69,7 @@ class TransitionManager: NSObject, UIViewControllerAnimatedTransitioning  {
         }
     }
 
-    func transitionDuration(transitionContext: UIViewControllerContextTransitioning) -> NSTimeInterval {
+    func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
         return 0.4
     }
 }

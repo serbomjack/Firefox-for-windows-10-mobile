@@ -5,7 +5,7 @@
 import Foundation
 import Shared
 
-public struct ClientAndTabs: Equatable, Printable {
+public struct ClientAndTabs: Equatable, CustomStringConvertible {
     public let client: RemoteClient
     public let tabs: [RemoteTab]
 
@@ -76,7 +76,7 @@ public func ==(lhs: RemoteTab, rhs: RemoteTab) -> Bool {
         lhs.icon == rhs.icon
 }
 
-extension RemoteTab: Printable {
+extension RemoteTab: CustomStringConvertible {
     public var description: String {
         return "<RemoteTab clientGUID: \(clientGUID), URL: \(URL), title: \(title), lastUsed: \(lastUsed)>"
     }

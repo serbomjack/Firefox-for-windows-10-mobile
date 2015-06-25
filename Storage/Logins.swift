@@ -36,7 +36,7 @@ public protocol LoginUsageData {
     var timePasswordChanged: MicrosecondTimestamp { get set }
 }
 
-public class Login: Printable, LoginData, LoginUsageData, Equatable {
+public class Login: CustomStringConvertible, LoginData, LoginUsageData, Equatable {
     public var guid: String
 
     public let credentials: NSURLCredential
@@ -140,7 +140,7 @@ public class Login: Printable, LoginData, LoginUsageData, Equatable {
     }
 
     public class func fromScript(url: NSURL, script: [String: String]) -> LoginData {
-        let login = Login(hostname: getPasswordOrigin(url.absoluteString!)!, username: script["username"]!, password: script["password"]!)
+        let login = Login(hostname: getPasswordOrigin(url.absoluteString)!, username: script["username"]!, password: script["password"]!)
 
         if let formSubmit = script["formSubmitURL"] {
             login.formSubmitURL = formSubmit
@@ -164,7 +164,7 @@ public class Login: Printable, LoginData, LoginUsageData, Equatable {
                 return "javascript:"
             }
 
-            realm = "\(uri.scheme!)://\(uri.host!)"
+            realm = "\(uri.scheme)://\(uri.host!)"
 
             // If the URI explicitly specified a port, only include it when
             // it's not the default. (We never want "http://foo.com:80")

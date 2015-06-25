@@ -178,7 +178,7 @@ class ReadingListTableViewCell: SWTableViewCell {
         let hostname = url.host ?? ""
         for prefix in prefixesToSimplify {
             if hostname.hasPrefix(prefix) {
-                return hostname.substringFromIndex(advance(hostname.startIndex, count(prefix)))
+                return hostname.substringFromIndex(advance(hostname.startIndex, prefix.characters.count))
             }
         }
         return hostname
@@ -253,7 +253,7 @@ class ReadingListPanel: UITableViewController, HomePanel, SWTableViewCellDelegat
                 view.addSubview(overlayView)
                 overlayView.backgroundColor = UIColor.whiteColor()
                 // Unknown why this does not work with autolayout
-                overlayView.autoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth
+                overlayView.autoresizingMask = [UIViewAutoresizing.FlexibleHeight, UIViewAutoresizing.FlexibleWidth]
 
                 let containerView = UIView()
                 overlayView.addSubview(containerView)

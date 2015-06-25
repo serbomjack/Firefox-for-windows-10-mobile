@@ -145,7 +145,7 @@ public class FirefoxAccount {
         return nil
     }
 
-    public enum AccountError: Printable, ErrorType {
+    public enum AccountError: CustomStringConvertible, ErrorType {
         case NotMarried
 
         public var description: String {

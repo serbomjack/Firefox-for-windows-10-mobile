@@ -66,7 +66,7 @@ extension KIFUITestActor {
             if result as! String == "undefined" {
                 let bundle = NSBundle(forClass: NavigationTests.self)
                 let path = bundle.pathForResource("KIFHelper", ofType: "js")!
-                let source = NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding, error: nil)!
+                let source = try! NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding)
                 webView.evaluateJavaScript(source as String, completionHandler: nil)
             }
             stepResult = KIFTestStepResult.Success
@@ -111,8 +111,8 @@ class BrowserUtils {
 
 class SimplePageServer {
     class func getPageData(name: String, ext: String = "html") -> String {
-        var pageDataPath = NSBundle(forClass: self).pathForResource(name, ofType: ext)!
-        return NSString(contentsOfFile: pageDataPath, encoding: NSUTF8StringEncoding, error: nil)! as String
+        let pageDataPath = NSBundle(forClass: self).pathForResource(name, ofType: ext)!
+        return (try! NSString(contentsOfFile: pageDataPath, encoding: NSUTF8StringEncoding)) as String
     }
 
     class func start() -> String {
@@ -132,7 +132,7 @@ class SimplePageServer {
         // we may create more than one of these but we need to give them uniquie accessibility ids in the tab manager so we'll pass in a page number
         webServer.addHandlerForMethod("GET", path: "/scrollablePage.html", requestClass: GCDWebServerRequest.self) { (request) -> GCDWebServerResponse! in
             var pageData = self.getPageData("scrollablePage")
-            let page = (request.query["page"] as! String).toInt()!
+            let page = Int((request.query["page"] as! String))!
             pageData = pageData.stringByReplacingOccurrencesOfString("{page}", withString: page.description)
             return GCDWebServerDataResponse(HTML: pageData as String)
         }
@@ -140,7 +140,7 @@ class SimplePageServer {
         webServer.addHandlerForMethod("GET", path: "/numberedPage.html", requestClass: GCDWebServerRequest.self) { (request) -> GCDWebServerResponse! in
             var pageData = self.getPageData("numberedPage")
 
-            let page = (request.query["page"] as! String).toInt()!
+            let page = Int((request.query["page"] as! String))!
             pageData = pageData.stringByReplacingOccurrencesOfString("{page}", withString: page.description)
 
             return GCDWebServerDataResponse(HTML: pageData as String)

@@ -27,8 +27,11 @@ class TestBookmarks: ProfileTest {
             })
 
             self.waitForExpectationsWithTimeout(10.0, handler:nil)
-            // This'll do.
-            profile.files.remove("mock.db")
+            do {
+                // This'll do.
+                try profile.files.remove("mock.db")
+            } catch _ {
+            }
         }
     }
 }

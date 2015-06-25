@@ -26,7 +26,7 @@ class HashchangeHelper: NSObject, BrowserHelper {
     required init(browser: Browser) {
         super.init()
         let path = NSBundle.mainBundle().pathForResource("HashchangeHelper", ofType: "js")!
-        let source = NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding, error: nil) as! String
+        let source = NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
         let userScript = WKUserScript(source: source, injectionTime: WKUserScriptInjectionTime.AtDocumentEnd, forMainFrameOnly: false)
         browser.webView!.configuration.userContentController.addUserScript(userScript)
     }

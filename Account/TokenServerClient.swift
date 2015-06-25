@@ -62,7 +62,7 @@ enum TokenServerError {
     case Local(NSError)
 }
 
-extension TokenServerError: Printable, ErrorType {
+extension TokenServerError: CustomStringConvertible, ErrorType {
     var description: String {
         switch self {
         case let Remote(code: code, status: status, remoteTimestamp: remoteTimestamp):
@@ -86,9 +86,9 @@ public class TokenServerClient {
 
     public class func getAudienceForURL(URL: NSURL) -> String {
         if let port = URL.port {
-            return "\(URL.scheme!)://\(URL.host!):\(port)"
+            return "\(URL.scheme)://\(URL.host!):\(port)"
         } else {
-            return "\(URL.scheme!)://\(URL.host!)"
+            return "\(URL.scheme)://\(URL.host!)"
         }
     }
 

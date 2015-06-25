@@ -83,14 +83,20 @@ class CacheClearable : Clearable {
 
         // Now lets finish up by destroying our Cache directory.
         let manager = NSFileManager.defaultManager()
-        var url = manager.URLsForDirectory(NSSearchPathDirectory.LibraryDirectory, inDomains: .UserDomainMask)[0] as! NSURL
+        var url = manager.URLsForDirectory(NSSearchPathDirectory.LibraryDirectory, inDomains: .UserDomainMask)[0] as NSURL
         var file = url.path!.stringByAppendingPathComponent("Caches")
         var error: NSError? = nil
-        if let contents = NSFileManager.defaultManager().contentsOfDirectoryAtPath(file, error: nil) {
+        do {
+            let contents = try NSFileManager.defaultManager().contentsOfDirectoryAtPath(file)
             for content in contents {
-                let filePath = file.stringByAppendingPathComponent(content as! String)
-                NSFileManager.defaultManager().removeItemAtPath(filePath, error: &error)
+                let filePath = file.stringByAppendingPathComponent(content as String)
+                do {
+                    try NSFileManager.defaultManager().removeItemAtPath(filePath)
+                } catch var error1 as NSError {
+                    error = error1
+                }
             }
+        } catch _ {
         }
         return succeed()
     }
@@ -109,10 +115,14 @@ class SiteDataClearable : Clearable {
 
         // Then we just wipe the WebKit directory from our Library.
         let manager = NSFileManager.defaultManager()
-        let url = manager.URLsForDirectory(NSSearchPathDirectory.LibraryDirectory, inDomains: .UserDomainMask)[0] as! NSURL
+        let url = manager.URLsForDirectory(NSSearchPathDirectory.LibraryDirectory, inDomains: .UserDomainMask)[0] as NSURL
         let file = url.path!.stringByAppendingPathComponent("WebKit")
         var error: NSError? = nil
-        NSFileManager.defaultManager().removeItemAtPath(file, error: &error)
+        do {
+            try NSFileManager.defaultManager().removeItemAtPath(file)
+        } catch var error1 as NSError {
+            error = error1
+        }
 
         return succeed()
     }
@@ -133,20 +143,26 @@ class CookiesClearable : Clearable {
         let storage = NSHTTPCookieStorage.sharedHTTPCookieStorage()
         if let cookies = storage.cookies {
             for cookie in cookies {
-                storage.deleteCookie(cookie as! NSHTTPCookie)
+                storage.deleteCookie(cookie as NSHTTPCookie)
             }
         }
 
         // And just to be safe, we also wipe the Cookies directory.
         let manager = NSFileManager.defaultManager()
-        var url = manager.URLsForDirectory(NSSearchPathDirectory.LibraryDirectory, inDomains: .UserDomainMask)[0] as! NSURL
+        var url = manager.URLsForDirectory(NSSearchPathDirectory.LibraryDirectory, inDomains: .UserDomainMask)[0] as NSURL
         var file = url.path!.stringByAppendingPathComponent("Cookies")
         var error: NSError? = nil
-        if let contents = NSFileManager.defaultManager().contentsOfDirectoryAtPath(file, error: nil) {
+        do {
+            let contents = try NSFileManager.defaultManager().contentsOfDirectoryAtPath(file)
             for content in contents {
-                let filePath = file.stringByAppendingPathComponent(content as! String)
-                NSFileManager.defaultManager().removeItemAtPath(filePath, error: &error)
+                let filePath = file.stringByAppendingPathComponent(content as String)
+                do {
+                    try NSFileManager.defaultManager().removeItemAtPath(filePath)
+                } catch var error1 as NSError {
+                    error = error1
+                }
             }
+        } catch _ {
         }
 
         return succeed()

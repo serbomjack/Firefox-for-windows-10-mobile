@@ -125,7 +125,7 @@ class TestSQLiteLogins: XCTestCase {
             log.debug("Get logins for \(protectionSpace)")
             return self.logins.getLoginsForProtectionSpace(protectionSpace) >>== { results in
                 XCTAssertEqual(expected.count, results.count)
-                for (index, login) in enumerate(expected) {
+                for (index, login) in expected.enumerate() {
                     XCTAssertEqual(results[index]!.username!, login.username!)
                     XCTAssertEqual(results[index]!.hostname, login.hostname)
                     XCTAssertEqual(results[index]!.password, login.password)
@@ -192,18 +192,18 @@ class TestSyncableLogins: XCTestCase {
         let guid = "abcdabcdabcd"
         let host = "http://example.com"
         let user = "username"
-        var loginA1 = Login(guid: guid, hostname: host, username: user, password: "password1")
+        let loginA1 = Login(guid: guid, hostname: host, username: user, password: "password1")
         loginA1.formSubmitURL = "\(host)/form1/"
         loginA1.usernameField = "afield"
 
-        var loginA2 = Login(guid: guid, hostname: host, username: user, password: "password1")
+        let loginA2 = Login(guid: guid, hostname: host, username: user, password: "password1")
         loginA2.formSubmitURL = "\(host)/form1/"
         loginA2.usernameField = "somefield"
 
-        var loginB = Login(guid: guid, hostname: host, username: user, password: "password2")
+        let loginB = Login(guid: guid, hostname: host, username: user, password: "password2")
         loginB.formSubmitURL = "\(host)/form1/"
 
-        var loginC = Login(guid: guid, hostname: host, username: user, password: "password")
+        let loginC = Login(guid: guid, hostname: host, username: user, password: "password")
         loginC.formSubmitURL = "\(host)/form2/"
 
         XCTAssert(loginA1.isSignificantlyDifferentFrom(loginB))

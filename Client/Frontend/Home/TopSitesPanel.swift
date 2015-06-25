@@ -45,9 +45,15 @@ private class SuggestedSitesData<T: Tile>: Cursor<T> {
         // TODO: Make this list localized. That should be as simple as making sure its in the lproj directory.
         var err: NSError? = nil
         let path = NSBundle.mainBundle().pathForResource("suggestedsites", ofType: "json")
-        let data = NSString(contentsOfFile: path!, encoding: NSUTF8StringEncoding, error: &err)
+        let data: NSString?
+        do {
+            data = try NSString(contentsOfFile: path!, encoding: NSUTF8StringEncoding)
+        } catch var error as NSError {
+            err = error
+            data = nil
+        }
         let json = JSON.parse(data as! String)
-        println("\(data) \(json)")
+        print("\(data) \(json)")
 
         for i in 0..<json.length {
             let t = T(json: json[i])
@@ -235,7 +241,7 @@ extension TopSitesPanel: ThumbnailCellDelegate {
 }
 
 private class TopSitesCollectionView: UICollectionView {
-    private override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
+    private override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         // Hide the keyboard if this view is touched.
         window?.rootViewController?.view.endEditing(true)
         super.touchesBegan(touches, withEvent: event)
@@ -287,7 +293,7 @@ private class TopSitesLayout: UICollectionViewLayout {
         }
     }
 
-    private func getIndexAtPosition(#y: CGFloat) -> Int {
+    private func getIndexAtPosition(y y: CGFloat) -> Int {
         if y < topSectionHeight {
             let row = Int(y / thumbnailHeight)
             return min(count - 1, max(0, row * thumbnailCols))
@@ -305,7 +311,7 @@ private class TopSitesLayout: UICollectionViewLayout {
         return CGSize(width: width, height: topSectionHeight + bottomSectionHeight)
     }
 
-    override func layoutAttributesForElementsInRect(rect: CGRect) -> [AnyObject]? {
+    override func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         let start = getIndexAtPosition(y: rect.origin.y)
         let end = getIndexAtPosition(y: rect.origin.y + rect.height)
 

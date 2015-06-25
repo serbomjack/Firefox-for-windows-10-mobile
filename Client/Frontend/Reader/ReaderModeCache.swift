@@ -18,23 +18,22 @@ class ReaderModeCache {
         return ReaderModeCacheSharedInstance
     }
 
-    func put(url: NSURL, _ readabilityResult: ReadabilityResult, error: NSErrorPointer) -> Bool {
+    func put(url: NSURL, _ readabilityResult: ReadabilityResult) throws {
         if let cacheDirectoryPath = cacheDirectoryForURL(url) {
-            if NSFileManager.defaultManager().createDirectoryAtPath(cacheDirectoryPath as String, withIntermediateDirectories: true, attributes: nil, error: error) {
-                let contentFilePath = cacheDirectoryPath.stringByAppendingPathComponent("content.json")
-                let string: NSString = readabilityResult.encode()
-                return string.writeToFile(contentFilePath, atomically: true, encoding: NSUTF8StringEncoding, error: error)
-            }
+            try NSFileManager.defaultManager().createDirectoryAtPath(cacheDirectoryPath as String, withIntermediateDirectories: true, attributes: nil)
+            let contentFilePath = cacheDirectoryPath.stringByAppendingPathComponent("content.json")
+            let string: NSString = readabilityResult.encode()
+            try string.writeToFile(contentFilePath, atomically: true, encoding: NSUTF8StringEncoding)
         }
-        return false
     }
 
-    func get(url: NSURL, error: NSErrorPointer) -> ReadabilityResult? {
+    func get(url: NSURL) throws -> ReadabilityResult {
         if let cacheDirectoryPath = cacheDirectoryForURL(url) {
             let contentFilePath = cacheDirectoryPath.stringByAppendingPathComponent("content.json")
             if NSFileManager.defaultManager().fileExistsAtPath(contentFilePath) {
-                if let string = NSString(contentsOfFile: contentFilePath, encoding: NSUTF8StringEncoding, error: error) {
-                    return ReadabilityResult(string: string as String)
+                let string = try NSString(contentsOfFile: contentFilePath, encoding: NSUTF8StringEncoding)
+                if let value = ReadabilityResult(string: string as String) {
+                    return value
                 }
             }
         }
@@ -44,17 +43,25 @@ class ReaderModeCache {
     func delete(url: NSURL, error: NSErrorPointer) {
         if let cacheDirectoryPath = cacheDirectoryForURL(url) {
             if NSFileManager.defaultManager().fileExistsAtPath(cacheDirectoryPath) {
-                NSFileManager.defaultManager().removeItemAtPath(cacheDirectoryPath, error: error)
+                do {
+                    try NSFileManager.defaultManager().removeItemAtPath(cacheDirectoryPath)
+                } catch let error1 as NSError {
+                    error.memory = error1
+                }
             }
         }
     }
 
-    func contains(url: NSURL, error: NSErrorPointer) -> Bool {
+    func contains(url: NSURL) throws {
+        let error: NSError! = NSError(domain: "Migrator", code: 0, userInfo: nil)
         if let cacheDirectoryPath = cacheDirectoryForURL(url) {
             let contentFilePath = cacheDirectoryPath.stringByAppendingPathComponent("content.json")
-            return NSFileManager.defaultManager().fileExistsAtPath(contentFilePath)
+            if NSFileManager.defaultManager().fileExistsAtPath(contentFilePath) {
+                return
+            }
+            throw error
         }
-        return false
+        throw error
     }
 
     private func cacheDirectoryForURL(url: NSURL) -> String? {

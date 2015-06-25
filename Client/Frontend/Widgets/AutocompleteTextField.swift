@@ -40,7 +40,7 @@ class AutocompleteTextField: UITextField, UITextFieldDelegate {
     func highlightAll() {
         if !text.isEmpty {
             let attributedString = NSMutableAttributedString(string: text)
-            attributedString.addAttribute(NSBackgroundColorAttributeName, value: AutocompleteTextFieldUX.HighlightColor, range: NSMakeRange(0, count(text)))
+            attributedString.addAttribute(NSBackgroundColorAttributeName, value: AutocompleteTextFieldUX.HighlightColor, range: NSMakeRange(0, text.characters.count))
             attributedText = attributedString
 
             enteredTextLength = 0
@@ -84,10 +84,10 @@ class AutocompleteTextField: UITextField, UITextFieldDelegate {
             // Check that the length of the entered text is shorter than the length of the suggestion.
             // This ensures that completionActive is true only if there are remaining characters to
             // suggest (which will suppress the caret).
-            if suggestion.startsWith(text) && count(text) < count(suggestion) {
-                let endingString = suggestion.substringFromIndex(advance(suggestion.startIndex, count(self.text)))
+            if suggestion.startsWith(text) && text.characters.count < suggestion.characters.count {
+                let endingString = suggestion.substringFromIndex(advance(suggestion.startIndex, self.text.characters.count))
                 let completedAndMarkedString = NSMutableAttributedString(string: suggestion)
-                completedAndMarkedString.addAttribute(NSBackgroundColorAttributeName, value: AutocompleteTextFieldUX.HighlightColor, range: NSMakeRange(enteredTextLength, count(endingString)))
+                completedAndMarkedString.addAttribute(NSBackgroundColorAttributeName, value: AutocompleteTextFieldUX.HighlightColor, range: NSMakeRange(enteredTextLength, endingString.characters.count))
                 attributedText = completedAndMarkedString
                 completionActive = true
             }
@@ -115,7 +115,7 @@ class AutocompleteTextField: UITextField, UITextFieldDelegate {
         return autocompleteDelegate?.autocompleteTextFieldShouldClear(self) ?? true
     }
 
-    override func setMarkedText(markedText: String!, selectedRange: NSRange) {
+    override func setMarkedText(markedText: String?, selectedRange: NSRange) {
         // Clear the autocompletion if any provisionally inserted text has been
         // entered (e.g., a partial composition from a Japanese keyboard).
         removeCompletion()
@@ -125,12 +125,12 @@ class AutocompleteTextField: UITextField, UITextFieldDelegate {
     override func insertText(text: String) {
         removeCompletion()
         super.insertText(text)
-        enteredTextLength = count(self.text)
+        enteredTextLength = self.text.characters.count
 
         autocompleteDelegate?.autocompleteTextField(self, didTextChange: self.text)
     }
 
-    override func caretRectForPosition(position: UITextPosition!) -> CGRect {
+    override func caretRectForPosition(position: UITextPosition) -> CGRect {
         return completionActive ? CGRectZero : super.caretRectForPosition(position)
     }
 
@@ -139,19 +139,19 @@ class AutocompleteTextField: UITextField, UITextFieldDelegate {
         return super.resignFirstResponder()
     }
 
-    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         if !completionActive {
             super.touchesBegan(touches, withEvent: event)
         }
     }
 
-    override func touchesMoved(touches: Set<NSObject>, withEvent event: UIEvent) {
+    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         if !completionActive {
             super.touchesMoved(touches, withEvent: event)
         }
     }
 
-    override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         if !active || !completionActive {
             super.touchesBegan(touches, withEvent: event)
         } else {

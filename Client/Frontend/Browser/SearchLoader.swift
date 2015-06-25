@@ -9,7 +9,7 @@ import XCGLogger
 
 private let log = XCGLogger.defaultInstance()
 
-private let URLBeforePathRegex = NSRegularExpression(pattern: "^https?://([^/]+/)", options: nil, error: nil)!
+private let URLBeforePathRegex = try! NSRegularExpression(pattern: "^https?://([^/]+/)", options: [])
 
 // TODO: Swift currently requires that classes extending generic classes must also be generic.
 // This is a workaround until that requirement is fixed.
@@ -63,7 +63,7 @@ class _SearchLoader<UnusedA, UnusedB>: Loader<Cursor<Site>, SearchViewController
             // NSURL since we need to only look at the beginning of the string.
             // Note that we won't match non-HTTP(S) URLs.
             if let url = result?.url,
-                   match = URLBeforePathRegex.firstMatchInString(url, options: nil, range: NSRange(location: 0, length: count(url))) {
+                   match = URLBeforePathRegex.firstMatchInString(url, options: [], range: NSRange(location: 0, length: url.characters.count)) {
                 // If the pre-path component starts with the filter, just use it as is.
                 let prePathURL = (url as NSString).substringWithRange(match.rangeAtIndex(0))
                 if prePathURL.startsWith(query) {

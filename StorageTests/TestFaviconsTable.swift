@@ -34,7 +34,7 @@ class TestFaviconsTable : XCTestCase {
             for index in 0..<cursor.count {
                 if let s = cursor[index] {
                     XCTAssertNotNil(s, "cursor has an icon for entry")
-                    let index = find(urls, s.url)
+                    let index = urls.indexOf(s.url.characters)
                     XCTAssert(index > -1, "Found right url")
                 } else {
                     XCTAssertFalse(true, "Should not be nil...")
@@ -61,7 +61,7 @@ class TestFaviconsTable : XCTestCase {
     // This is a very basic test. Adds an entry. Retrieves it, and then clears the database
     func testFaviconsTable() {
         let files = MockFiles()
-        self.db = SwiftData(filename: files.getAndEnsureDirectory()!.stringByAppendingPathComponent("test.db"))
+        self.db = SwiftData(filename: (try! files.getAndEnsureDirectory()).stringByAppendingPathComponent("test.db"))
         let f = FaviconsTable<Favicon>()
 
         self.db.withConnection(SwiftData.Flags.ReadWriteCreate, cb: { (db) -> NSError? in
@@ -86,6 +86,9 @@ class TestFaviconsTable : XCTestCase {
         self.clear(f)
         self.checkIcons(f, options: nil, urls: [String]())
         
-        files.remove("test.db")
+        do {
+            try files.remove("test.db")
+        } catch _ {
+        }
     }
 }

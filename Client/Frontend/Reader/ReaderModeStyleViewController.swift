@@ -178,7 +178,7 @@ class ReaderModeStyleViewController: UIViewController {
 
     /// Setup constraints for a row of buttons. Left to right. They are all given the same width.
     private func setupButtons(buttons: [UIButton], inRow row: UIView, action: Selector) {
-        for (idx, button) in enumerate(buttons) {
+        for (idx, button) in buttons.enumerate() {
             row.addSubview(button)
             button.addTarget(self, action: action, forControlEvents: UIControlEvents.TouchUpInside)
             button.snp_makeConstraints { make in

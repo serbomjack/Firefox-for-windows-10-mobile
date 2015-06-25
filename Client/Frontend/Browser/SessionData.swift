@@ -13,7 +13,7 @@ class SessionData: NSObject, NSCoding {
         self.urls = urls
     }
 
-    required init(coder: NSCoder) {
+    required init?(coder: NSCoder) {
         self.currentPage = coder.decodeObjectForKey("currentPage") as? Int ?? 0
         self.urls = coder.decodeObjectForKey("urls") as? [NSURL] ?? []
     }

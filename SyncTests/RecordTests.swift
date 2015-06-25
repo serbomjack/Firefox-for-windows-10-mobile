@@ -11,7 +11,7 @@ import Sync
 class RecordTests: XCTestCase {
     func testGUIDs() {
         let s = Bytes.generateGUID()
-        println("Got GUID: \(s)")
+        print("Got GUID: \(s)")
         XCTAssertEqual(12, s.lengthOfBytesUsingEncoding(NSUTF8StringEncoding))
     }
 
@@ -58,7 +58,7 @@ class RecordTests: XCTestCase {
             return CleartextPayloadJSON(s)
         }
 
-        println(clientPayload)
+        print(clientPayload)
 
         // Only payloads that parse as JSON are valid.
         XCTAssertNil(Record<CleartextPayloadJSON>.fromEnvelope(EnvelopeJSON(invalidPayload), payloadFactory: clearFactory))

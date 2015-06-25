@@ -39,7 +39,7 @@ class TabManager : NSObject {
     func removeDelegate(delegate: TabManagerDelegate) {
         assert(NSThread.isMainThread())
         for var i = 0; i < delegates.count; i++ {
-            var del = delegates[i]
+            let del = delegates[i]
             if delegate === del.get() {
                 delegates.removeAtIndex(i)
                 return
@@ -137,8 +137,8 @@ class TabManager : NSObject {
     }
 
     // This method is duplicated to hide the flushToDisk option from consumers.
-    func addTab(var request: NSURLRequest! = nil, configuration: WKWebViewConfiguration! = nil) -> Browser {
-        return self.addTab(request: request, configuration: configuration, flushToDisk: true, zombie: false)
+    func addTab(request: NSURLRequest! = nil, configuration: WKWebViewConfiguration! = nil) -> Browser {
+        return self.addTab(request, configuration: configuration, flushToDisk: true, zombie: false)
     }
 
     func addTab(var request: NSURLRequest! = nil, configuration: WKWebViewConfiguration! = nil, flushToDisk: Bool, zombie: Bool) -> Browser {
@@ -284,7 +284,7 @@ extension TabManager {
             }
         }
 
-        required init(coder: NSCoder) {
+        required init?(coder: NSCoder) {
             self.sessionData = coder.decodeObjectForKey("sessionData") as? SessionData
             self.screenshot = coder.decodeObjectForKey("screenshot") as? UIImage
             self.isSelected = coder.decodeBoolForKey("isSelected")
@@ -299,7 +299,7 @@ extension TabManager {
 
     func encodeRestorableStateWithCoder(coder: NSCoder) {
         var savedTabs = [SavedTab]()
-        for (tabIndex, tab) in enumerate(tabs) {
+        for (tabIndex, tab) in tabs.enumerate() {
             if let savedTab = SavedTab(browser: tab, isSelected: tabIndex == selectedIndex) {
                 savedTabs.append(savedTab)
             }
@@ -364,7 +364,7 @@ class TabManagerNavDelegate : NSObject, WKNavigationDelegate {
 
     func webView(webView: WKWebView, didReceiveAuthenticationChallenge challenge: NSURLAuthenticationChallenge,
         completionHandler: (NSURLSessionAuthChallengeDisposition,
-        NSURLCredential!) -> Void) {
+        NSURLCredential?) -> Void) {
             var disp: NSURLSessionAuthChallengeDisposition? = nil
             for delegate in delegates {
                 delegate.webView?(webView, didReceiveAuthenticationChallenge: challenge) { (disposition, credential) in

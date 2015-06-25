@@ -364,7 +364,7 @@ class RemoteTabsNotLoggedInCell: UITableViewCell {
             make.width.equalTo(RemoteTabsPanelUX.EmptyStateSignInButtonWidth)
         }
 
-        let createAnAccountButton = UIButton.buttonWithType(UIButtonType.System) as! UIButton
+        let createAnAccountButton = UIButton.buttonWithType(UIButtonType.System) as UIButton
         createAnAccountButton.setTitle(NSLocalizedString("Create an account", comment: "See http://mzl.la/1Qtkf0j"), forState: .Normal)
         createAnAccountButton.titleLabel?.font = RemoteTabsPanelUX.EmptyStateCreateAccountButtonFont
         createAnAccountButton.addTarget(self, action: "SELcreateAnAccount", forControlEvents: UIControlEvents.TouchUpInside)

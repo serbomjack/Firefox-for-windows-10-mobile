@@ -14,7 +14,8 @@ import XCTest
 public class LiveAccountTest: XCTestCase {
     lazy var signedInUser: JSON? = {
         if let path = NSBundle(forClass: self.dynamicType).pathForResource("signedInUser.json", ofType: nil) {
-            if let contents = String(contentsOfFile: path, encoding: NSUTF8StringEncoding, error: nil) {
+            do {
+                let contents = try String(contentsOfFile: path, encoding: NSUTF8StringEncoding)
                 let json = JSON.parse(contents)
                 if json.isError {
                     return nil
@@ -25,6 +26,7 @@ public class LiveAccountTest: XCTestCase {
                     // This is the standard case: signedInUser.json is {}.
                     return nil
                 }
+            } catch _ {
             }
         }
         XCTFail("Expected to read signedInUser.json!")
@@ -86,7 +88,7 @@ public class LiveAccountTest: XCTestCase {
         }
     }
 
-    public enum AccountError: Printable, ErrorType {
+    public enum AccountError: CustomStringConvertible, ErrorType {
         case BadParameters
         case NoSignedInUser
         case UnverifiedSignedInUser
@@ -140,9 +142,9 @@ public class LiveAccountTest: XCTestCase {
 
     public func getAuthState(now: Timestamp) -> Deferred<Result<SyncAuthState>> {
         let account = self.getTestAccount()
-        println("Got test account.")
+        print("Got test account.")
         return account.map { result in
-            println("Result was successful? \(result.isSuccess)")
+            print("Result was successful? \(result.isSuccess)")
             if let account = result.successValue {
                 return Result(success: account.syncAuthState)
             }

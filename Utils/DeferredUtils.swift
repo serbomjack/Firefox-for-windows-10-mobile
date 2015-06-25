@@ -7,7 +7,7 @@
 // Monadic bind/flatMap operator for Deferred.
 infix operator >>== { associativity left precedence 160 }
 public func >>== <T, U>(x: Deferred<Result<T>>, f: T -> Deferred<Result<U>>) -> Deferred<Result<U>> {
-    return chainDeferred(x, f)
+    return chainDeferred(x, f: f)
 }
 
 // A termination case.
@@ -129,7 +129,7 @@ public func walk<T, U>(items: [T], start: Deferred<Result<U>>, f: (T, U) -> Defe
 public func allSucceed(deferreds: Success...) -> Success {
     return all(deferreds).bind {
         (results) -> Success in
-        if let failure = find(results, { $0.isFailure }) {
+        if let failure = find(results, f: { $0.isFailure }) {
             return deferResult(failure.failureValue!)
         }
 
@@ -156,5 +156,5 @@ public func chainResult<T, U>(a: Deferred<Result<T>>, f: T -> Result<U>) -> Defe
 }
 
 public func chain<T, U>(a: Deferred<Result<T>>, f: T -> U) -> Deferred<Result<U>> {
-    return chainResult(a, { Result<U>(success: f($0)) })
+    return chainResult(a, f: { Result<U>(success: f($0)) })
 }

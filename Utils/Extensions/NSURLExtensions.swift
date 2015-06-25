@@ -4,7 +4,7 @@
 
 import UIKit
 
-private struct ETLDEntry: Printable {
+private struct ETLDEntry: CustomStringConvertible {
     let entry: String
 
     var isNormal: Bool { return isWild || !isException }
@@ -25,9 +25,10 @@ private struct ETLDEntry: Printable {
 private typealias TLDEntryMap = [String:ETLDEntry]
 
 private func loadEntriesFromDisk() -> TLDEntryMap? {
-    if let data = NSString.contentsOfFileWithResourceName("effective_tld_names", ofType: "dat", fromBundle: NSBundle(identifier: "org.mozilla.Shared")!, encoding: NSUTF8StringEncoding, error: nil) {
-        var lines = data.componentsSeparatedByString("\n") as! [String]
-        var trimmedLines = filter(lines) { !$0.hasPrefix("//") && $0 != "\n" && $0 != "" }
+    do {
+        let data = try NSString.contentsOfFileWithResourceName("effective_tld_names", ofType: "dat", fromBundle: NSBundle(identifier: "org.mozilla.Shared")!, encoding: NSUTF8StringEncoding)
+        let lines = data.componentsSeparatedByString("\n") as [String]
+        let trimmedLines = lines.filter { !$0.hasPrefix("//") && $0 != "\n" && $0 != "" }
 
         var entries = TLDEntryMap()
         for line in trimmedLines {
@@ -45,6 +46,7 @@ private func loadEntriesFromDisk() -> TLDEntryMap? {
             entries[key] = entry
         }
         return entries
+    } catch _ {
     }
     return nil
 }
@@ -73,7 +75,7 @@ extension NSURL {
 
     public func getQuery() -> [String: String] {
         var results = [String: String]()
-        var keyValues = self.query?.componentsSeparatedByString("&")
+        let keyValues = self.query?.componentsSeparatedByString("&")
 
         if keyValues?.count > 0 {
             for pair in keyValues! {
@@ -98,16 +100,12 @@ extension NSURL {
     }
 
     public func absoluteStringWithoutHTTPScheme() -> String? {
-        if let urlString = self.absoluteString {
-            // If it's basic http, strip out the string but leave anything else in
-            if urlString.hasPrefix("http://") ?? false {
-                return urlString.substringFromIndex(advance(urlString.startIndex, 7))
-            } else {
-                return urlString
-            }
-        } else {
-            return nil
+        let urlString = self.absoluteString
+        // If it's basic http, strip out the string but leave anything else in
+        if urlString.hasPrefix("http://") ?? false {
+            return urlString.substringFromIndex(advance(urlString.startIndex, 7))
         }
+        return urlString
     }
 
     /**
@@ -115,7 +113,7 @@ extension NSURL {
     with the base private domain attached to the front. For example, for the URL www.bbc.co.uk, the base domain
     would be bbc.co.uk. The base domain includes the public suffix (co.uk) + one level down (bbc).
 
-    :returns: The base domain string for the given host name.
+    - returns: The base domain string for the given host name.
     */
     public func baseDomain() -> String? {
         if let host = self.host {
@@ -129,7 +127,7 @@ extension NSURL {
     Returns the public portion of the host name determined by the public suffix list found here: https://publicsuffix.org/list/. 
     For example for the url www.bbc.co.uk, based on the entries in the TLD list, the public suffix would return co.uk.
 
-    :returns: The public suffix for within the given hostname.
+    - returns: The public suffix for within the given hostname.
     */
     public func publicSuffix() -> String? {
         if let host = self.host {
@@ -142,7 +140,7 @@ extension NSURL {
 
 //MARK: Private Helpers
 private extension NSURL {
-    private func publicSuffixFromHost(var host: String, withAdditionalParts additionalPartCount: Int) -> String? {
+    private func publicSuffixFromHost(host: String, withAdditionalParts additionalPartCount: Int) -> String? {
         if host.isEmpty { return nil }
 
         // Check edge cast where host is either a single or double .
@@ -171,14 +169,14 @@ private extension NSURL {
         */
 
         let tokens = host.componentsSeparatedByString(".")
-        let tokenCount = count(tokens)
+        let tokenCount = tokens.count
         var suffix: String?
         var previousDomain: String? = nil
         var currentDomain: String = host
 
         for offset in 0..<tokenCount {
             // Store the offset for use outside of this scope so we can add additional parts if needed
-            let nextDot: String? = offset + 1 < tokenCount ? join(".", tokens[offset + 1..<tokenCount]) : nil
+            let nextDot: String? = offset + 1 < tokenCount ? ".".join(tokens[offset + 1..<tokenCount]) : nil
 
             if let entry = etldEntries?[currentDomain] {
                 if entry.isWild && (previousDomain != nil) {
@@ -209,8 +207,8 @@ private extension NSURL {
                 let suffixlessTokens = suffixlessHost.componentsSeparatedByString(".").filter { $0 != "" }
                 let maxAdditionalCount = max(0, suffixlessTokens.count - additionalPartCount)
                 let additionalParts = suffixlessTokens[maxAdditionalCount..<suffixlessTokens.count]
-                let partsString = join(".", additionalParts)
-                baseDomain = join(".", [partsString, suffix])
+                let partsString = ".".join(additionalParts)
+                baseDomain = ".".join([partsString, suffix])
             } else {
                 return nil
             }

@@ -88,13 +88,11 @@ public func optArrayEqual<T: Equatable>(lhs: [T]?, rhs: [T]?) -> Bool {
  *
  * If the input array is empty, returns an empty array.
  */
-public func chunk<T>(arr: [T], #by: Int) -> [ArraySlice<T>] {
+public func chunk<T>(arr: [T], by: Int) -> [ArraySlice<T>] {
     let count = arr.count
     let step = max(1, by)     // Handle out-of-range 'by'.
     let s = stride(from: 0, to: count, by: step)
-    return map(s) {
-        arr[$0..<advance($0, step, count)]
-    }
+    return s.map{ arr[$0..<advance($0, step, count)] }
 }
 
 public func optDictionaryEqual<K: Equatable, V: Equatable>(lhs: [K: V]?, rhs: [K: V]?) -> Bool {

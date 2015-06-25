@@ -267,7 +267,7 @@ class FxAContentViewController: UIViewController, WKScriptMessageHandler, WKNavi
 
     private func getJS() -> String {
         let fileRoot = NSBundle.mainBundle().pathForResource("FxASignIn", ofType: "js")
-        return NSString(contentsOfFile: fileRoot!, encoding: NSUTF8StringEncoding, error: nil)! as String
+        return (try! NSString(contentsOfFile: fileRoot!, encoding: NSUTF8StringEncoding)) as String
     }
 
     func webView(webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: NSError) {

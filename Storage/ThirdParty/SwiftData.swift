@@ -176,25 +176,19 @@ private class SQLiteDBStatement {
     var pointer: COpaquePointer = nil
     private let connection: SQLiteDBConnection
 
-    init?(connection: SQLiteDBConnection, query: String, args: [AnyObject?]?, error: NSErrorPointer) {
+    init(connection: SQLiteDBConnection, query: String, args: [AnyObject?]?) throws {
         self.connection = connection
 
-        var status = sqlite3_prepare_v2(connection.sqliteDB, query, -1, &pointer, nil)
+        let status = sqlite3_prepare_v2(connection.sqliteDB, query, -1, &pointer, nil)
         if status != SQLITE_OK {
-            if error != nil {
-                error.memory = connection.createErr("During: SQL Prepare \(query)", status: Int(status))
-            }
-            return nil
+            throw connection.createErr("During: SQL Prepare \(query)", status: Int(status))
         }
 
         if let args = args {
             let bindError = bind(args)
 
             if bindError != nil {
-                if error != nil {
-                    error.memory = bindError
-                }
-                return nil
+                throw bindError
             }
         }
     }
@@ -209,7 +203,7 @@ private class SQLiteDBStatement {
             return connection.createErr("During: Bind", status: 201)
         }
 
-        for (index, obj) in enumerate(objects) {
+        for (index, obj) in objects.enumerate() {
             var status: Int32 = SQLITE_OK
 
             // Doubles also pass obj as Int, so order is important here.
@@ -273,7 +267,7 @@ public class SQLiteDBConnection {
     }
 
     private func setKey(key: String?) -> NSError? {
-        sqlite3_key(sqliteDB, key ?? "", Int32(count(key ?? "")))
+        sqlite3_key(sqliteDB, key ?? "", Int32((key ?? "").characters.count))
         let cursor = executeQuery("SELECT count(*) FROM sqlite_master;", factory: IntFactory, withArgs: nil)
         if cursor.status != .Success {
             return NSError(domain: "mozilla", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid key"])
@@ -282,10 +276,10 @@ public class SQLiteDBConnection {
     }
 
     private func reKey(oldKey: String?, newKey: String?) -> NSError? {
-        sqlite3_key(sqliteDB, oldKey ?? "", Int32(count(oldKey ?? "")))
-        sqlite3_rekey(sqliteDB, newKey ?? "", Int32(count(newKey ?? "")))
+        sqlite3_key(sqliteDB, oldKey ?? "", Int32((oldKey ?? "").characters.count))
+        sqlite3_rekey(sqliteDB, newKey ?? "", Int32((newKey ?? "").characters.count))
         // Check that the new key actually works
-        sqlite3_key(sqliteDB, newKey ?? "", Int32(count(newKey ?? "")))
+        sqlite3_key(sqliteDB, newKey ?? "", Int32((newKey ?? "").characters.count))
         let cursor = executeQuery("SELECT count(*) FROM sqlite_master;", factory: IntFactory, withArgs: nil)
         if cursor.status != .Success {
             return NSError(domain: "mozilla", code: 0, userInfo: [NSLocalizedDescriptionKey: "Rekey failed"])
@@ -395,7 +389,13 @@ public class SQLiteDBConnection {
     /// Executes a change on the database.
     func executeChange(sqlStr: String, withArgs args: [AnyObject?]? = nil) -> NSError? {
         var error: NSError?
-        let statement = SQLiteDBStatement(connection: self, query: sqlStr, args: args, error: &error)
+        let statement: SQLiteDBStatement?
+        do {
+            statement = try SQLiteDBStatement(connection: self, query: sqlStr, args: args)
+        } catch var error1 as NSError {
+            error = error1
+            statement = nil
+        }
         if let error = error {
             log.error("SQL error: \(error.localizedDescription) for SQL \(sqlStr).")
             statement?.close()
@@ -416,7 +416,13 @@ public class SQLiteDBConnection {
     /// Returns a cursor pre-filled with the complete result set.
     func executeQuery<T>(sqlStr: String, factory: ((SDRow) -> T), withArgs args: [AnyObject?]? = nil) -> Cursor<T> {
         var error: NSError?
-        let statement = SQLiteDBStatement(connection: self, query: sqlStr, args: args, error: &error)
+        let statement: SQLiteDBStatement?
+        do {
+            statement = try SQLiteDBStatement(connection: self, query: sqlStr, args: args)
+        } catch var error1 as NSError {
+            error = error1
+            statement = nil
+        }
         if let error = error {
             log.error("SQL error: \(error.localizedDescription).")
             return Cursor<T>(err: error)
@@ -438,7 +444,13 @@ public class SQLiteDBConnection {
      */
     func executeQueryUnsafe<T>(sqlStr: String, factory: ((SDRow) -> T), withArgs args: [AnyObject?]? = nil) -> Cursor<T> {
         var error: NSError?
-        let statement = SQLiteDBStatement(connection: self, query: sqlStr, args: args, error: &error)
+        let statement: SQLiteDBStatement?
+        do {
+            statement = try SQLiteDBStatement(connection: self, query: sqlStr, args: args)
+        } catch let error1 as NSError {
+            error = error1
+            statement = nil
+        }
         if let error = error {
             return Cursor(err: error)
         }
@@ -509,7 +521,7 @@ class SDRow: SequenceType {
     // the columns array passed into this Row to find the correct index.
     subscript(key: String) -> AnyObject? {
         get {
-            if let index = find(columnNames, key) {
+            if let index = columnNames.indexOf(key.characters) {
                 return getValue(index)
             }
             return nil
@@ -517,9 +529,9 @@ class SDRow: SequenceType {
     }
 
     // Allow iterating through the row. This is currently broken.
-    func generate() -> GeneratorOf<Any> {
-        var nextIndex = 0
-        return GeneratorOf<Any>() {
+    func generate() -> AnyGenerator<Any> {
+        let nextIndex = 0
+        return anyGenerator() {
             // This crashes the compiler. Yay!
             if (nextIndex < self.columnNames.count) {
                 return nil // self.getValue(nextIndex)

@@ -227,7 +227,7 @@ class BrowserLocationView : UIView, ToolbarTextFieldDelegate {
     private func highlightDomain() {
         if let httplessURL = url?.absoluteStringWithoutHTTPScheme(), let baseDomain = url?.baseDomain() {
             var attributedString = NSMutableAttributedString(string: httplessURL)
-            let nsRange = NSMakeRange(0, count(httplessURL))
+            let nsRange = NSMakeRange(0, httplessURL.characters.count)
             attributedString.addAttribute(NSForegroundColorAttributeName, value: BrowserLocationViewUX.BaseURLFontColor, range: nsRange)
             attributedString.colorSubstring(baseDomain, withColor: BrowserLocationViewUX.HostFontColor)
             editTextField.attributedText = attributedString
@@ -320,7 +320,7 @@ class ToolbarTextField: AutocompleteTextField, UITextFieldDelegate, UIGestureRec
     override init(frame: CGRect) {
 
         super.init(frame: frame)
-        var longPressRecogniser = UILongPressGestureRecognizer(target: self, action: Selector("longPress:"))
+        let longPressRecogniser = UILongPressGestureRecognizer(target: self, action: Selector("longPress:"))
         longPressRecogniser.delegate = self
         self.addGestureRecognizer(longPressRecogniser)
     }
@@ -336,7 +336,7 @@ class ToolbarTextField: AutocompleteTextField, UITextFieldDelegate, UIGestureRec
     }
 
     override func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
-        var shouldBeginEditing = super.textFieldShouldBeginEditing(textField)
+        let shouldBeginEditing = super.textFieldShouldBeginEditing(textField)
 
         return (toolbarTextFieldDelegate?.textFieldShouldBeginEditing?(textField) ?? shouldBeginEditing) && !longPress
     }

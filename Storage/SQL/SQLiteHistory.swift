@@ -116,7 +116,7 @@ extension SQLiteHistory: BrowserHistory {
     private func isIgnoredURL(url: String) -> Bool {
         if let url = NSURL(string: url) {
             if let scheme = url.scheme {
-                if let index = find(ignoredSchemes, scheme) {
+                if let index = ignoredSchemes.indexOf(scheme.characters) {
                     return true
                 }
             }
@@ -198,13 +198,13 @@ extension SQLiteHistory: BrowserHistory {
     }
 
     public func getSitesByFrecencyWithLimit(limit: Int) -> Deferred<Result<Cursor<Site>>> {
-        let frecencySQL = getMicrosecondFrecencySQL("visitDate", "visitCount")
+        let frecencySQL = getMicrosecondFrecencySQL("visitDate", visitCountColumn: "visitCount")
         let orderBy = "ORDER BY \(frecencySQL) DESC "
         return self.getFilteredSitesWithLimit(limit, whereURLContains: nil, orderBy: orderBy, includeIcon: true)
     }
 
     public func getSitesByFrecencyWithLimit(limit: Int, whereURLContains filter: String) -> Deferred<Result<Cursor<Site>>> {
-        let frecencySQL = getMicrosecondFrecencySQL("visitDate", "visitCount")
+        let frecencySQL = getMicrosecondFrecencySQL("visitDate", visitCountColumn: "visitCount")
         let orderBy = "ORDER BY \(frecencySQL) DESC "
         return self.getFilteredSitesWithLimit(limit, whereURLContains: filter, orderBy: orderBy, includeIcon: true)
     }
@@ -616,7 +616,7 @@ extension SQLiteHistory: SyncableHistory {
                 c.close()
 
                 // Now collect the return value.
-                return deferResult(map(ids, { return (places[$0]!, visits[$0]!) }))
+                return deferResult(ids.map({ return (places[$0]!, visits[$0]!) }))
         }
     }
 

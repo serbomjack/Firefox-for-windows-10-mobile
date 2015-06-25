@@ -87,7 +87,7 @@ class LiveStorageClientTests : LiveAccountTest {
                 XCTAssert(rec.id == "keys", "GUID is correct.")
                 XCTAssert(rec.modified > 1000, "modified is sane.")
                 let payload: KeysPayload = rec.payload as KeysPayload
-                println("Body: \(payload.toString(pretty: false))")
+                print("Body: \(payload.toString(pretty: false))")
                 XCTAssert(rec.id == "keys", "GUID inside is correct.")
                 let arr = payload["default"].asArray![0].asString
                 if let keys = payload.defaultKeys {
@@ -108,7 +108,7 @@ class LiveStorageClientTests : LiveAccountTest {
         deferred.upon {
             res in
             if let (token, keyBundle) = res.successValue {
-                println("Yay")
+                print("Yay")
             } else {
                 XCTAssertEqual(res.failureValue!.description, "")
             }
@@ -132,7 +132,7 @@ class LiveStorageClientTests : LiveAccountTest {
                 XCTAssertTrue(ready.collectionKeys.defaultBundle.encKey.length == 32)
                 XCTAssertTrue(ready.scratchpad.global != nil)
                 if let clients = ready.scratchpad.global?.value.engines?["clients"] {
-                    XCTAssertTrue(count(clients.syncID) == 12)
+                    XCTAssertTrue(clients.syncID.characters.count == 12)
                 }
             }
             XCTAssertTrue(result.isSuccess)

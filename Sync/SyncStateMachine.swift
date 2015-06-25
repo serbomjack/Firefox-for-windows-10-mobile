@@ -542,7 +542,7 @@ public class ResolveMetaGlobal: BaseSyncStateWithInfo {
         // scratchpad, and optionally a meta/global to upload.
         // If this upload fails, we abort, of course.
         let previousMetaGlobal = self.scratchpad.global?.value
-        let (withEnginesApplied: Scratchpad, toUpload: MetaGlobal?) = newScratchpad.applyEngineChoices(previousMetaGlobal)
+        let (withEnginesApplied, toUpload): (Scratchpad, MetaGlobal?) = newScratchpad.applyEngineChoices(previousMetaGlobal)
 
         if let toUpload = toUpload {
             // Upload the new meta/global.

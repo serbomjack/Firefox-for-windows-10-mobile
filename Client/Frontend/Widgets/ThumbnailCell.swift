@@ -117,7 +117,7 @@ class ThumbnailCell: UICollectionViewCell {
             delay: 0,
             usingSpringWithDamping: ThumbnailCellUX.RemoveButtonAnimationDamping,
             initialSpringVelocity: 0,
-            options: UIViewAnimationOptions.AllowUserInteraction |  UIViewAnimationOptions.CurveEaseInOut,
+            options: [UIViewAnimationOptions.AllowUserInteraction, UIViewAnimationOptions.CurveEaseInOut],
             animations: {
                 self.removeButton.transform = show ? CGAffineTransformIdentity : scaleTransform
             }, completion: { _ in

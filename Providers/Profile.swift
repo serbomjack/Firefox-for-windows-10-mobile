@@ -39,7 +39,7 @@ class ProfileFileAccessor: FileAccessor {
             rootPath = path
         } else {
             log.error("Unable to find the shared container. Defaulting profile location to ~/Documents instead.")
-            rootPath = String(NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as! NSString)
+            rootPath = String(NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as NSString)
         }
 
         super.init(rootPath: rootPath!.stringByAppendingPathComponent(profileDirName))
@@ -90,8 +90,8 @@ class BrowserProfileSyncDelegate: SyncDelegate {
 
             notification.fireDate = NSDate()
             notification.timeZone = NSTimeZone.defaultTimeZone()
-            notification.alertBody = String(format: NSLocalizedString("New tab: %@: %@", comment:"New tab [title] [url]"), title, URL.absoluteString!)
-            notification.userInfo = [TabSendURLKey: URL.absoluteString!, TabSendTitleKey: title]
+            notification.alertBody = String(format: NSLocalizedString("New tab: %@: %@", comment:"New tab [title] [url]"), title, URL.absoluteString)
+            notification.userInfo = [TabSendURLKey: URL.absoluteString, TabSendTitleKey: title]
             notification.alertAction = nil
             notification.category = TabSendCategory
 

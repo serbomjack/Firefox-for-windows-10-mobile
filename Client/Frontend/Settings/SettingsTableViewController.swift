@@ -216,7 +216,7 @@ private class AccountStatusSetting: WithAccountSetting {
                 return NSAttributedString(string: NSLocalizedString("Verify your email address.", comment: "Text message in the settings table view"), attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
             case .NeedsPassword:
                 let string = NSLocalizedString("Enter your password to connect.", comment: "Text message in the settings table view")
-                let range = NSRange(location: 0, length: count(string))
+                let range = NSRange(location: 0, length: string.characters.count)
                 let orange = UIColor(red: 255.0 / 255, green: 149.0 / 255, blue: 0.0 / 255, alpha: 1)
                 let attrs : [NSObject : AnyObject]? = [NSForegroundColorAttributeName : orange]
                 let res = NSMutableAttributedString(string: string)
@@ -224,7 +224,7 @@ private class AccountStatusSetting: WithAccountSetting {
                 return res
             case .NeedsUpgrade:
                 let string = NSLocalizedString("Upgrade Firefox to connect.", comment: "Text message in the settings table view")
-                let range = NSRange(location: 0, length: count(string))
+                let range = NSRange(location: 0, length: string.characters.count)
                 let orange = UIColor(red: 255.0 / 255, green: 149.0 / 255, blue: 0.0 / 255, alpha: 1)
                 let attrs : [NSObject : AnyObject]? = [NSForegroundColorAttributeName : orange]
 
@@ -367,7 +367,7 @@ private class ShowIntroductionSetting: Setting {
         navigationController?.dismissViewControllerAnimated(true, completion: {
             if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate {
                 appDelegate.browserViewController.dismissTabTrayController(animated: true) {
-                    appDelegate.browserViewController.presentIntroViewController(force: true)
+                    appDelegate.browserViewController.presentIntroViewController(true)
                 }
             }
         })
@@ -588,12 +588,12 @@ class SettingsTableViewController: UITableViewController {
                 // Be aware that dequeing and then ignoring a cell appears to cause issues; only deque a cell if you're going to return it.
                 cell = SettingsTableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: nil)
             } else {
-                cell = tableView.dequeueReusableCellWithIdentifier(Identifier, forIndexPath: indexPath) as! UITableViewCell
+                cell = tableView.dequeueReusableCellWithIdentifier(Identifier, forIndexPath: indexPath) as UITableViewCell
             }
             setting.onConfigureCell(cell)
             return cell
         }
-        return tableView.dequeueReusableCellWithIdentifier(Identifier, forIndexPath: indexPath) as! UITableViewCell
+        return tableView.dequeueReusableCellWithIdentifier(Identifier, forIndexPath: indexPath) as UITableViewCell
     }
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {

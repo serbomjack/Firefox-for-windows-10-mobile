@@ -57,7 +57,7 @@ class URLBarView: UIView {
 
     lazy var locationView: BrowserLocationView = {
         var locationView = BrowserLocationView(frame: CGRectZero)
-        locationView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        locationView.translatesAutoresizingMaskIntoConstraints = false
         locationView.readerModeState = ReaderModeState.Unavailable
         locationView.delegate = self
 
@@ -73,13 +73,13 @@ class URLBarView: UIView {
 
     private lazy var locationContainer: UIView = {
         var locationContainer = UIView()
-        locationContainer.setTranslatesAutoresizingMaskIntoConstraints(false)
+        locationContainer.translatesAutoresizingMaskIntoConstraints = false
         return locationContainer
     }()
 
     private lazy var tabsButton: UIButton = {
         var tabsButton = InsetButton()
-        tabsButton.setTranslatesAutoresizingMaskIntoConstraints(false)
+        tabsButton.translatesAutoresizingMaskIntoConstraints = false
         tabsButton.setTitle("0", forState: UIControlState.Normal)
         tabsButton.setTitleColor(URLBarViewUX.backgroundColorWithAlpha(1), forState: UIControlState.Normal)
         tabsButton.titleLabel?.layer.backgroundColor = UIColor.whiteColor().CGColor
@@ -456,12 +456,12 @@ class URLBarView: UIView {
         self.stopReloadButton.hidden = !self.toolbarIsShowing || editing
     }
 
-    func updateLayoutForEditing(#editing: Bool, animated: Bool = true) {
+    func updateLayoutForEditing(editing editing: Bool, animated: Bool = true) {
         prepareEditingAnimation(editing)
 
         if animated {
             self.layoutIfNeeded()
-            UIView.animateWithDuration(0.3, delay: 0.0, usingSpringWithDamping: 0.85, initialSpringVelocity: 0.0, options: nil, animations: { _ in
+            UIView.animateWithDuration(0.3, delay: 0.0, usingSpringWithDamping: 0.85, initialSpringVelocity: 0.0, options: [], animations: { _ in
                 self.transitionToEditing(editing)
                 self.layoutIfNeeded()
             }, completion: { _ in
@@ -509,13 +509,13 @@ extension URLBarView: BrowserToolbarProtocol {
         }
     }
 
-    func updatePageStatus(#isWebPage: Bool) {
+    func updatePageStatus(isWebPage isWebPage: Bool) {
         bookmarkButton.enabled = isWebPage
         stopReloadButton.enabled = isWebPage
         shareButton.enabled = isWebPage
     }
 
-    override var accessibilityElements: [AnyObject]! {
+    override var accessibilityElements: [AnyObject]? {
         get {
             if isEditing {
                 return [locationView, cancelButton]
@@ -634,7 +634,7 @@ private class CurveView: UIView {
     private func drawFromTop(path: UIBezierPath) {
         let height: Double = Double(UIConstants.ToolbarHeight)
         let width = getWidthForHeight(height)
-        var from = (Double(self.frame.width) - width * 2 - Double(URLBarViewUX.URLBarCurveOffset - URLBarViewUX.URLBarCurveBounceBuffer), Double(0))
+        let from = (Double(self.frame.width) - width * 2 - Double(URLBarViewUX.URLBarCurveOffset - URLBarViewUX.URLBarCurveBounceBuffer), Double(0))
 
         path.moveToPoint(CGPoint(x: from.0, y: from.1))
         path.addCurveToPoint(CGPoint(x: from.0 + width * W_M2, y: from.1 + height * H_M2),

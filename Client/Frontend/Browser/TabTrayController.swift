@@ -166,7 +166,7 @@ private class CustomCell: UICollectionViewCell {
     }
 
     func showFullscreen(container: UIView, table: UICollectionView, shouldOffset: Bool) {
-        var offset: CGFloat = shouldOffset ? 2 : 1
+        let offset: CGFloat = shouldOffset ? 2 : 1
 
         frame = CGRect(x: 0,
                         y: container.frame.origin.y + UIConstants.ToolbarHeight + TabTrayControllerUX.StatusBarHeight,
@@ -242,7 +242,7 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
         navBar = UIView()
         navBar.backgroundColor = TabTrayControllerUX.BackgroundColor
 
-        let signInButton = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
+        let signInButton = UIButton.buttonWithType(UIButtonType.Custom) as UIButton
         signInButton.addTarget(self, action: "SELdidClickDone", forControlEvents: UIControlEvents.TouchUpInside)
         signInButton.setTitle(NSLocalizedString("Sign in", comment: "Button that leads to Sign in section of the Settings sheet."), forState: UIControlState.Normal)
         signInButton.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)

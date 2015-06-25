@@ -31,25 +31,25 @@ public extension String {
             return true
         }
         if let range = self.rangeOfString(other,
-                options: NSStringCompareOptions.AnchoredSearch | NSStringCompareOptions.BackwardsSearch) {
+                options: [NSStringCompareOptions.AnchoredSearch, NSStringCompareOptions.BackwardsSearch]) {
             return range.endIndex == self.endIndex
         }
         return false
     }
 
     func escape() -> String {
-        var raw: NSString = self
-        var str = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
+        let raw: NSString = self
+        let str = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
             raw,
             "[].",":/?&=;+!@#$()',*",
             CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding))
-        return str as! String
+        return str as String
     }
 
     func unescape() -> String {
-        var raw: NSString = self
-        var str = CFURLCreateStringByReplacingPercentEscapes(kCFAllocatorDefault, raw, "[].")
-        return str as! String
+        let raw: NSString = self
+        let str = CFURLCreateStringByReplacingPercentEscapes(kCFAllocatorDefault, raw, "[].")
+        return str as String
     }
 
     public var asURL: NSURL? {

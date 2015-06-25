@@ -711,7 +711,7 @@ extension SQLiteLogins: SyncableLogins {
         }
     }
 
-    private func resolveConflictBetween(#local: LocalLogin, upstream: Login, shared: Login) -> Success {
+    private func resolveConflictBetween(local local: LocalLogin, upstream: Login, shared: Login) -> Success {
         // Attempt to compute two delta sets by comparing each new record to the shared record.
         // Then we can merge the two delta sets -- either perfectly or by picking a winner in the case
         // of a true conflict -- and produce a resultant record.
@@ -727,7 +727,7 @@ extension SQLiteLogins: SyncableLogins {
         return succeed()
     }
 
-    private func resolveConflictWithoutParentBetween(#local: LocalLogin, upstream: Login) -> Success {
+    private func resolveConflictWithoutParentBetween(local local: LocalLogin, upstream: Login) -> Success {
         // TODO
         return succeed()
     }

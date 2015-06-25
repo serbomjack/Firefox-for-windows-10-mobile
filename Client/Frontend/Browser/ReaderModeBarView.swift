@@ -89,7 +89,7 @@ class ReaderModeBarView: UIView {
         CGContextStrokePath(context)
     }
 
-    private func createButton(#type: ReaderModeBarButtonType, action: Selector) -> UIButton {
+    private func createButton(type type: ReaderModeBarButtonType, action: Selector) -> UIButton {
         let button = UIButton()
         addSubview(button)
         button.setImage(type.image, forState: .Normal)

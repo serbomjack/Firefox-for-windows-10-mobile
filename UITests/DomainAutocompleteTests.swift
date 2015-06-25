@@ -74,7 +74,7 @@ class DomainAutocompleteTests: KIFTestCase {
     private func ensureAutocompletionResult(textField: UITextField, prefix: String, completion: String) {
         var range = NSRange()
         var attribute: AnyObject?
-        let textLength = count(textField.text)
+        let textLength = textField.text.characters.count
 
         attribute = textField.attributedText!.attribute(NSBackgroundColorAttributeName, atIndex: 0, effectiveRange: &range)
 

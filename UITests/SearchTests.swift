@@ -15,7 +15,12 @@ class SearchTests: KIFTestCase {
         // Ensure that the prompt appears.
         tester().tapViewWithAccessibilityIdentifier("url")
         tester().clearTextFromAndThenEnterText("foobar", intoViewWithAccessibilityLabel: LabelAddressAndSearch)
-        found = tester().tryFindingViewWithAccessibilityLabel(LabelPrompt, error: nil)
+        do {
+            try tester().tryFindingViewWithAccessibilityLabel(LabelPrompt)
+            found = true
+        } catch _ {
+            found = false
+        }
         XCTAssertTrue(found, "Prompt is shown")
 
         // Ensure that no suggestions are visible before answering the prompt.
@@ -29,8 +34,14 @@ class SearchTests: KIFTestCase {
 
         tester().tapViewWithAccessibilityLabel("Cancel")
 
-        // Return to the search screen, and make sure our choice was remembered.
-        found = tester().tryFindingViewWithAccessibilityLabel(LabelPrompt, error: nil)
+        do {
+            // Return to the search screen, and make sure our choice was remembered.
+            try tester().tryFindingViewWithAccessibilityLabel(LabelPrompt)
+            // Return to the search screen, and make sure our choice was remembered.
+            found = true
+        } catch _ {
+            found = false
+        }
         XCTAssertFalse(found, "Prompt is not shown")
         tester().tapViewWithAccessibilityIdentifier("url")
         tester().clearTextFromAndThenEnterText("foobar", intoViewWithAccessibilityLabel: LabelAddressAndSearch)
@@ -43,7 +54,12 @@ class SearchTests: KIFTestCase {
         // Ensure that the prompt appears.
         tester().tapViewWithAccessibilityIdentifier("url")
         tester().clearTextFromAndThenEnterText("foobar", intoViewWithAccessibilityLabel: LabelAddressAndSearch)
-        found = tester().tryFindingViewWithAccessibilityLabel(LabelPrompt, error: nil)
+        do {
+            try tester().tryFindingViewWithAccessibilityLabel(LabelPrompt)
+            found = true
+        } catch _ {
+            found = false
+        }
         XCTAssertTrue(found, "Prompt is shown")
 
         // Ensure that no suggestions are visible before answering the prompt.

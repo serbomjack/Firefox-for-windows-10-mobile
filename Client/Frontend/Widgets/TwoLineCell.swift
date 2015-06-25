@@ -91,12 +91,12 @@ class TwoLineHeaderFooterView: UITableViewHeaderFooterView {
     let imageView = UIImageView()
 
     // Yes, this is strange.
-    override var textLabel: UILabel {
+    override var textLabel: UILabel? {
         return _textLabel
     }
 
     // Yes, this is strange.
-    override var detailTextLabel: UILabel {
+    override var detailTextLabel: UILabel? {
         return _detailTextLabel
     }
 

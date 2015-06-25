@@ -154,7 +154,13 @@ class SearchEngines {
         }
 
         let index = searchDirectory.stringByAppendingPathComponent("list.txt")
-        let listFile = String(contentsOfFile: index, encoding: NSUTF8StringEncoding, error: &error)
+        let listFile: String?
+        do {
+            listFile = try String(contentsOfFile: index, encoding: NSUTF8StringEncoding)
+        } catch var error1 as NSError {
+            error = error1
+            listFile = nil
+        }
         let engineNames = listFile!
             .stringByTrimmingCharactersInSet(NSCharacterSet.newlineCharacterSet())
             .componentsSeparatedByCharactersInSet(NSCharacterSet.newlineCharacterSet())
@@ -178,9 +184,9 @@ class SearchEngines {
         }
 
         let defaultEngineFile = searchDirectory.stringByAppendingPathComponent("default.txt")
-        let defaultEngineName = String(contentsOfFile: defaultEngineFile, encoding: NSUTF8StringEncoding, error: nil)?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+        let defaultEngineName = String(contentsOfFile: defaultEngineFile, encoding: NSUTF8StringEncoding)?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 
-        return engines.sorted({ e, _ in e.shortName == defaultEngineName })
+        return engines.sort({ e, _ in e.shortName == defaultEngineName })
     }
 
     // Get all known search engines, possibly as ordered by the user.
@@ -191,9 +197,9 @@ class SearchEngines {
             // We may have found engines that weren't persisted in the ordered list
             // (if the user changed locales or added a new engine); these engines
             // will be appended to the end of the list.
-            return unorderedEngines.sorted { engine1, engine2 in
-                let index1 = find(orderedEngineNames, engine1.shortName)
-                let index2 = find(orderedEngineNames, engine2.shortName)
+            return unorderedEngines.sort { engine1, engine2 in
+                let index1 = orderedEngineNames.indexOf(engine1.shortName.characters)
+                let index2 = orderedEngineNames.indexOf(engine2.shortName.characters)
 
                 if index1 == nil && index2 == nil {
                     return engine1.shortName < engine2.shortName

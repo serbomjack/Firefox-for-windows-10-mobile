@@ -238,7 +238,7 @@ public class MemoryBookmarksSink: ShareToDestination {
         }
 
         // Don't create duplicates.
-        if (!contains(queue, exists)) {
+        if (!queue.contains(exists)) {
             queue.append(BookmarkItem(guid: Bytes.generateGUID(), title: title, url: item.url))
         }
     }
@@ -255,7 +255,7 @@ public class MockMemoryBookmarksStore: BookmarksModelFactory, ShareToDestination
     let sink: MemoryBookmarksSink
 
     public init() {
-        var res = [BookmarkItem]()
+        let res = [BookmarkItem]()
 
         mobile = MemoryBookmarkFolder(guid: BookmarkRoots.MobileFolderGUID, title: "Mobile Bookmarks", children: res)
 

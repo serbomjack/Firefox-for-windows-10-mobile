@@ -5,15 +5,13 @@
 import Foundation
 
 extension NSString {
-    public class func contentsOfFileWithResourceName(name: String, ofType type: String, fromBundle bundle: NSBundle, encoding: NSStringEncoding, error: NSErrorPointer) -> NSString? {
+    public class func contentsOfFileWithResourceName(name: String, ofType type: String, fromBundle bundle: NSBundle, encoding: NSStringEncoding) throws -> NSString {
+        let error: NSError! = NSError(domain: "Migrator", code: 0, userInfo: nil)
         if let path = bundle.pathForResource(name, ofType: type) {
-            if let data = NSString(contentsOfFile: path, encoding: encoding, error: error) {
-                return data
-            } else {
-                return nil
-            }
+            let data = try NSString(contentsOfFile: path, encoding: encoding)
+            return data
         } else {
-            return nil
+            throw error
         }
     }
 }

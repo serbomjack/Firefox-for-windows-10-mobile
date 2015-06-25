@@ -14,7 +14,7 @@ public class MockLogins: BrowserLogins, SyncableLogins {
     public func getLoginsForProtectionSpace(protectionSpace: NSURLProtectionSpace) -> Deferred<Result<Cursor<LoginData>>> {
         let cursor = ArrayCursor(data: cache.filter({ login in
             return login.protectionSpace.host == protectionSpace.host
-        }).sorted({ (loginA, loginB) -> Bool in
+        }).sort({ (loginA, loginB) -> Bool in
             return loginA.timeLastUsed > loginB.timeLastUsed
         }).map({ login in
             return login as LoginData
@@ -26,7 +26,7 @@ public class MockLogins: BrowserLogins, SyncableLogins {
         let cursor = ArrayCursor(data: cache.filter({ login in
             return login.protectionSpace.host == protectionSpace.host &&
                    login.username == username
-        }).sorted({ (loginA, loginB) -> Bool in
+        }).sort({ (loginA, loginB) -> Bool in
             return loginA.timeLastUsed > loginB.timeLastUsed
         }).map({ login in
             return login as LoginData
@@ -38,7 +38,7 @@ public class MockLogins: BrowserLogins, SyncableLogins {
     public func getUsageDataForLoginByGUID(guid: GUID) -> Deferred<Result<LoginUsageData>> {
         let res = cache.filter({ login in
             return login.guid == guid
-        }).sorted({ (loginA, loginB) -> Bool in
+        }).sort({ (loginA, loginB) -> Bool in
             return loginA.timeLastUsed > loginB.timeLastUsed
         })[0] as LoginUsageData
 
@@ -46,7 +46,7 @@ public class MockLogins: BrowserLogins, SyncableLogins {
     }
 
     public func addLogin(login: LoginData) -> Success {
-        if let index = find(cache, login as! Login) {
+        if let index = cache.indexOf(login as! Login) {
             return deferResult(LoginDataError(description: "Already in the cache"))
         }
         cache.append(login as! Login)
@@ -59,7 +59,7 @@ public class MockLogins: BrowserLogins, SyncableLogins {
     }
 
     public func updateLogin(login: LoginData) -> Success {
-        if let index = find(cache, login as! Login) {
+        if let index = cache.indexOf(login as! Login) {
             cache[index].timePasswordChanged = NSDate.nowMicroseconds()
             return succeed()
         }

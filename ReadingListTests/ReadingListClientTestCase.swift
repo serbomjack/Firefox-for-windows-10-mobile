@@ -19,7 +19,7 @@ class ReadingListClientTestCase: XCTestCase {
     override func setUp() {
         super.setUp()
         if let serviceURL = NSURL(string: TestServiceURLString) {
-            var accountName = TestAccountUsername + "-" + randomStringWithLength(16)
+            let accountName = TestAccountUsername + "-" + randomStringWithLength(16)
             authenticator = ReadingListBasicAuthAuthenticator(username: accountName, password: TestAccountPassword)
             self.client = ReadingListClient(serviceURL: serviceURL, authenticator: authenticator)
             XCTAssertNotNil(self.client)
@@ -486,10 +486,10 @@ class ReadingListClientTestCase: XCTestCase {
 
     private func randomStringWithLength(len : Int) -> String {
         let letters : NSString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        var randomString : NSMutableString = NSMutableString(capacity: len)
+        let randomString : NSMutableString = NSMutableString(capacity: len)
         for (var i=0; i < len; i++){
-            var length = UInt32 (letters.length)
-            var rand = arc4random_uniform(length)
+            let length = UInt32 (letters.length)
+            let rand = arc4random_uniform(length)
             randomString.appendFormat("%C", letters.characterAtIndex(Int(rand)))
         }
         return randomString as String

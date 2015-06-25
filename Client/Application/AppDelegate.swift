@@ -26,8 +26,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Set up a web server that serves us static content. Do this early so that it is ready when the UI is presented.
         setUpWebServer(profile)
 
-        // for aural progress bar: play even with silent switch on, and do not stop audio from other apps (like music)
-        AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, withOptions: AVAudioSessionCategoryOptions.MixWithOthers, error: nil)
+        do {
+            // for aural progress bar: play even with silent switch on, and do not stop audio from other apps (like music)
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, withOptions: AVAudioSessionCategoryOptions.MixWithOthers)
+        } catch _ {
+        }
 
         self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
         self.window!.backgroundColor = UIColor.whiteColor()
@@ -85,7 +88,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
-    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject?) -> Bool {
+    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
         if let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: false) where components.scheme == "firefox" && components.host == "open-url" {
             if let query = components.query, item = components.queryItems?.first as? NSURLQueryItem {
                 if item.name == "url" && item.value != nil {
@@ -131,10 +134,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let userAgent = webView.stringByEvaluatingJavaScriptFromString("navigator.userAgent")!
 
             // Extract the WebKit version and use it as the Safari version.
-            let webKitVersionRegex = NSRegularExpression(pattern: "AppleWebKit/([^ ]+) ", options: nil, error: nil)!
-            let match = webKitVersionRegex.firstMatchInString(userAgent, options: nil, range: NSRange(location: 0, length: count(userAgent)))
+            let webKitVersionRegex = try! NSRegularExpression(pattern: "AppleWebKit/([^ ]+) ", options: [])
+            let match = webKitVersionRegex.firstMatchInString(userAgent, options: [], range: NSRange(location: 0, length: userAgent.characters.count))
             if match == nil {
-                println("Error: Unable to determine WebKit version")
+                print("Error: Unable to determine WebKit version")
                 return
             }
             let webKitVersion = (userAgent as NSString).substringWithRange(match!.rangeAtIndex(1))
@@ -142,7 +145,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Insert "FxiOS/<version>" before the Mobile/ section.
             let mobileRange = (userAgent as NSString).rangeOfString("Mobile/")
             if mobileRange.location == NSNotFound {
-                println("Error: Unable to find Mobile section")
+                print("Error: Unable to find Mobile section")
                 return
             }
 
@@ -171,10 +174,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     break
                 }
             } else {
-                println("ERROR: Unknown notification action received")
+                print("ERROR: Unknown notification action received")
             }
         } else {
-            println("ERROR: Unknown notification received")
+            print("ERROR: Unknown notification received")
         }
     }
 
