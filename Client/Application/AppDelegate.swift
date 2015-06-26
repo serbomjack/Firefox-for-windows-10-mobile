@@ -19,6 +19,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let appVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as! String
 
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        runAddon()
+
         // Set the Firefox UA for browsing.
         setUserAgent()
 
@@ -76,6 +78,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             viewURLInNewTab(localNotification)
         }
         return true
+    }
+
+    var jsInterface = JSInterface()
+    func runAddon() {
+        let path = NSBundle.mainBundle().pathForResource("test", ofType: "js")
+        let url = NSURL(fileURLWithPath: path!)
+//        jsInterface.installAddonUsingScript(url!)
+        jsInterface.startupAddonUsingScript(url!)
     }
 
     /**

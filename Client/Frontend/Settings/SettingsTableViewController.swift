@@ -949,9 +949,13 @@ class SettingsTableSectionHeaderView: UITableViewHeaderFooterView {
         super.init(reuseIdentifier: reuseIdentifier)
         contentView.backgroundColor = UIConstants.TableViewHeaderBackgroundColor
         addSubview(titleLabel)
+<<<<<<< HEAD
         clipsToBounds = true
         layer.addSublayer(topBorder)
         layer.addSublayer(bottomBorder)
+=======
+        self.clipsToBounds = true
+>>>>>>> WIP creating addon home panel that will be controlled by Addon API
     }
 
     required init?(coder aDecoder: NSCoder) {
