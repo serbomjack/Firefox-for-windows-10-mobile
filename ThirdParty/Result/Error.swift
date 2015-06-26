@@ -8,5 +8,5 @@
 
 import Foundation
 
-public protocol ErrorType: CustomStringConvertible {
+public protocol BNRErrorType: CustomStringConvertible {
 }

@@ -14,7 +14,7 @@ private let log = XCGLogger.defaultInstance()
 
 // Not an error that indicates a server problem, but merely an
 // error that encloses a StorageResponse.
-public class StorageResponseError<T>: ErrorType {
+public class StorageResponseError<T>: BNRErrorType {
     public let response: StorageResponse<T>
 
     public init(_ response: StorageResponse<T>) {
@@ -26,7 +26,7 @@ public class StorageResponseError<T>: ErrorType {
     }
 }
 
-public class RequestError: ErrorType {
+public class RequestError: BNRErrorType {
     public let error: NSError?
 
     public init(_ err: NSError?) {
@@ -72,13 +72,13 @@ public class NotFound<T>: StorageResponseError<T> {
     }
 }
 
-public class RecordParseError: ErrorType {
+public class RecordParseError: BNRErrorType {
     public var description: String {
         return "Failed to parse record."
     }
 }
 
-public class MalformedMetaGlobalError: ErrorType {
+public class MalformedMetaGlobalError: BNRErrorType {
     public var description: String {
         return "Supplied meta/global for upload did not serialize to valid JSON."
     }
@@ -90,7 +90,7 @@ public class MalformedMetaGlobalError: ErrorType {
  * If you want to bypass this, remove the backoff from the BackoffStorage that
  * the storage client is using.
  */
-public class ServerInBackoffError: ErrorType {
+public class ServerInBackoffError: BNRErrorType {
     private let until: Timestamp
 
     public var description: String {

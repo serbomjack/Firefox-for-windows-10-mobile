@@ -193,7 +193,7 @@ public class BaseSyncStateWithInfo: BaseSyncState {
 /*
  * Error types.
  */
-public protocol SyncError: ErrorType {}
+public protocol SyncError: BNRErrorType {}
 
 public class UnknownError: SyncError {
     public var description: String {
@@ -563,7 +563,7 @@ public class ResolveMetaGlobal: BaseSyncStateWithInfo {
 public class InitialWithLiveTokenAndInfo: BaseSyncStateWithInfo {
     public override var label: SyncStateLabel { return SyncStateLabel.InitialWithLiveTokenAndInfo }
 
-    private func processFailure(failure: ErrorType?) -> ErrorType {
+    private func processFailure(failure: BNRErrorType?) -> BNRErrorType {
         if let failure = failure as? ServerInBackoffError {
             return failure
         }
@@ -652,7 +652,7 @@ public class HasMetaGlobal: BaseSyncStateWithInfo {
         return HasMetaGlobal(client: state.client, scratchpad: scratchpad, token: state.token, info: state.info)
     }
 
-    private func processFailure(failure: ErrorType?) -> ErrorType {
+    private func processFailure(failure: BNRErrorType?) -> BNRErrorType {
         // For now, avoid the risky stuff.
         if ShortCircuitMissingCryptoKeys {
             return MissingCryptoKeysAndUnwillingError()

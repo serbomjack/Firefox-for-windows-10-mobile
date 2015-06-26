@@ -10,12 +10,12 @@ import Foundation
 //import Box
 
 public enum Result<T> {
-    case Failure(ErrorType)
+    case Failure(BNRErrorType)
 
     // TODO: Get rid of Box hack at some point after 6.3
     case Success(Box<T>)
 
-    public init(failure: ErrorType) {
+    public init(failure: BNRErrorType) {
         self = .Failure(failure)
     }
 
@@ -30,7 +30,7 @@ public enum Result<T> {
         }
     }
 
-    public var failureValue: ErrorType? {
+    public var failureValue: BNRErrorType? {
         switch self {
         case .Success: return nil
         case let .Failure(error): return error

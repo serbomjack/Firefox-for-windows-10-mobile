@@ -8,7 +8,7 @@ import Shared
 import Account
 import XCTest
 
-private class KeyFetchError: ErrorType {
+private class KeyFetchError: BNRErrorType {
     var description: String {
         return "key fetch error"
     }

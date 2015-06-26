@@ -110,7 +110,7 @@ extension JSON {
                 userInfo:[NSLocalizedDescriptionKey: "not an JSON object"]
                 )
         }
-        return JSON(obj).toString(pretty)
+        return JSON(obj).toString(pretty: pretty)
     }
 }
 /// instance properties
@@ -394,7 +394,7 @@ extension JSON : SequenceType {
 extension JSON : CustomStringConvertible {
     /// stringifies self.
     /// if pretty:true it pretty prints
-    public func toString(pretty:Bool=false)->String {
+    public func toString(pretty pretty:Bool=false)->String {
         switch _value {
         case is NSError: return "\(_value)"
         case is NSNull: return "null"

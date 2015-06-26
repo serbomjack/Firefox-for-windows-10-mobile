@@ -10,7 +10,7 @@ protocol Clearable {
     func clear() -> Success
 }
 
-class ClearableError : ErrorType {
+class ClearableError : BNRErrorType {
     private let msg: String
     init(msg: String) {
         self.msg = msg

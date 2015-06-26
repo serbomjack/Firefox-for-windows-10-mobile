@@ -88,7 +88,7 @@ public class LiveAccountTest: XCTestCase {
         }
     }
 
-    public enum AccountError: CustomStringConvertible, ErrorType {
+    public enum AccountError: CustomStringConvertible, BNRErrorType {
         case BadParameters
         case NoSignedInUser
         case UnverifiedSignedInUser

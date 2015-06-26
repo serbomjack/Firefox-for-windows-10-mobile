@@ -127,7 +127,7 @@ public class SyncAuthState {
                         self.cache.value = newCache
                     }
                 }
-                return chain(deferred, { (token: $0, forKey: married.kB) })
+                return chain(deferred, f: { (token: $0, forKey: married.kB) })
             }
             return deferResult(result.failureValue!)
         }

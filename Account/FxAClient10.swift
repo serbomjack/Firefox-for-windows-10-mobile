@@ -62,7 +62,7 @@ public enum FxAClientError {
 }
 
 // Be aware that string interpolation doesn't work: rdar://17318018, much good that it will do.
-extension FxAClientError: CustomStringConvertible, ErrorType {
+extension FxAClientError: CustomStringConvertible, BNRErrorType {
     public var description: String {
         switch self {
         case let .Remote(error):
@@ -233,7 +233,7 @@ public class FxAClient10 {
         mutableURLRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         mutableURLRequest.HTTPBody = JSON(parameters).toString(pretty: false).utf8EncodedData
 
-        let request = Alamofire.request(mutableURLRequest)
+        _ = Alamofire.request(mutableURLRequest)
             .validate(contentType: ["application/json"])
             .responseJSON { (request, response, data, error) in
                 if let error = error {

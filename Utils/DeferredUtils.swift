@@ -41,7 +41,7 @@ public func deferResult<T>(s: T) -> Deferred<Result<T>> {
     return Deferred(value: Result(success: s))
 }
 
-public func deferResult<T>(e: ErrorType) -> Deferred<Result<T>> {
+public func deferResult<T>(e: BNRErrorType) -> Deferred<Result<T>> {
     return Deferred(value: Result(failure: e))
 }
 

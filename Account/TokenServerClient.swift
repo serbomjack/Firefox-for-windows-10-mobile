@@ -62,10 +62,10 @@ enum TokenServerError {
     case Local(NSError)
 }
 
-extension TokenServerError: CustomStringConvertible, ErrorType {
+extension TokenServerError: CustomStringConvertible, BNRErrorType {
     var description: String {
         switch self {
-        case let Remote(code: code, status: status, remoteTimestamp: remoteTimestamp):
+        case let Remote(code: code, status: status, remoteTimestamp: _):
             if let status = status {
                 return "<TokenServerError.Remote \(code): \(status)>"
             } else {
@@ -132,7 +132,7 @@ public class TokenServerClient {
     public func token(assertion: String, clientState: String? = nil) -> Deferred<Result<TokenServerToken>> {
         let deferred = Deferred<Result<TokenServerToken>>()
 
-        var mutableURLRequest = NSMutableURLRequest(URL: URL)
+        let mutableURLRequest = NSMutableURLRequest(URL: URL)
         mutableURLRequest.setValue("BrowserID " + assertion, forHTTPHeaderField: "Authorization")
         if let clientState = clientState {
             mutableURLRequest.setValue(clientState, forHTTPHeaderField: "X-Client-State")

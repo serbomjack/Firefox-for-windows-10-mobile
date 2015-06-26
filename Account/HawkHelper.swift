@@ -52,7 +52,7 @@ public class HawkHelper {
         if !extra.isEmpty {
             append("ext", value: HawkHelper.escapeExtraHeaderAttribute(extra))
         }
-        append("mac", macString)
+        append("mac", value: macString)
         // Drop the trailing "\",".
         return s.substringToIndex(s.length - 2)
     }
@@ -120,7 +120,7 @@ public class HawkHelper {
 
     class func getBaseContentTypeFor(contentType: String?) -> String {
         if let contentType = contentType {
-            if let index = contentType.characters.indexOf(";".characters) {
+            if let index = contentType.characters.indexOf(";") {
                 return contentType.substringToIndex(index).stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
             } else {
                 return contentType.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
