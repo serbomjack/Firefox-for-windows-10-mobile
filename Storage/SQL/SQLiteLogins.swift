@@ -163,7 +163,7 @@ public class SQLiteLogins: BrowserLogins {
     }
 
     class func LocalLoginFactory(row: SDRow) -> LocalLogin {
-        var login = self.constructLogin(row, c: LocalLogin.self)
+        let login = self.constructLogin(row, c: LocalLogin.self)
 
         login.localModified = row.getTimestamp("local_modified")!
         login.isDeleted = row.getBoolean("is_deleted")
@@ -173,7 +173,7 @@ public class SQLiteLogins: BrowserLogins {
     }
 
     class func MirrorLoginFactory(row: SDRow) -> MirrorLogin {
-        var login = self.constructLogin(row, c: MirrorLogin.self)
+        let login = self.constructLogin(row, c: MirrorLogin.self)
 
         login.serverModified = row.getTimestamp("server_modified")!
         login.isOverridden = row.getBoolean("is_overridden")

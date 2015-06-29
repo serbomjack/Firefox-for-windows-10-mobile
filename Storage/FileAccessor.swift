@@ -21,17 +21,14 @@ public class FileAccessor {
      * Gets the absolute directory path at the given relative path, creating it if it does not exist.
      */
     public func getAndEnsureDirectory(relativeDir: String? = nil) throws -> String {
-        var error: NSError! = NSError(domain: "Migrator", code: 0, userInfo: nil)
         var absolutePath = rootPath
 
         if let relativeDir = relativeDir {
             absolutePath = absolutePath.stringByAppendingPathComponent(relativeDir)
         }
 
-        if var value = createDir(absolutePath) ? absolutePath : nil {
-            return value
-        }
-        throw error
+        try createDir(absolutePath)
+        return absolutePath
     }
 
     /**
@@ -46,27 +43,12 @@ public class FileAccessor {
      * Removes the contents of the directory without removing the directory itself.
      */
     public func removeFilesInDirectory(relativePath: String = "") throws {
-        var error: NSError! = NSError(domain: "Migrator", code: 0, userInfo: nil)
         let fileManager = NSFileManager.defaultManager()
         let path = rootPath.stringByAppendingPathComponent(relativePath)
-        do {
-            let files = try fileManager.contentsOfDirectoryAtPath(path)
-            var success = true
-            for file in files {
-                if let filename = file as? String {
-                    success = success && remove(relativePath.stringByAppendingPathComponent(filename))
-                }
-            }
-            if success {
-                return
-            }
-            # /* TODO: Finish migration: rewrite code to move the next statement out of enclosing do/catch */
-            throw error
-        } catch var error1 as NSError {
-            error = error1
+        let files = try fileManager.contentsOfDirectoryAtPath(path)
+        for file in files {
+            try remove(relativePath.stringByAppendingPathComponent(file))
         }
-
-        throw error
     }
 
     /**

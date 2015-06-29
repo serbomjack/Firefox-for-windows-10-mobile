@@ -46,11 +46,13 @@ public class MockLogins: BrowserLogins, SyncableLogins {
     }
 
     public func addLogin(login: LoginData) -> Success {
-        if let index = cache.indexOf(login as! Login) {
-            return deferResult(LoginDataError(description: "Already in the cache"))
+        let logIn = login as! Login
+        guard let index = cache.indexOf(logIn) else {
+            cache.append(logIn)
+            return succeed()
         }
-        cache.append(login as! Login)
-        return succeed()
+        return deferResult(LoginDataError(description: "Already in the cache"))
+
     }
 
     public func updateLoginByGUID(guid: GUID, new: LoginData, significant: Bool) -> Success {

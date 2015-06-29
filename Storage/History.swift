@@ -4,7 +4,7 @@
 
 import Shared
 
-public class IgnoredSiteError: ErrorType {
+public class IgnoredSiteError: BNRErrorType {
     public var description: String {
         return "Ignored site."
     }

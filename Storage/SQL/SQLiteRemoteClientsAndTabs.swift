@@ -202,7 +202,7 @@ public class SQLiteRemoteClientsAndTabs: RemoteClientsAndTabs {
         log.info("Accumulated tabs with client GUIDs \(acc.keys).")
 
         // Most recent first.
-        let sort: (RemoteTab, RemoteTab) -> Bool = { $0.lastUsed > $1.lastUsed }
+//        let sort: (RemoteTab, RemoteTab) -> Bool = { $0.lastUsed > $1.lastUsed }
         let fillTabs: (RemoteClient) -> ClientAndTabs = { client in
             var tabs: [RemoteTab]? = nil
             if let guid: String = client.guid {

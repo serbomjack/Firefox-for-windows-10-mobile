@@ -168,7 +168,7 @@ public class Login: CustomStringConvertible, LoginData, LoginUsageData, Equatabl
 
             // If the URI explicitly specified a port, only include it when
             // it's not the default. (We never want "http://foo.com:80")
-            if var port = uri.port {
+            if let port = uri.port {
                 realm? += ":\(port)"
             }
         } else {
@@ -227,7 +227,7 @@ public protocol SyncableLogins {
     func onRemovedAccount() -> Success
 }
 
-public class LoginDataError: ErrorType {
+public class LoginDataError: BNRErrorType {
     public let description: String
     public init(description: String) {
         self.description = description

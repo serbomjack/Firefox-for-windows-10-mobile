@@ -10,7 +10,7 @@ private let log = XCGLogger.defaultInstance()
 
 private let LogPII = false
 
-class NoSuchRecordError: ErrorType {
+class NoSuchRecordError: BNRErrorType {
     let guid: GUID
     init(guid: GUID) {
         self.guid = guid
@@ -30,7 +30,7 @@ func failOrSucceed<T>(err: NSError?, op: String, val: T) -> Deferred<Result<T>> 
 }
 
 func failOrSucceed(err: NSError?, op: String) -> Success {
-    return failOrSucceed(err, op, ())
+    return failOrSucceed(err, op: op, val: ())
 }
 
 /*
@@ -96,7 +96,6 @@ extension SQLiteHistory: BrowserHistory {
     // Note: clearing history isn't really a sane concept in the presence of Sync.
     // This method should be split to do something else.
     public func clearHistory() -> Success {
-        let s: Site? = nil
         var err: NSError? = nil
 
         db.withWritableConnection(&err) { (conn, inout err: NSError?) -> Int in
@@ -110,15 +109,14 @@ extension SQLiteHistory: BrowserHistory {
             return 1
         }
 
-        return failOrSucceed(err, "Clear")
+        return failOrSucceed(err, op: "Clear")
     }
 
     private func isIgnoredURL(url: String) -> Bool {
         if let url = NSURL(string: url) {
-            if let scheme = url.scheme {
-                if let index = ignoredSchemes.indexOf(scheme.characters) {
-                    return true
-                }
+            let scheme = url.scheme
+            if let index = ignoredSchemes.indexOf(scheme) {
+                return true
             }
         }
 
@@ -168,7 +166,7 @@ extension SQLiteHistory: BrowserHistory {
             return 1
         }
 
-        return failOrSucceed(error, "Record site")
+        return failOrSucceed(error, op: "Record site")
     }
 
     // TODO: thread siteID into this to avoid the need to do the lookup.
@@ -189,7 +187,7 @@ extension SQLiteHistory: BrowserHistory {
             return 1
         }
 
-        return failOrSucceed(error, "Record visit")
+        return failOrSucceed(error, op: "Record visit")
     }
 
     public func addLocalVisit(visit: SiteVisit) -> Success {
@@ -298,7 +296,7 @@ extension SQLiteHistory: Favicons {
             return 1
         }
 
-        return failOrSucceed(err, "Clear favicons")
+        return failOrSucceed(err, op: "Clear favicons")
     }
 
     public func addFavicon(icon: Favicon) -> Deferred<Result<Int>> {
@@ -358,24 +356,24 @@ extension SQLiteHistory: Favicons {
             if let siteID = site.id {
                 // So easy!
                 let args: Args? = [siteID, iconID]
-                return doChange("\(insertOrIgnore) (?, ?)", args)
+                return doChange("\(insertOrIgnore) (?, ?)", args: args)
             }
 
             // Nearly easy.
             let args: Args? = [site.url, iconID]
-            return doChange("\(insertOrIgnore) (\(siteSubselect), ?)", args)
+            return doChange("\(insertOrIgnore) (\(siteSubselect), ?)", args: args)
 
         }
 
         // Sigh.
         if let siteID = site.id {
             let args: Args? = [siteID, icon.url]
-            return doChange("\(insertOrIgnore) (?, \(iconSubselect))", args)
+            return doChange("\(insertOrIgnore) (?, \(iconSubselect))", args: args)
         }
 
         // The worst.
         let args: Args? = [site.url, icon.url]
-        return doChange("\(insertOrIgnore) (\(siteSubselect), \(iconSubselect))", args)
+        return doChange("\(insertOrIgnore) (\(siteSubselect), \(iconSubselect))", args: args)
     }
 }
 

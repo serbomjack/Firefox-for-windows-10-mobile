@@ -1,5 +1,5 @@
 github "Alamofire/Alamofire" "swift-2.0"
-github "Masonry/Snap"
+github "Masonry/Snap" "swift-2.0"
 github "swisspol/GCDWebServer"
 github "kif-framework/KIF" "v3.2.1"
 github "drmohundro/SWXMLHash" "xcode-7.0"           # So we get Swift 1.2 fixes.

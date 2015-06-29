@@ -215,7 +215,7 @@ extension SQLiteBookmarks: ShareToDestination {
         return self.db.withWritableConnection(&err) {  (conn, err) -> Success in
             func insertBookmark(icon: Int) -> Success {
                 log.debug("Inserting bookmark with specified icon \(icon).")
-                let urlString = url.absoluteString!
+                let urlString = url.absoluteString
                 var args: Args = [
                     Bytes.generateGUID(),
                     BookmarkNodeType.Bookmark.rawValue,
@@ -255,7 +255,7 @@ extension SQLiteBookmarks: ShareToDestination {
     public func shareItem(item: ShareItem) {
         // We parse here in anticipation of getting real URLs at some point.
         if let url = item.url.asURL {
-            let title = item.title ?? url.absoluteString!
+            let title = item.title ?? url.absoluteString
             self.addToMobileBookmarks(url, title: title, favicon: item.favicon)
         }
     }
