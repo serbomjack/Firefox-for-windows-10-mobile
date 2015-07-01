@@ -174,6 +174,10 @@ class Browser: NSObject {
                     return ErrorPageHelper.decodeURL(url)
                 }
 
+                if AboutLicenseHandler.isAboutLicenseURL(url) {
+                    return NSURL(string: "about:license")!
+                }
+
                 return url
             }
         }
