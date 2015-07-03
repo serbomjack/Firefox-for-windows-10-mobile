@@ -645,20 +645,6 @@
 			remoteGlobalIDString = 2827315D1ABC9BE600AA1954;
 			remoteInfo = Sync;
 		};
-		285D3B521B4332C10035FD22 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D38B2D761A8D98380040E6B5 /* SWXMLHash.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = CD9D052C1A757D8B003CCB21;
-			remoteInfo = SWXMLHashOSX;
-		};
-		285D3B541B4332C10035FD22 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D38B2D761A8D98380040E6B5 /* SWXMLHash.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = CD9D05361A757D8B003CCB21;
-			remoteInfo = SWXMLHashOSXTests;
-		};
 		288A2D9B1AB8B3260023ABC3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
@@ -2220,8 +2206,6 @@
 			children = (
 				D38B2D811A8D98380040E6B5 /* SWXMLHash.framework */,
 				D38B2D831A8D98380040E6B5 /* SWXMLHashTests.xctest */,
-				285D3B531B4332C10035FD22 /* SWXMLHash.framework */,
-				285D3B551B4332C10035FD22 /* SWXMLHashOSXTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3282,20 +3266,6 @@
 			fileType = wrapper.cfbundle;
 			path = "SnapKit OSX Tests.xctest";
 			remoteRef = 0BA84ADF1AE57095009C4D0C /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		285D3B531B4332C10035FD22 /* SWXMLHash.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = SWXMLHash.framework;
-			remoteRef = 285D3B521B4332C10035FD22 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		285D3B551B4332C10035FD22 /* SWXMLHashOSXTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = SWXMLHashOSXTests.xctest;
-			remoteRef = 285D3B541B4332C10035FD22 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		28CE83D01A1D1D5100576538 /* FxA.framework */ = {

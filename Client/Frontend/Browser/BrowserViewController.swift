@@ -18,6 +18,7 @@ private let CancelString = NSLocalizedString("Cancel", comment: "Cancel button")
 
 private let KVOLoading = "loading"
 private let KVOEstimatedProgress = "estimatedProgress"
+private let KVOContentSize = "scrollView.contentSize"
 
 private struct BrowserViewControllerUX {
     private static let ToolbarBaseAnimationDuration: CGFloat = 0.3
@@ -65,6 +66,8 @@ class BrowserViewController: UIViewController {
     private var readerConstraintOffset: CGFloat = 0
 
     private var keyboardState: KeyboardState?
+
+    private var shouldAnimateInsets: Bool = false
 
     let WhiteListedUrls = ["\\/\\/itunes\\.apple\\.com\\/"]
 
@@ -164,6 +167,10 @@ class BrowserViewController: UIViewController {
                 self.view.layoutIfNeeded()
 
                 scrollView.setContentOffset(CGPoint(x: contentOffset.x, y: contentOffset.y + 1), animated: true)
+
+                if let webView = self.tabManager.selectedTab?.webView {
+                    self.updateWebView(webView, forContentHeight: webView.scrollView.contentSize.height)
+                }
             }, completion: { context in
                 scrollView.setContentOffset(CGPoint(x: contentOffset.x, y: contentOffset.y), animated: false)
             })
@@ -178,7 +185,7 @@ class BrowserViewController: UIViewController {
     }
 
     func SELtappedTopArea() {
-        showToolbars(animated: true, completion: nil)
+        showToolbars(animated: true)
     }
 
     deinit {
@@ -193,6 +200,7 @@ class BrowserViewController: UIViewController {
         KeyboardHelper.defaultHelper.addDelegate(self)
 
         webViewContainer = UIView()
+        webViewContainer.backgroundColor = UIColor.whiteColor()
         view.addSubview(webViewContainer)
 
         // Temporary work around for covering the non-clipped web view content
@@ -299,19 +307,9 @@ class BrowserViewController: UIViewController {
         }
 
         webViewContainer.snp_remakeConstraints { make in
-            make.left.right.equalTo(self.view)
-
-            if let readerModeBarBottom = readerModeBar?.snp_bottom {
-                make.top.equalTo(readerModeBarBottom)
-            } else {
-                make.top.equalTo(self.header.snp_bottom)
-            }
-
-            if let toolbar = self.toolbar {
-                make.bottom.equalTo(toolbar.snp_top)
-            } else {
-                make.bottom.equalTo(self.view)
-            }
+            make.left.right.bottom.equalTo(self.view)
+            let topLayoutGuide = self.topLayoutGuide as! UIView
+            make.top.equalTo(topLayoutGuide.snp_bottom)
         }
 
         // Setup the bottom toolbar
@@ -536,6 +534,15 @@ class BrowserViewController: UIViewController {
             toolbar?.updateReloadStatus(loading)
             urlBar.updateReloadStatus(loading)
             auralProgress.progress = loading ? 0 : nil
+        case KVOContentSize:
+            if let webView = object as? WKWebView {
+                let newContentSize = change[NSKeyValueChangeNewKey] as! NSValue
+                let oldContentSize = change[NSKeyValueChangeOldKey] as! NSValue
+                if newContentSize != oldContentSize {
+                    let height = newContentSize.CGSizeValue().height
+                    updateWebView(webView, forContentHeight: height)
+                }
+            }
         default:
             assertionFailure("Unhandled KVO key: \(keyPath)")
         }
@@ -696,7 +703,9 @@ extension BrowserViewController: URLBarDelegate {
         if let selectedTab = tabManager.selectedTab {
             // Only scroll to top if we are not showing the home view controller
             if homePanelController == nil {
-                selectedTab.webView?.scrollView.setContentOffset(CGPointZero, animated: true)
+                if let scrollView = selectedTab.webView?.scrollView {
+                    scrollViewShouldScrollToTop(scrollView)
+                }
             }
         }
     }
@@ -820,17 +829,39 @@ extension BrowserViewController: BrowserToolbarDelegate {
 
 extension BrowserViewController: BrowserDelegate {
 
+    func updateWebView(webView: WKWebView, forContentHeight height: CGFloat) {
+
+        // If our contentSize is larger than what fits on the screen, add in content insets so we can scroll away the toolbars
+        let topOffset = self.header.frame.height
+        let bottomOffset = self.toolbar?.frame.height ?? 0
+
+        if height > webViewContainer.frame.height {
+            webView.scrollView.scrollEnabled = true
+            let inset = UIEdgeInsets(top: topOffset, left: 0, bottom: bottomOffset, right: 0)
+            webView.scrollView.contentInset = inset
+            webView.scrollView.scrollIndicatorInsets = inset
+            webView.frame = CGRect(origin: CGPointZero, size: webViewContainer.frame.size)
+            shouldAnimateInsets = true
+        } else {
+            webView.scrollView.contentInset = UIEdgeInsetsZero
+            webView.scrollView.scrollIndicatorInsets = UIEdgeInsetsZero
+            webView.frame = CGRect(origin: CGPoint(x: 0, y: topOffset), size:  CGSize(width: webViewContainer.frame.width, height: webViewContainer.frame.height - topOffset - bottomOffset))
+            webView.scrollView.scrollEnabled = false
+            shouldAnimateInsets = false
+        }
+    }
+
     func browser(browser: Browser, didCreateWebView webView: WKWebView) {
         webView.scrollView.delegate = self
         webViewContainer.insertSubview(webView, atIndex: 0)
         webView.snp_makeConstraints { make in
             make.edges.equalTo(self.webViewContainer)
         }
-
         // Observers that live as long as the tab. Make sure these are all cleared
         // in willDeleteWebView below!
         webView.addObserver(self, forKeyPath: KVOEstimatedProgress, options: .New, context: nil)
         webView.addObserver(self, forKeyPath: KVOLoading, options: .New, context: nil)
+        webView.addObserver(self, forKeyPath: KVOContentSize, options: NSKeyValueObservingOptions.New | NSKeyValueObservingOptions.Old, context: nil)
         webView.UIDelegate = self
 
         let readerMode = ReaderMode(browser: browser)
@@ -859,6 +890,7 @@ extension BrowserViewController: BrowserDelegate {
     func browser(browser: Browser, willDeleteWebView webView: WKWebView) {
         webView.removeObserver(self, forKeyPath: KVOEstimatedProgress)
         webView.removeObserver(self, forKeyPath: KVOLoading)
+        webView.removeObserver(self, forKeyPath: KVOContentSize)
         webView.UIDelegate = nil
         webView.scrollView.delegate = nil
         webView.removeFromSuperview()
@@ -1038,7 +1070,11 @@ extension BrowserViewController : UIScrollViewDelegate {
 
     func scrollViewDidScroll(scrollView: UIScrollView) {
         if let tab = tabManager.selectedTab,
-           let prev = self.previousScroll {
+           var prev = self.previousScroll {
+
+            if prev.y < -self.header.frame.height {
+                prev.y = -self.header.frame.height
+            }
 
             var totalToolbarHeight = header.frame.size.height
             let offset = scrollView.contentOffset
@@ -1054,16 +1090,20 @@ extension BrowserViewController : UIScrollViewDelegate {
                 // There is enough web content to fill the screen if the scroll bars are fulling animated out
                 scrollView.contentSize.height > (scrollView.frame.size.height + totalToolbarHeight) &&
 
-                // The user is scrolling through the content and not because of the bounces that
-                // happens when you pull up past the content
-                scrollView.contentOffset.y > 0 &&
-
                 // Only scroll away the toolbars if we are NOT pinching to zoom, only when we are dragging
                 !scrollView.zooming {
 
                 scrollFooter(dy)
                 scrollHeader(dy)
                 scrollReader(dy)
+
+                if shouldAnimateInsets {
+                    var inset = scrollView.contentInset
+                    inset.top = clamp(inset.top + dy, min: 0, max: self.header.frame.height)
+                    inset.bottom = clamp(inset.bottom + dy, min: 0, max: self.footer.frame.height)
+                    scrollView.contentInset = inset
+                    scrollView.scrollIndicatorInsets = inset
+                }
             } else {
                 // Force toolbars to be in open state
                 showToolbars(animated: false)
@@ -1101,6 +1141,10 @@ extension BrowserViewController : UIScrollViewDelegate {
 extension BrowserViewController {
     func scrollViewShouldScrollToTop(scrollView: UIScrollView) -> Bool {
         showToolbars(animated: true)
+        let inset = UIEdgeInsets(top: self.header.frame.height, left: 0, bottom: self.toolbar?.frame.height ?? 0, right: 0)
+        scrollView.contentInset = inset
+        scrollView.scrollIndicatorInsets = inset
+        scrollView.setContentOffset(CGPoint(x: 0, y: -scrollView.contentInset.top), animated: true)
         return true
     }
 
