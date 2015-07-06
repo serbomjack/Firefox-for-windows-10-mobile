@@ -2351,6 +2351,10 @@
 				0BF0DBBF1A8598D50039F300 /* TransitionManager.swift */,
 				D3C744CC1A687D6C004CE85D /* URIFixup.swift */,
 				0BF0DB931A8545800039F300 /* URLBarView.swift */,
+				746D4E361B1E699C008F789F /* HashchangeHelper.swift */,
+				74C295261B21152000862FE3 /* AboutHomeHandler.swift */,
+				74C027441B2A348C001B1E88 /* SessionData.swift */,
+				E698FFD91B4AADF40001F623 /* BrowserScrollController.swift */,
 			);
 			path = Browser;
 			sourceTree = "<group>";

@@ -107,7 +107,6 @@ private extension BrowserScrollingController {
             } else if delta < 0 {
                 scrollDirection = .Up
             }
-
             lastContentOffset = translation.y
             if checkRubberbandingForDelta(delta) {
                 scrollWithDelta(delta)

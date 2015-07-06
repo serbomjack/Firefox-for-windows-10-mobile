@@ -1358,6 +1358,27 @@ extension BrowserViewController: WKNavigationDelegate {
         }
     }
 
+    func webView(webView: WKWebView, didCommitNavigation navigation: WKNavigation!) {
+        if let tab = tabManager.selectedTab {
+            if tab.webView == webView {
+                updateNavigationToolbarStates(tab, webView: webView)
+
+                let isPage = (tab.displayURL != nil) ? isWebPage(tab.displayURL!) : false
+                navigationToolbar.updatePageStatus(isWebPage: isPage)
+                scrollController.showToolbars(animated: false)
+
+                if let url = tab.url {
+                    if ReaderModeUtils.isReaderModeURL(url) {
+                        showReaderModeBar(animated: false)
+                    } else {
+                        hideReaderModeBar(animated: false)
+                    }
+                }
+                updateInContentHomePanel(tab.url)
+            }
+        }
+    }
+
     func webView(webView: WKWebView,
         didReceiveAuthenticationChallenge challenge: NSURLAuthenticationChallenge,
         completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential!) -> Void) {
