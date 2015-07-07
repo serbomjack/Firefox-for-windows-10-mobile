@@ -7,17 +7,18 @@ import Shared
 
 struct ThumbnailCellUX {
     /// Ratio of width:height of the thumbnail image.
-    static let ImageAspectRatio: Float = 1.5
+    static let ImageAspectRatio: Float = 1.0
     static let TextSize = UIConstants.DefaultSmallFontSize
-    static let BorderColor = UIColor.blackColor().colorWithAlphaComponent(0.2)
+    static let BorderColor = UIColor.blackColor().colorWithAlphaComponent(0.1)
     static let BorderWidth: CGFloat = 1
-    static let LabelFont = UIConstants.DefaultSmallFont
-    static let LabelColor = UIAccessibilityDarkerSystemColorsEnabled() ? UIColor.blackColor() : UIColor.darkGrayColor()
+    static let LabelFont = UIConstants.DefaultSmallFontMedium
+    static let LabelColor = UIAccessibilityDarkerSystemColorsEnabled() ? UIColor.blackColor() : UIColor(rgb: 0x353535)
     static let LabelBackgroundColor = UIColor(white: 1.0, alpha: 0.5)
-    static let InsetSize: CGFloat = 8
-    static let Insets = UIEdgeInsetsMake(InsetSize, InsetSize, InsetSize, InsetSize)
+    static let LabelAlignment: NSTextAlignment = .Center
+    static let InsetSize: CGFloat = 4
+    static let Insets = UIEdgeInsetsMake(InsetSize * 2, InsetSize, InsetSize * 2, InsetSize)
     static let TextOffset = 2
-    static let PlaceholderImage = UIImage(named: "defaultFavicon")
+    static let PlaceholderImage = UIImage(named: "defaultTopSiteIcon")
     static let CornerRadius: CGFloat = 3
 
     // Make the remove button look 20x20 in size but have the clickable area be 44x44
@@ -50,18 +51,13 @@ class ThumbnailCell: UICollectionViewCell {
         textLabel.setContentHuggingPriority(1000, forAxis: UILayoutConstraintAxis.Vertical)
         textLabel.font = ThumbnailCellUX.LabelFont
         textLabel.textColor = ThumbnailCellUX.LabelColor
+        textLabel.textAlignment = ThumbnailCellUX.LabelAlignment
         return textLabel
     }()
 
     lazy var imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = UIViewContentMode.ScaleAspectFit
-
-        // Force nearest neighbor scaling
-        imageView.layer.shouldRasterize = true
-        imageView.layer.rasterizationScale = 2
-        imageView.layer.minificationFilter = kCAFilterNearest
-        imageView.layer.magnificationFilter = kCAFilterNearest
 
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = ThumbnailCellUX.CornerRadius
@@ -126,14 +122,14 @@ class ThumbnailCell: UICollectionViewCell {
         })
 
         imageView.snp_remakeConstraints({ make in
-            make.top.left.right.equalTo(self.imageWrapper)
+            make.top.equalTo(self.imageWrapper)
+            make.width.equalTo(self.imageView.snp_height)
             make.bottom.equalTo(self.textWrapper.snp_top)
         })
 
         textWrapper.snp_remakeConstraints({ make in
             make.bottom.equalTo(self.imageWrapper.snp_bottom) // .offset(ThumbnailCellUX.BorderWidth)
             make.left.right.equalTo(self.imageWrapper) // .offset(ThumbnailCellUX.BorderWidth)
-            make.height.equalTo(ThumbnailCellUX.TextSize + ThumbnailCellUX.InsetSize * 2)
         })
 
         textLabel.snp_remakeConstraints({ make in

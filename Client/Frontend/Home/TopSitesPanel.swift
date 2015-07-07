@@ -264,7 +264,7 @@ private class TopSitesLayout: UICollectionViewLayout {
         if orientation.isLandscape {
             thumbnailCols = 3
         } else {
-            thumbnailCols = 2
+            thumbnailCols = 3
         }
     }
 
@@ -311,7 +311,7 @@ private class TopSitesLayout: UICollectionViewLayout {
         let col = indexPath.item % thumbnailCols
         let x = ThumbnailCellUX.Insets.left + thumbnailWidth * CGFloat(col)
         let y = ThumbnailCellUX.Insets.top + CGFloat(row) * thumbnailHeight
-        attr.frame = CGRectMake(x, y, thumbnailWidth, thumbnailHeight)
+        attr.frame = CGRectMake(ceil(x), ceil(y), thumbnailWidth, thumbnailHeight)
 
         return attr
     }
@@ -349,7 +349,7 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
     }
 
     private func setDefaultThumbnailBackground(cell: ThumbnailCell) {
-        cell.imageView.image = UIImage(named: "defaultFavicon")!
+        cell.imageView.image = UIImage(named: "defaultTopSiteIcon")!
         cell.imageView.contentMode = UIViewContentMode.Center
     }
 
@@ -360,9 +360,18 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
         cell.imageView.sd_setImageWithURL(site.icon?.url.asURL!, completed: { (img, err, type, url) -> Void in
             if let img = img {
                 cell.backgroundImage.image = img
+
+                // Force nearest neighbor scaling for small favicons
+                if cell.backgroundImage.image?.size.width < 24 {
+                    cell.imageView.layer.shouldRasterize = true
+                    cell.imageView.layer.rasterizationScale = 2
+                    cell.imageView.layer.minificationFilter = kCAFilterNearest
+                    cell.imageView.layer.magnificationFilter = kCAFilterNearest
+                }
+
             } else {
                 cell.backgroundImage.image = nil
-            }
+                self.setDefaultThumbnailBackground(cell)            }
         })
 
         cell.imagePadding = TopSitesPanelUX.SuggestedTileImagePadding

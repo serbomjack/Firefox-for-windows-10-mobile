@@ -18,6 +18,7 @@ public struct UIConstants {
     static let DefaultMediumBoldFont = UIFont.boldSystemFontOfSize(DefaultMediumFontSize)
     static let DefaultSmallFontSize: CGFloat = 11
     static let DefaultSmallFont = UIFont.systemFontOfSize(DefaultSmallFontSize, weight: UIFontWeightRegular)
+    static let DefaultSmallFontMedium = UIFont.systemFontOfSize(DefaultSmallFontSize, weight: UIFontWeightMedium)
     static let DefaultSmallFontBold = UIFont.systemFontOfSize(DefaultSmallFontSize, weight: UIFontWeightBold)
     static let DefaultStandardFontSize: CGFloat = 17
     static let DefaultStandardFontBold = UIFont.boldSystemFontOfSize(DefaultStandardFontSize)
