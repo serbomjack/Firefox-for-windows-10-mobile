@@ -4,6 +4,7 @@
 
 import UIKit
 import SnapKit
+import WebKit
 
 private let ToolbarBaseAnimationDuration: CGFloat = 0.3
 
@@ -29,6 +30,7 @@ class BrowserScrollingController: NSObject {
     weak var footer: UIView?
     weak var urlBar: URLBarView?
 
+    var shouldScrollToolbars: Bool = false
     var footerBottomConstraint: Constraint?
     var headerTopConstraint: Constraint?
     var toolbarsShowing: Bool { return headerTopOffset == 0 }
@@ -108,7 +110,7 @@ private extension BrowserScrollingController {
                 scrollDirection = .Up
             }
             lastContentOffset = translation.y
-            if checkRubberbandingForDelta(delta) {
+            if shouldScrollToolbars && checkRubberbandingForDelta(delta) {
                 scrollWithDelta(delta)
             }
 
@@ -119,31 +121,30 @@ private extension BrowserScrollingController {
     }
 
     func checkRubberbandingForDelta(delta: CGFloat) -> Bool {
-        return !((delta < 0 && contentOffset.y + scrollViewHeight > contentSize.height &&
-                scrollViewHeight < contentSize.height) ||
-                contentOffset.y < delta)
+        let adjustedOffset = contentOffset.y + (scrollView?.contentInset.top ?? 0)
+        return !((delta < 0 &&  adjustedOffset + scrollViewHeight > contentSize.height &&
+            scrollViewHeight < contentSize.height) ||
+            adjustedOffset < delta)
     }
 
     func scrollWithDelta(delta: CGFloat) {
-        if scrollViewHeight >= contentSize.height {
-            return
-        }
+        let updatedHeaderOffset = headerTopOffset - delta
+        headerTopOffset = clamp(updatedHeaderOffset, min: -headerFrame.height, max: 0)
 
-        var updatedOffset = headerTopOffset - delta
-        headerTopOffset = clamp(updatedOffset, min: -headerFrame.height, max: 0)
-        if isHeaderDisplayedForGivenOffset(updatedOffset) {
-            scrollView?.contentOffset = CGPoint(x: contentOffset.x, y: contentOffset.y - delta)
-        }
-
-        updatedOffset = footerBottomOffset + delta
-        footerBottomOffset = clamp(updatedOffset, min: 0, max: footerFrame.height)
+        let updatedFooterOffset = footerBottomOffset + delta
+        footerBottomOffset = clamp(updatedFooterOffset, min: 0, max: footerFrame.height)
 
         let alpha = 1 - abs(headerTopOffset / headerFrame.height)
         urlBar?.updateAlphaForSubviews(alpha)
-    }
 
-    func isHeaderDisplayedForGivenOffset(offset: CGFloat) -> Bool {
-        return offset > -headerFrame.height && offset < 0
+        if let scrollView = scrollView {
+            var updatedInset = scrollView.contentInset
+            updatedInset.top = clamp(updatedInset.top - delta, min: 0, max: headerFrame.height)
+            updatedInset.bottom = clamp(updatedInset.bottom - delta, min: 0, max: footerFrame.height)
+            println(updatedInset.top)
+            scrollView.contentInset = updatedInset
+            scrollView.scrollIndicatorInsets = updatedInset
+        }
     }
 
     func clamp(y: CGFloat, min: CGFloat, max: CGFloat) -> CGFloat {
@@ -162,6 +163,16 @@ private extension BrowserScrollingController {
             self.headerTopOffset = headerOffset
             self.footerBottomOffset = footerOffset
             self.urlBar?.updateAlphaForSubviews(alpha)
+
+            let inset: UIEdgeInsets
+            if !self.shouldScrollToolbars || headerOffset != 0 {
+                inset = UIEdgeInsetsZero
+            } else {
+                inset = UIEdgeInsets(top: self.headerFrame.height, left: 0, bottom: self.footerFrame.height, right: 0)
+            }
+
+            self.scrollView?.contentInset = inset
+            self.scrollView?.scrollIndicatorInsets = inset
             self.header?.superview?.layoutIfNeeded()
         }
 
@@ -182,17 +193,17 @@ extension BrowserScrollingController: UIGestureRecognizerDelegate {
 }
 
 extension BrowserScrollingController: UIScrollViewDelegate {
-    func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        if scrollViewHeight >= contentSize.height {
-            return
-        }
-
-        if scrollDirection == .Up {
-            showToolbars(animated: true)
-        } else if scrollDirection == .Down {
-            hideToolbars(animated: true)
-        }
-    }
+//    func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+//        if scrollViewHeight >= contentSize.height {
+//            return
+//        }
+//
+//        if scrollDirection == .Up {
+//            showToolbars(animated: true)
+//        } else if scrollDirection == .Down {
+//            hideToolbars(animated: true)
+//        }
+//    }
 
     func scrollViewShouldScrollToTop(scrollView: UIScrollView) -> Bool {
         showToolbars(animated: true)
