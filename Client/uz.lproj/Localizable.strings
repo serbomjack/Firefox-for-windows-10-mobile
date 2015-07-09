@@ -1,0 +1,284 @@
+/* Button for larger reader font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"+" = "+";
+
+/* Button for smaller reader font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"-" = "-";
+
+/* Authentication prompt message with no realm. Parameter is the hostname of the site */
+"A username and password are being requested by %@." = "%@ so‘ragan foydalanuvchi nomi va paroli.";
+
+/* Authentication prompt message with a realm. First parameter is the hostname. Second is the realm string */
+"A username and password are being requested by %@. The site says: %@" = "Foydalanuvchi nomi va paroli %1$@. tomonidan so‘raladi Sayt aytmoqda: %2$@";
+
+/* Button for reader mode font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"Aa" = "Aa";
+
+/* About settings section title */
+"About" = "Haqida";
+
+/* Accessibility label for the Add Tab button in the Tab Tray. */
+"Add Tab" = "Ichki oyna qo‘shish";
+
+/* Add URL to the reading list - https://bugzilla.mozilla.org/attachment.cgi?id=8624438, https://bug1157303.bugzilla.mozilla.org/attachment.cgi?id=8624440 */
+"Add to Reading List" = "O‘qish ro‘yxatiga qo‘shish";
+
+/* Accessibility label for address and search field, both words (Address, Search) are therefore nouns. */
+"Address and Search" = "Manzil va qidirish";
+
+/* Authentication prompt title */
+"Authentication required" = "Tasdiqdan oʻtish talab qilinadi";
+
+/* Accessibility Label for the browser toolbar Back button */
+"Back" = "Orqaga";
+
+/* Bookmark a URL - https://bugzilla.mozilla.org/attachment.cgi?id=8624438, https://bug1157303.bugzilla.mozilla.org/attachment.cgi?id=8624440 */
+"Bookmark" = "Xatcho‘p";
+
+/* Panel accessibility label */
+"Bookmarks" = "Xatcho‘plar";
+
+/* Accessibility label for brightness adjustment slider in Reader Mode display settings */
+"Brightness" = "Yorqinlik";
+
+/* Alert Call Button */
+"Call" = "Qo‘ng‘iroq qilish";
+
+/* Alert Cancel Button
+   Authentication prompt cancel button
+   Button label to cancel entering a URL or search query
+   Cancel alert view
+   Cancel button
+   Cancel button in the 'log out firefox account' alert */
+"Cancel" = "Bekor qilish";
+
+/* Accessibility hint for the color theme setting buttons in reader mode display settings */
+"Changes color theme." = "Mavzu rangini o‘zgartiradi.";
+
+/* Accessibility hint for the font type buttons in reader mode display settings */
+"Changes font type." = "Shrift hajmini o‘zgartiradi.";
+
+/* Accessibility label for action denoting closing a tab in tab list (tray) */
+"Close" = "Yopish";
+
+/* Copy the URL from the location bar */
+"Copy Address" = "Manzildan nusxa olish";
+
+/* Error message that is shown in settings when there was a problem connecting to Firefox Accounts */
+"Could not connect to Firefox Accounts." = "Firefox hisoblariga ulana olmadi.";
+
+/* Dark theme setting in Reading View settings */
+"Dark" = "To‘q";
+
+/* Debug option */
+"Debug: forget Sync auth state" = "Debug: forget Sync auth state";
+
+/* Debug option */
+"Debug: require password" = "Debug: require password";
+
+/* Debug option */
+"Debug: require upgrade" = "Debug: require upgrade";
+
+/* Accessibility label for default search engine setting.
+   Title for default search engine picker.
+   Title for default search engine settings section. */
+"Default Search Engine" = "Default Search Engine";
+
+/* Prompt for saving a password. The first parameter is the username being saved. The second parameter is the hostname of the site. */
+"Do you want to save the password for %@ on %@?" = "Do you want to save the password for %1$@ on %2$@?";
+
+/* Prompt for updating a password. The first parameter is the username being saved. The second parameter is the hostname of the site. */
+"Do you want to update the password for %@ on %@?" = "Do you want to update the password for %1$@ on %2$@?";
+
+/* Done button on left side of the Settings view controller title bar
+   Done editing button */
+"Done" = "Done";
+
+/* No comment provided by engineer. */
+"Double tap and hold to open history" = "Double tap and hold to open history";
+
+/* Text message in the settings table view */
+"Enter your password to connect." = "Enter your password to connect.";
+
+/* Text of the 'log out firefox account' alert */
+"Firefox will stop syncing with your account, but won’t delete any of your browsing data on this device." = "Firefox will stop syncing with your account, but won’t delete any of your browsing data on this device.";
+
+/* Accessibility Label for the browser toolbar Forward button */
+"Forward" = "Forward";
+
+/* Panel accessibility label */
+"History" = "History";
+
+/* History tableview section header */
+"Last month" = "Last month";
+
+/* Remote tabs last synced time. Argument is the relative date string. */
+"Last synced: %@" = "Last synced: %@";
+
+/* History tableview section header */
+"Last week" = "Last week";
+
+/* Light theme setting in Reading View settings */
+"Light" = "Light";
+
+/* Name for Mark as read button in reader mode
+   Title for the button that marks a reading list item as read */
+"Mark as Read" = "Mark as Read";
+
+/* Name for Mark as unread button in reader mode
+   Title for the button that marks a reading list item as unread */
+"Mark as Unread" = "Mark as Unread";
+
+/* Error for a missing remote error number */
+"Missing error" = "Missing error";
+
+/* Error for a missing remote error message */
+"Missing message" = "Missing message";
+
+/* Prompt title for application update */
+"New version available" = "New version available";
+
+/* Label for button to cancel application update prompt */
+"Not Now" = "Not Now";
+
+/* Button to not save the user's password */
+"Not now" = "Not now";
+
+/* Alert OK Button
+   Label for OK button in the application update prompt
+   OK button */
+"OK" = "OK";
+
+/* Opening an external URL */
+"Opening %@" = "Opening %@";
+
+/* Password textbox in Authentication prompt */
+"Password" = "Password";
+
+/* Paste the URL into the location bar */
+"Paste" = "Paste";
+
+/* Paste the URL into the location bar and visit */
+"Paste & Go" = "Paste & Go";
+
+/* Privacy section title */
+"Privacy" = "Privacy";
+
+/* Title for quick-search engines settings section. */
+"Quick-search Engines" = "Quick-search Engines";
+
+/* Browser function that presents simplified version of the page with bigger text. */
+"Reader" = "Reader";
+
+/* Accessibility label for the reader mode button */
+"Reader Mode" = "Reader Mode";
+
+/* Panel accessibility label */
+"Reading list" = "Reading list";
+
+/* Header for bookmarks list */
+"Recent Bookmarks" = "Recent Bookmarks";
+
+/* Accessibility Label for the browser toolbar Reload button */
+"Reload" = "Reload";
+
+/* Title for the button that removes a reading list item */
+"Remove" = "Remove";
+
+/* Font type setting in the reading view settings */
+"Sans-serif" = "Sans-serif";
+
+/* Button to save the user's password */
+"Save" = "Save";
+
+/* Navigation title for search settings.
+   Open search section of settings */
+"Search" = "Search";
+
+/* The text shown in the URL bar on about:home */
+"Search or enter address" = "Search or enter address";
+
+/* Accessibility label for the lock icon, which is only present if the connection is secure */
+"Secure connection" = "Secure connection";
+
+/* Sepia theme setting in Reading View settings */
+"Sepia" = "Sepia";
+
+/* Font type setting in the reading view settings */
+"Serif" = "Serif";
+
+/* Accessibility label for the Settings button in the Tab Tray.
+   Settings */
+"Settings" = "Settings";
+
+/* Accessibility Label for the browser toolbar Share button */
+"Share" = "Share";
+
+/* Accessibility label for the tabs button in the (top) browser toolbar
+   Accessibility Label for the tabs button in the browser toolbar */
+"Show Tabs" = "Show Tabs";
+
+/* Label for show search suggestions setting. */
+"Show search suggestions" = "Show search suggestions";
+
+/* Button that leads to Sign in section of the Settings sheet.
+   See http://mzl.la/1Qtkf0j
+   Text message / button in the settings table view */
+"Sign in" = "Sign in";
+
+/* Accessibility Label for the browser toolbar Stop button */
+"Stop" = "Stop";
+
+/* Panel accessibility label */
+"Synced tabs" = "Synced tabs";
+
+/* Accessibility label for the Tabs Tray view. */
+"Tabs Tray" = "Tabs Tray";
+
+/* Accessibility hint for the browser toolbar Reload button */
+"Tap to reload the page" = "Tap to reload the page";
+
+/* No comment provided by engineer. */
+"Tap to stop loading the page" = "Tap to stop loading the page";
+
+/* Prompt message for application update */
+"There is a new version available of Firefox Aurora. Tap OK to go to the download page." = "There is a new version available of Firefox Aurora. Tap OK to go to the download page.";
+
+/* Error displayed when reader mode cannot be enabled */
+"There was an error converting the page" = "There was an error converting the page";
+
+/* Opening an external app */
+"This will open in another application" = "This will open in another application";
+
+/* History tableview section header */
+"Today" = "Today";
+
+/* Panel accessibility label */
+"Top sites" = "Top sites";
+
+/* Button to update the user's password */
+"Update" = "Update";
+
+/* Text message in the settings table view */
+"Upgrade Firefox to connect." = "Upgrade Firefox to connect.";
+
+/* Username textbox in Authentication prompt */
+"Username" = "Username";
+
+/* Text message in the settings table view */
+"Verify your email address." = "Verify your email address.";
+
+/* Version number of Firefox shown in settings */
+"Version %@ (%@)" = "Version %1$@ (%2$@)";
+
+/* Accessibility label for the main web content view */
+"Web content" = "Web content";
+
+/* History tableview section header */
+"Yesterday" = "Yesterday";
+
+/* Accessibility label for read article in reading list. It's a past participle - functions as an adjective. */
+"read" = "read";
+
+/* Accessibility label for unread article in reading list. It's a past participle - functions as an adjective. */
+"unread" = "unread";
+
