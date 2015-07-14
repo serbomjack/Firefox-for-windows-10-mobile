@@ -135,7 +135,7 @@ class BrowserViewController: UIViewController {
         }
 
         if let tab = tabManager.selectedTab {
-            updateNavigationToolbarStates(tab, webView: tab.webView!)
+            updateNavigationToolbarStates(tab)
             let isPage = (tab.displayURL != nil) ? isWebPage(tab.displayURL!) : false
             navigationToolbar.updatePageStatus(isWebPage: isPage)
             navigationToolbar.updateReloadStatus(tab.loading ?? false)
@@ -641,17 +641,19 @@ class BrowserViewController: UIViewController {
         return false
     }
 
-    private func updateNavigationToolbarStates(tab: Browser, webView: WKWebView) {
-        urlBar.currentURL = tab.displayURL
-        navigationToolbar.updateBackStatus(webView.canGoBack)
-        navigationToolbar.updateForwardStatus(webView.canGoForward)
+    private func updateNavigationToolbarStates(tab: Browser) {
+        if let webView = tab.webView {
+            urlBar.currentURL = tab.displayURL
+            navigationToolbar.updateBackStatus(webView.canGoBack)
+            navigationToolbar.updateForwardStatus(webView.canGoForward)
 
-        if let url = tab.displayURL?.absoluteString {
-            profile.bookmarks.isBookmarked(url, success: { bookmarked in
-                self.navigationToolbar.updateBookmarkStatus(bookmarked)
-            }, failure: { err in
-                log.error("Error getting bookmark status: \(err).")
-            })
+            if let url = tab.displayURL?.absoluteString {
+                profile.bookmarks.isBookmarked(url, success: { bookmarked in
+                    self.navigationToolbar.updateBookmarkStatus(bookmarked)
+                }, failure: { err in
+                    log.error("Error getting bookmark status: \(err).")
+                })
+            }
         }
     }
 
@@ -903,11 +905,23 @@ extension BrowserViewController: BrowserToolbarDelegate {
                 var activityViewController = UIActivityViewController(activityItems: [selected.title ?? url.absoluteString!, url], applicationActivities: nil)
                 // Hide 'Add to Reading List' which currently uses Safari
                 activityViewController.excludedActivityTypes = [UIActivityTypeAddToReadingList]
+                activityViewController.completionWithItemsHandler = { _, completed, _, _ in
+                    if completed {
+                        if let selectedTab = self.tabManager.selectedTab {
+                            // We don't know what share action the user has chosen so we simply always
+                            // update the toolbar and reader mode bar to refelect the latest status.
+                            self.updateNavigationToolbarStates(selectedTab)
+                            self.updateReaderModeBar()
+                        }
+                    }
+                }
+
                 if let popoverPresentationController = activityViewController.popoverPresentationController {
                     // Using the button for the sourceView here results in this not showing on iPads.
                     popoverPresentationController.sourceView = toolbar ?? urlBar
                     popoverPresentationController.sourceRect = button.frame ?? button.frame
                     popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirection.Up
+                    popoverPresentationController.delegate = self
                 }
                 presentViewController(activityViewController, animated: true, completion: nil)
             }
@@ -1142,14 +1156,13 @@ extension BrowserViewController: TabManagerDelegate {
             wv.scrollView.hidden = true
         }
 
-        if let tab = selected,
-               webView = tab.webView {
+        if let tab = selected, webView = tab.webView {
             // if we have previously hidden this scrollview in order to make scrollsToTop work then
             // we should ensure that it is not hidden now that it is our foreground scrollView
             if webView.scrollView.hidden {
                 webView.scrollView.hidden = false
             }
-            updateNavigationToolbarStates(tab, webView: webView)
+            updateNavigationToolbarStates(tab)
 
             scrollController.browser = selected
             webViewContainer.addSubview(webView)
@@ -1315,23 +1328,21 @@ extension BrowserViewController: WKNavigationDelegate {
     }
 
     func webView(webView: WKWebView, didCommitNavigation navigation: WKNavigation!) {
-        if let tab = tabManager.selectedTab {
-            if tab.webView == webView {
-                updateNavigationToolbarStates(tab, webView: webView)
+        if let tab = tabManager.selectedTab where tab.webView == webView {
+            updateNavigationToolbarStates(tab)
 
-                let isPage = (tab.displayURL != nil) ? isWebPage(tab.displayURL!) : false
-                navigationToolbar.updatePageStatus(isWebPage: isPage)
-                scrollController.showToolbars(animated: false)
+            let isPage = (tab.displayURL != nil) ? isWebPage(tab.displayURL!) : false
+            navigationToolbar.updatePageStatus(isWebPage: isPage)
+            scrollController.showToolbars(animated: false)
 
-                if let url = tab.url {
-                    if ReaderModeUtils.isReaderModeURL(url) {
-                        showReaderModeBar(animated: false)
-                    } else {
-                        hideReaderModeBar(animated: false)
-                    }
+            if let url = tab.url {
+                if ReaderModeUtils.isReaderModeURL(url) {
+                    showReaderModeBar(animated: false)
+                } else {
+                    hideReaderModeBar(animated: false)
                 }
-                updateInContentHomePanel(tab.url)
             }
+            updateInContentHomePanel(tab.url)
         }
     }
 
@@ -1629,14 +1640,7 @@ extension BrowserViewController : Transitionable {
 }
 
 extension BrowserViewController {
-    func showReaderModeBar(#animated: Bool) {
-        if self.readerModeBar == nil {
-            let readerModeBar = ReaderModeBarView(frame: CGRectZero)
-            readerModeBar.delegate = self
-            view.insertSubview(readerModeBar, belowSubview: header)
-            self.readerModeBar = readerModeBar
-        }
-
+    func updateReaderModeBar() {
         if let readerModeBar = readerModeBar {
             if let url = self.tabManager.selectedTab?.displayURL?.absoluteString, result = profile.readingList?.getRecordWithURL(url) {
                 if let successValue = result.successValue, record = successValue {
@@ -1651,6 +1655,17 @@ extension BrowserViewController {
                 readerModeBar.added = false
             }
         }
+    }
+
+    func showReaderModeBar(#animated: Bool) {
+        if self.readerModeBar == nil {
+            let readerModeBar = ReaderModeBarView(frame: CGRectZero)
+            readerModeBar.delegate = self
+            view.insertSubview(readerModeBar, belowSubview: header)
+            self.readerModeBar = readerModeBar
+        }
+
+        updateReaderModeBar()
 
         self.updateViewConstraints()
     }
@@ -1930,10 +1945,8 @@ extension BrowserViewController: ContextMenuHelperDelegate {
 
 extension BrowserViewController: HashchangeHelperDelegate {
     func hashchangeHelperDidHashchange(hashchangeHelper: HashchangeHelper) {
-        if let tab = tabManager.selectedTab,
-           let webView = tab.webView
-        {
-            updateNavigationToolbarStates(tab, webView: webView)
+        if let tab = tabManager.selectedTab {
+            updateNavigationToolbarStates(tab)
         }
     }
 }
