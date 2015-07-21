@@ -17,11 +17,9 @@ class BrowserScrollingController: NSObject {
     weak var browser: Browser? {
         willSet {
             self.scrollView?.delegate = nil
-            self.scrollView?.removeGestureRecognizer(panGesture)
         }
 
         didSet {
-            self.scrollView?.addGestureRecognizer(panGesture)
             scrollView?.delegate = self
         }
     }
@@ -48,13 +46,6 @@ class BrowserScrollingController: NSObject {
             footer?.superview?.setNeedsLayout()
         }
     }
-
-    private lazy var panGesture: UIPanGestureRecognizer = {
-        let panGesture = UIPanGestureRecognizer(target: self, action: "handlePan:")
-        panGesture.maximumNumberOfTouches = 1
-        panGesture.delegate = self
-        return panGesture
-    }()
 
     private var scrollView: UIScrollView? { return browser?.webView?.scrollView }
     private var contentOffset: CGPoint { return scrollView?.contentOffset ?? CGPointZero }
@@ -97,29 +88,6 @@ class BrowserScrollingController: NSObject {
 }
 
 private extension BrowserScrollingController {
-    @objc func handlePan(gesture: UIPanGestureRecognizer) {
-        if let loading = browser?.loading where loading { return }
-
-        if let containerView = scrollView?.superview {
-            let translation = gesture.translationInView(containerView)
-            let delta = lastContentOffset - translation.y
-
-            if delta > 0 {
-                scrollDirection = .Down
-            } else if delta < 0 {
-                scrollDirection = .Up
-            }
-            lastContentOffset = translation.y
-            if shouldScrollToolbars && checkRubberbandingForDelta(delta) {
-                scrollWithDelta(delta)
-            }
-
-            if gesture.state == .Ended || gesture.state == .Cancelled {
-                lastContentOffset = 0
-            }
-        }
-    }
-
     func checkRubberbandingForDelta(delta: CGFloat) -> Bool {
         let adjustedOffset = contentOffset.y + (scrollView?.contentInset.top ?? 0)
         return !((delta < 0 &&  adjustedOffset + scrollViewHeight > contentSize.height &&
@@ -185,14 +153,24 @@ private extension BrowserScrollingController {
     }
 }
 
-extension BrowserScrollingController: UIGestureRecognizerDelegate {
-    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer,
-        shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return true
-    }
-}
-
 extension BrowserScrollingController: UIScrollViewDelegate {
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        if let loading = browser?.loading where loading { return }
+
+        let delta = lastContentOffset - scrollView.contentOffset.y
+        if delta > 0 {
+            scrollDirection = .Down
+        } else if delta < 0 {
+            scrollDirection = .Up
+        }
+
+        if shouldScrollToolbars && checkRubberbandingForDelta(delta) {
+            scrollWithDelta(-delta)
+        }
+
+        lastContentOffset = scrollView.contentOffset.y
+    }
+
 //    func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
 //        if scrollViewHeight >= contentSize.height {
 //            return
@@ -204,6 +182,10 @@ extension BrowserScrollingController: UIScrollViewDelegate {
 //            hideToolbars(animated: true)
 //        }
 //    }
+
+    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+        lastContentOffset = 0
+    }
 
     func scrollViewShouldScrollToTop(scrollView: UIScrollView) -> Bool {
         showToolbars(animated: true)
