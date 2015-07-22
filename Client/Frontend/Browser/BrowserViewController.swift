@@ -1551,6 +1551,112 @@ extension BrowserViewController: ReaderModeStyleViewControllerDelegate {
     }
 }
 
+extension BrowserViewController: Transitionable  {
+    // The tab tray will produce the view which we use for transitioning
+    func movingViewForHiding() -> TransitioningViewProperties? { return nil }
+    func movingViewForShowing() -> TransitioningViewProperties? { return nil }
+
+    func transitionableWillHide(transitionable: Transitionable, options: TransitionOptions) {
+         // Hide views we don't want to show during the animation in the BVC
+        homePanelController?.view.hidden = true
+        toggleWebViewVisibility(show: false, usingTabManager: tabManager)
+    }
+
+    func transitionableWillShow(transitionable: Transitionable, options: TransitionOptions) {
+        // Hide browser components
+        toggleWebViewVisibility(show: false, usingTabManager: tabManager)
+        homePanelController?.view.hidden = true
+
+        var endFrame = webViewContainer.frame
+        // If we're navigating to a home panel and we were expecting to show the toolbar, add more height to end frame since
+        // there is no toolbar for home panels
+        if AboutUtils.isAboutURL(tabManager.selectedTab?.url) && shouldShowToolbarForTraitCollection(traitCollection) {
+            footer.hidden = true
+            endFrame.size.height += UIConstants.ToolbarHeight
+        }
+
+        // Reset any transform we had previously on the header and transform them to where the cell will be animating from
+        header.transform = CGAffineTransformIdentity
+        footer.transform = CGAffineTransformIdentity
+        readerModeBar?.transform = CGAffineTransformIdentity
+
+        header.transform = transformForHeaderFrame(header.frame, toCellFrame: endFrame)
+        footer.transform = transformForFooterFrame(footer.frame, toCellFrame: endFrame)
+
+        // If we're in reader mode, transform it along with the header
+        if let readerModeBar = readerModeBar {
+            readerModeBar.transform = transformForReaderBarFrame(readerModeBar.frame, toCellFrame: endFrame)
+        }
+    }
+
+    func transitionablePerformHide(transitionable: Transitionable, options: TransitionOptions) {
+        if let transitioningViewProperties = options.toMoving {
+            header.transform = transformForHeaderFrame(header.frame, toCellFrame: transitioningViewProperties.endFrame)
+            footer.transform = transformForFooterFrame(footer.frame, toCellFrame: transitioningViewProperties.endFrame)
+
+            if let readerModeBar = readerModeBar {
+                readerModeBar.transform = transformForReaderBarFrame(readerModeBar.frame, toCellFrame: transitioningViewProperties.endFrame)
+            }
+        }
+
+        urlBar.updateAlphaForSubviews(0)
+        footer.alpha = 0
+    }
+
+    func transitionablePerformShow(transitionable: Transitionable, options: TransitionOptions) {
+        header.transform = CGAffineTransformIdentity
+        footer.transform = CGAffineTransformIdentity
+        readerModeBar?.transform = CGAffineTransformIdentity
+        urlBar.updateAlphaForSubviews(1)
+        footer.alpha = 1
+    }
+
+    func transitionableWillComplete(transitionable: Transitionable, options: TransitionOptions) {
+        if true {
+            startTrackingAccessibilityStatus()
+        } else {
+            stopTrackingAccessibilityStatus()
+        }
+
+        toggleWebViewVisibility(show: true, usingTabManager: tabManager)
+        homePanelController?.view.hidden = false
+        footer.hidden = false
+    }
+
+    private func toggleWebViewVisibility(#show: Bool, usingTabManager tabManager: TabManager) {
+        for i in 0..<tabManager.count {
+            if let tab = tabManager[i] {
+                tab.webView?.hidden = !show
+            }
+        }
+    }
+
+    private func transformForHeaderFrame(headerFrame: CGRect, toCellFrame cellFrame: CGRect) -> CGAffineTransform {
+        let scale = cellFrame.size.width / headerFrame.size.width
+        // Since the scale will happen in the center of the frame, we move this so the centers of the two frames overlap.
+        let tx = cellFrame.origin.x + cellFrame.width/2 - (headerFrame.origin.x + headerFrame.width/2)
+        let ty = cellFrame.origin.y - headerFrame.origin.y * scale * 2 // Move this up a little actually keeps it above the web page. I'm not sure what you want
+        var transform = CGAffineTransformMakeTranslation(tx, ty)
+        return CGAffineTransformScale(transform, scale, scale)
+    }
+
+    private func transformForFooterFrame(footerFrame: CGRect, toCellFrame cellFrame: CGRect) -> CGAffineTransform {
+        let tx = cellFrame.origin.x + cellFrame.width/2 - (footerFrame.origin.x + footerFrame.width/2)
+        var footerTransform = CGAffineTransformMakeTranslation(tx, -footerFrame.origin.y + cellFrame.origin.y + cellFrame.size.height - footerFrame.size.height)
+        let footerScale = cellFrame.size.width / footerFrame.size.width
+        return CGAffineTransformScale(footerTransform, footerScale, footerScale)
+    }
+
+    private func transformForReaderBarFrame(readerBarFrame: CGRect, toCellFrame cellFrame: CGRect) -> CGAffineTransform {
+        let scale = cellFrame.size.width / readerBarFrame.size.width
+        // Since the scale will happen in the center of the frame, we move this so the centers of the two frames overlap.
+        let tx = cellFrame.origin.x + cellFrame.width/2 - (readerBarFrame.origin.x + readerBarFrame.width/2)
+        let ty = cellFrame.origin.y - readerBarFrame.origin.y * scale * 2 // Move this up a little actually keeps it above the web page. I'm not sure what you want
+        var transform = CGAffineTransformMakeTranslation(tx, ty)
+        return CGAffineTransformScale(transform, scale, scale)
+    }
+}
+
 extension BrowserViewController {
     func updateReaderModeBar() {
         if let readerModeBar = readerModeBar {

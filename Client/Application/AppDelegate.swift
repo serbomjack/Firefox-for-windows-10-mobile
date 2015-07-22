@@ -246,9 +246,9 @@ extension AppDelegate: UINavigationControllerDelegate {
         fromViewController fromVC: UIViewController,
         toViewController toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
             if operation == UINavigationControllerOperation.Push {
-                return BrowserToTrayAnimator()
+                return TransitionManager(show: true)
             } else if operation == UINavigationControllerOperation.Pop {
-                return TrayToBrowserAnimator()
+                return TransitionManager(show: false)
             } else {
                 return nil
             }

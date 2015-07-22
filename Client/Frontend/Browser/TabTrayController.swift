@@ -209,7 +209,7 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
     var navBar: UIView!
     var addTabButton: UIButton!
     var settingsButton: UIButton!
-    var collectionViewTransitionSnapshot: UIView?
+    var snapshot: UIView?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -389,6 +389,119 @@ class TabTrayController: UIViewController, UITabBarDelegate, UICollectionViewDel
 
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
         return UIStatusBarStyle.LightContent
+    }
+}
+
+extension TabTrayController: Transitionable {
+    func movingViewForHiding() -> TransitioningViewProperties? {
+        // Create a fake cell to use for the upscaling animation
+        var cellFrame: CGRect?
+        if let attr = collectionView.collectionViewLayout.layoutAttributesForItemAtIndexPath(NSIndexPath(forItem: tabManager.selectedIndex, inSection: 0)) {
+            cellFrame = collectionView.convertRect(attr.frame, toView: view.superview)
+        }
+        let cell = createTransitionCellFromBrowser(tabManager.selectedTab, withFrame: cellFrame!)
+        cell.backgroundHolder.layer.cornerRadius = 0
+        return (view: cell, endFrame: collectionView.frame)
+    }
+
+    func movingViewForShowing() -> TransitioningViewProperties? {
+        view.layoutIfNeeded()
+        
+        // Build a tab cell that we will use to animate the scaling of the browser to the tab
+        let cell = createTransitionCellFromBrowser(tabManager.selectedTab, withFrame: collectionView.frame)
+        cell.backgroundHolder.layer.cornerRadius = TabTrayControllerUX.CornerRadius
+        cell.innerStroke.hidden = true
+        cell.title.transform = CGAffineTransformMakeTranslation(0, -cell.title.frame.size.height)
+
+//        // Force subview layout on the collection view so we can calculate the correct end frame for the animation
+//        view.layoutSubviews()
+        collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: tabManager.selectedIndex, inSection: 0), atScrollPosition: .CenteredVertically, animated: false)
+        var finalFrame: CGRect?
+        if let attr = collectionView.collectionViewLayout.layoutAttributesForItemAtIndexPath(NSIndexPath(forItem: tabManager.selectedIndex, inSection: 0)) {
+            finalFrame = collectionView.convertRect(attr.frame, toView: view.superview)
+        }
+        return (view: cell, endFrame: finalFrame!)
+    }
+
+    func transitionableWillHide(transitionable: Transitionable, options: TransitionOptions) {
+        // Take a snapshot of the collection view that we can scale/fade out. We don't need to wait for screen updates since it's already rendered on the screen
+        snapshot = collectionView.snapshotViewAfterScreenUpdates(false)
+        collectionView.alpha = 0
+        snapshot?.frame = collectionView.frame
+        options.container.insertSubview(snapshot!, aboveSubview: view)
+
+        options.container.addSubview(snapshot!)
+
+        let cell = options.fromMoving?.view as! TabCell
+        options.container.addSubview(cell)
+        cell.layoutIfNeeded()
+    }
+
+    func transitionableWillShow(transitionable: Transitionable, options: TransitionOptions) {
+        // Take a snapshot of the collection view to perform the scaling/alpha effect
+        snapshot = collectionView.snapshotViewAfterScreenUpdates(true)
+        snapshot?.frame = collectionView.frame
+        snapshot?.transform = CGAffineTransformMakeScale(0.9, 0.9)
+        snapshot?.alpha = 0
+        view.addSubview(snapshot!)
+
+        let cell = options.toMoving?.view as! TabCell
+        options.container.addSubview(cell)
+        cell.layoutIfNeeded()
+    }
+
+    func transitionablePerformHide(transitionable: Transitionable, options: TransitionOptions) {
+        if let transitioningViewProperties = options.fromMoving {
+            let cell = transitioningViewProperties.view as! TabCell
+
+            // Scale up the cell and reset the transforms for the header/footers
+            cell.frame = transitioningViewProperties.endFrame
+            options.container.layoutIfNeeded()
+            cell.title.transform = CGAffineTransformMakeTranslation(0, -cell.title.frame.height)
+        }
+
+        snapshot?.transform = CGAffineTransformMakeScale(0.9, 0.9)
+        snapshot?.alpha = 0
+        collectionView.alpha = 0
+
+        // Push out the navigation bar buttons
+        let buttonOffset = addTabButton.frame.width + TabTrayControllerUX.ToolbarButtonOffset
+        addTabButton.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, buttonOffset , 0)
+        settingsButton.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, -buttonOffset , 0)
+    }
+
+    func transitionablePerformShow(transitionable: Transitionable, options: TransitionOptions) {
+        if let transitioningViewProperties = options.toMoving {
+            let cell = transitioningViewProperties.view as! TabCell
+            cell.frame = transitioningViewProperties.endFrame
+            cell.layoutIfNeeded()
+            cell.title.transform = CGAffineTransformIdentity
+        }
+
+        snapshot?.transform = CGAffineTransformIdentity
+        snapshot?.alpha = 1
+        addTabButton.transform = CGAffineTransformIdentity
+        settingsButton.transform = CGAffineTransformIdentity
+    }
+
+    func transitionableWillComplete(transitionable: Transitionable, options: TransitionOptions) {
+        options.toMoving?.view.removeFromSuperview()
+        options.fromMoving?.view.removeFromSuperview()
+        snapshot?.removeFromSuperview()
+        collectionView.alpha = 1
+    }
+
+    private func createTransitionCellFromBrowser(browser: Browser?, withFrame frame: CGRect) -> TabCell {
+        let cell = TabCell(frame: frame)
+        cell.background.image = browser?.screenshot
+        cell.titleText.text = browser?.displayTitle
+        if let favIcon = browser?.displayFavicon {
+            cell.favicon.sd_setImageWithURL(NSURL(string: favIcon.url)!)
+        } else {
+            cell.favicon.image = UIImage(named: "defaultFavicon")
+        }
+        cell.layoutIfNeeded()
+        return cell
     }
 }
 

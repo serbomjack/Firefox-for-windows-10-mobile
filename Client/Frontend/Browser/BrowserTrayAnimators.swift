@@ -228,7 +228,6 @@ private func toggleWebViewVisibility(#show: Bool, usingTabManager tabManager: Ta
     }
 }
 
-
 /**
 Helper methods for calculate affine transforms from frame A to frame B
 */
