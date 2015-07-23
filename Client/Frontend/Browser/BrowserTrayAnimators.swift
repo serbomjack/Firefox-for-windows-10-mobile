@@ -238,7 +238,7 @@ private func transformForHeaderFrame(headerFrame: CGRect, toCellFrame cellFrame:
     let scale = cellFrame.size.width / headerFrame.size.width
     // Since the scale will happen in the center of the frame, we move this so the centers of the two frames overlap.
     let tx = cellFrame.origin.x + cellFrame.width/2 - (headerFrame.origin.x + headerFrame.width/2)
-    let ty = cellFrame.origin.y - headerFrame.origin.y * scale * 2 // Move this up a little actually keeps it above the web page. I'm not sure what you want
+    let ty = cellFrame.origin.y - headerFrame.origin.y * scale * 2
     var transform = CGAffineTransformMakeTranslation(tx, ty)
     return CGAffineTransformScale(transform, scale, scale)
 }

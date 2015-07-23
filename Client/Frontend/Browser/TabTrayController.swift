@@ -36,7 +36,6 @@ struct TabTrayControllerUX {
 
 protocol TabCellDelegate: class {
     func tabCellDidClose(cell: TabCell)
-    func cellHeightForCurrentDevice() -> CGFloat
 }
 
 // UIcollectionViewController doesn't let us specify a style for recycling views. We override the default style here.
