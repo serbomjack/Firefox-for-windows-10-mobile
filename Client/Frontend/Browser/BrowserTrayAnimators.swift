@@ -45,7 +45,7 @@ private extension TrayToBrowserAnimator {
         transformToolbarsToFrame([bvc.header, bvc.footer, bvc.readerModeBar], toRect: cell.frame)
 
         let finalFrame = calculateExpandedCellFrameFromBVC(bvc)
-        bvc.footer.hidden = !shouldDisplayFooterForBVC(bvc)
+        bvc.footer.alpha = shouldDisplayFooterForBVC(bvc) ? 1 : 0
 
         UIView.animateWithDuration(self.transitionDuration(transitionContext),
             delay: 0, usingSpringWithDamping: 1,
@@ -60,7 +60,6 @@ private extension TrayToBrowserAnimator {
             resetTransformsForViews([bvc.header, bvc.footer, bvc.readerModeBar])
 
             bvc.urlBar.updateAlphaForSubviews(1)
-            bvc.footer.alpha = 1
 
             tabCollectionViewSnapshot.transform = CGAffineTransformMakeScale(0.9, 0.9)
             tabCollectionViewSnapshot.alpha = 0
@@ -73,7 +72,7 @@ private extension TrayToBrowserAnimator {
             // Remove any of the views we used for the animation
             cell.removeFromSuperview()
             tabCollectionViewSnapshot.removeFromSuperview()
-
+            bvc.footer.alpha = 1
             bvc.startTrackingAccessibilityStatus()
             toggleWebViewVisibility(show: true, usingTabManager: bvc.tabManager)
             bvc.homePanelController?.view.hidden = false
