@@ -24,7 +24,8 @@ class ViewMemoryLeakTests: KIFTestCase, UITextFieldDelegate {
 
     func testAboutHomeDisposed() {
         // about:home is already active on startup; grab a reference to it.
-        let browserViewController = UIApplication.sharedApplication().keyWindow!.rootViewController!
+        let rootNavController = UIApplication.sharedApplication().keyWindow!.rootViewController! as! UINavigationController
+        let browserViewController = rootNavController.viewControllers[0] as! UIViewController
         weak var aboutHomeController = getChildViewController(browserViewController, childClass: "HomePanelViewController")
 
         // Change the page to make about:home go away.
@@ -43,7 +44,8 @@ class ViewMemoryLeakTests: KIFTestCase, UITextFieldDelegate {
         // Type the URL to make the search controller appear.
         tester().tapViewWithAccessibilityIdentifier("url")
         tester().clearTextFromAndThenEnterTextIntoCurrentFirstResponder("foobar")
-        let browserViewController = UIApplication.sharedApplication().keyWindow!.rootViewController!
+        let rootNavController = UIApplication.sharedApplication().keyWindow!.rootViewController! as! UINavigationController
+        let browserViewController = rootNavController.viewControllers[0] as! UIViewController
         weak var searchViewController = getChildViewController(browserViewController, childClass: "SearchViewController")
         XCTAssertNotNil(searchViewController, "Got search controller reference")
 
@@ -57,7 +59,8 @@ class ViewMemoryLeakTests: KIFTestCase, UITextFieldDelegate {
     }
 
     func testTabTrayDisposed() {
-        let browserViewController = UIApplication.sharedApplication().keyWindow!.rootViewController!
+        let rootNavController = UIApplication.sharedApplication().keyWindow!.rootViewController! as! UINavigationController
+        let browserViewController = rootNavController.viewControllers[0] as! UIViewController
 
         // Enter the tab tray.
         tester().tapViewWithAccessibilityLabel("Show Tabs")
