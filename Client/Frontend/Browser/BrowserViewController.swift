@@ -285,6 +285,9 @@ class BrowserViewController: UIViewController {
             self.view.alpha = (profile.prefs.intForKey(IntroViewControllerSeenProfileKey) != nil) ? 1.0 : 0.0
         }
 
+        let sendCrashDialog = UIAlertView.sendCrashReportDialog(delegate: self)
+        sendCrashDialog.show()
+
         if tabManager.count == 0 && !AppConstants.IsRunningTest {
             tabManager.restoreTabs()
         }
@@ -1860,29 +1863,34 @@ extension BrowserViewController: KeyboardHelperDelegate {
     }
 }
 
-private struct CrashPromptMessaging {
-    static let CrashPromptTitle = NSLocalizedString("Well, this is embarrassing.", comment: "Restore Tabs Prompt Title")
-    static let CrashPromptDescription = NSLocalizedString("Looks like Firefox crashed previously. Would you like to restore your tabs?", comment: "Restore Tabs Prompt Description")
-    static let CrashPromptAffirmative = NSLocalizedString("Okay", comment: "Restore Tabs Affirmative Action")
-    static let CrashPromptNegative = NSLocalizedString("No", comment: "Restore Tabs Negative Action")
+private extension UIAlertView {
+    class func sendCrashReportDialog(#delegate: UIAlertViewDelegate) -> UIAlertView {
+        return UIAlertView(
+            title: NSLocalizedString("Oops! Firefox crashed.", comment: "Send crash report dialog title"),
+            message: NSLocalizedString("Send a crash report so Mozilla can fix the problem?", comment: "Send crash report dialog message"),
+            delegate: delegate,
+            cancelButtonTitle: NSLocalizedString("Don't Send", comment: "Don't send crash report dialog option"),
+            otherButtonTitles: NSLocalizedString("Send Report", comment: "Send crash report dialog option"),
+                               NSLocalizedString("Always Send", comment: "Always send crash report dialog option"))
+    }
 }
 
 extension BrowserViewController: UIAlertViewDelegate {
-    private enum CrashPromptIndex: Int {
-        case Cancel = 0
-        case Restore = 1
-    }
-
-    func alertView(alertView: UIAlertView, clickedButtonAtIndex buttonIndex: Int) {
-        if buttonIndex == CrashPromptIndex.Restore.rawValue {
-            tabManager.restoreTabs()
-        }
-
-        // In case restore fails, launch at least one tab
-        if tabManager.count == 0 {
-            let tab = tabManager.addTab()
-            tabManager.selectTab(tab)
-        }
-    }
+//    private enum CrashPromptIndex: Int {
+//        case Cancel = 0
+//        case Restore = 1
+//    }
+//
+//    func alertView(alertView: UIAlertView, clickedButtonAtIndex buttonIndex: Int) {
+//        if buttonIndex == CrashPromptIndex.Restore.rawValue {
+//            tabManager.restoreTabs()
+//        }
+//
+//        // In case restore fails, launch at least one tab
+//        if tabManager.count == 0 {
+//            let tab = tabManager.addTab()
+//            tabManager.selectTab(tab)
+//        }
+//    }
 }
 
