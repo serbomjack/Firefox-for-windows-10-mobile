@@ -91,8 +91,7 @@ class SettingsContentViewController: UIViewController, WKNavigationDelegate {
         self.webView = makeWebView()
         view.addSubview(webView)
         self.webView.snp_remakeConstraints { make in
-            make.left.right.top.equalTo(self.view)
-            make.bottom.equalTo(self.view)
+            make.edges.equalTo(self.view)
         }
 
         // Destructuring let causes problems.
@@ -102,8 +101,7 @@ class SettingsContentViewController: UIViewController, WKNavigationDelegate {
         self.interstitialErrorView = ret.2
         view.addSubview(interstitialView)
         self.interstitialView.snp_remakeConstraints { make in
-            make.left.right.top.equalTo(self.view)
-            make.bottom.equalTo(self.view)
+            make.edges.equalTo(self.view)
         }
 
         startLoading()
