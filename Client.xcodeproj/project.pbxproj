@@ -566,6 +566,7 @@
 		E68AEDB01B18F81A00133D99 /* SwipeAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E68AEDAF1B18F81A00133D99 /* SwipeAnimator.swift */; };
 		E698FFDA1B4AADF40001F623 /* BrowserScrollController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E698FFD91B4AADF40001F623 /* BrowserScrollController.swift */; };
 		E69966991B72674B0036F797 /* RollingFileLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E69966981B72674B0036F797 /* RollingFileLogger.swift */; };
+		E6C6C44D1B7A410700F6A190 /* FXBlurView.m in Sources */ = {isa = PBXBuildFile; fileRef = E6C6C3EF1B7A410700F6A190 /* FXBlurView.m */; };
 		E6D8D5E71B569D70009E5A58 /* BrowserTrayAnimators.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D8D5E61B569D70009E5A58 /* BrowserTrayAnimators.swift */; };
 		E6EAC5961B29CB3A00E1DE1E /* scrollablePage.html in Resources */ = {isa = PBXBuildFile; fileRef = E6EAC5951B29CB3A00E1DE1E /* scrollablePage.html */; };
 		E6F965121B2F1CF20034B023 /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288A2D861AB8B3260023ABC3 /* Shared.framework */; };
@@ -1599,6 +1600,8 @@
 		E698FFD91B4AADF40001F623 /* BrowserScrollController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserScrollController.swift; sourceTree = "<group>"; };
 		E69966981B72674B0036F797 /* RollingFileLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RollingFileLogger.swift; sourceTree = "<group>"; };
 		E6A99D761B20D95800006EDD /* GeometryExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeometryExtensions.swift; sourceTree = "<group>"; };
+		E6C6C3EE1B7A410700F6A190 /* FXBlurView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FXBlurView.h; sourceTree = "<group>"; };
+		E6C6C3EF1B7A410700F6A190 /* FXBlurView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FXBlurView.m; sourceTree = "<group>"; };
 		E6D8D5E61B569D70009E5A58 /* BrowserTrayAnimators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserTrayAnimators.swift; sourceTree = "<group>"; };
 		E6EAC5951B29CB3A00E1DE1E /* scrollablePage.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = scrollablePage.html; sourceTree = "<group>"; };
 		E6F9650C1B2F1CF20034B023 /* SharedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SharedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2015,6 +2018,7 @@
 		28CE83EF1A1D246900576538 /* Third-Party Source */ = {
 			isa = PBXGroup;
 			children = (
+				E6C6C3ED1B7A410700F6A190 /* FXBlurView */,
 				E635D3FC1B73F03E0078962F /* NRFileManager */,
 				0B5B51AC1B4CDB9E00E3B6E9 /* RaptureXML */,
 				288A2D801AB8B2B90023ABC3 /* Deferred */,
@@ -2597,6 +2601,16 @@
 				E638F2291B62B5E700B080C0 /* libBreakpad.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		E6C6C3ED1B7A410700F6A190 /* FXBlurView */ = {
+			isa = PBXGroup;
+			children = (
+				E6C6C3EE1B7A410700F6A190 /* FXBlurView.h */,
+				E6C6C3EF1B7A410700F6A190 /* FXBlurView.m */,
+			);
+			name = FXBlurView;
+			path = Carthage/Checkouts/FXBlurView/FXBlurView;
 			sourceTree = "<group>";
 		};
 		E6F9650D1B2F1CF20034B023 /* SharedTests */ = {
@@ -4233,6 +4247,7 @@
 				0BF648111A9C54E900BA963C /* TopSitesPanel.swift in Sources */,
 				0B1C05D71A798B1F004C78B0 /* UIImageViewAligned.m in Sources */,
 				0BB5B30B1AC0AD1F0052877D /* LoginsHelper.swift in Sources */,
+				E6C6C44D1B7A410700F6A190 /* FXBlurView.m in Sources */,
 				0BD19A651A2530840084FBA7 /* Locking.swift in Sources */,
 				74203E251B276B3D007D481D /* SessionRestoreHandler.swift in Sources */,
 				E4B423BE1AB9FE6A007E66C8 /* ReaderModeCache.swift in Sources */,

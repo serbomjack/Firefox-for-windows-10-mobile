@@ -16,5 +16,6 @@
 #import "Carthage/Checkouts/SDWebImage/SDWebImage/UIView+WebCacheOperation.h"
 #import "Carthage/Checkouts/SWTableViewCell/SWTableViewCell/PodFiles/SWTableViewCell.h"
 #import "Carthage/Checkouts/RaptureXML/RaptureXML/RXMLElement.h"
+#import "Carthage/Checkouts/FXBlurView/FXBlurView/FXBlurView.h"
 
 #endif
