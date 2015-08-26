@@ -39,9 +39,9 @@
 			</dict>
 		</dict>
 		<key>NSExtensionPointIdentifier</key>
-		<string>com.apple.services</string>
+		<string>com.apple.ui-services</string>
 		<key>NSExtensionPrincipalClass</key>
-		<string>$(PRODUCT_MODULE_NAME).ActionRequestHandler</string>
+		<string>ViewLaterViewController</string>
 	</dict>
 </dict>
 </plist>

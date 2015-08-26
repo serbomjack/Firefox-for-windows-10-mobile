@@ -481,7 +481,6 @@
 		E4B7B7861A793CF20022C5E0 /* FiraSans-UltraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E4B7B75F1A793CF20022C5E0 /* FiraSans-UltraLight.ttf */; };
 		E4BA8A351B4B0A1700BC2E95 /* ViewLater.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E4BA8A2B1B4B0A1600BC2E95 /* ViewLater.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E4BA8A8A1B4B10F400BC2E95 /* Storage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FCAE21A1ABB51F800877008 /* Storage.framework */; };
-		E4BA8AA81B4B15EF00BC2E95 /* ActionRequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4BA8AA11B4B15EF00BC2E95 /* ActionRequestHandler.swift */; };
 		E4BA8AA91B4B15EF00BC2E95 /* Fennec.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = E4BA8AA21B4B15EF00BC2E95 /* Fennec.entitlements */; };
 		E4BA8AAA1B4B15EF00BC2E95 /* FennecAurora.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = E4BA8AA31B4B15EF00BC2E95 /* FennecAurora.entitlements */; };
 		E4BA8AAB1B4B15EF00BC2E95 /* FennecNightly.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = E4BA8AA41B4B15EF00BC2E95 /* FennecNightly.entitlements */; };
@@ -566,6 +565,8 @@
 		E65072A31B2737DA001A0AC6 /* GeometryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A99D761B20D95800006EDD /* GeometryExtensions.swift */; };
 		E65072A41B273824001A0AC6 /* GeometryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A99D761B20D95800006EDD /* GeometryExtensions.swift */; };
 		E65AB12C1B7CDADF00C2B47A /* SessionRestoreHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65AB12B1B7CDADF00C2B47A /* SessionRestoreHelper.swift */; };
+		E6870E031B8E39BE00EE27A1 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6870E021B8E39BE00EE27A1 /* ToastView.swift */; };
+		E6870E041B8E3A2F00EE27A1 /* ViewLaterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E383EB1B8E3667008A23AB /* ViewLaterViewController.swift */; };
 		E68AEDB01B18F81A00133D99 /* SwipeAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E68AEDAF1B18F81A00133D99 /* SwipeAnimator.swift */; };
 		E698FFDA1B4AADF40001F623 /* BrowserScrollController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E698FFD91B4AADF40001F623 /* BrowserScrollController.swift */; };
 		E69966991B72674B0036F797 /* RollingFileLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E69966981B72674B0036F797 /* RollingFileLogger.swift */; };
@@ -1528,7 +1529,6 @@
 		E4B7B7571A793CF20022C5E0 /* FiraSans-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "FiraSans-SemiBold.ttf"; sourceTree = "<group>"; };
 		E4B7B75F1A793CF20022C5E0 /* FiraSans-UltraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "FiraSans-UltraLight.ttf"; sourceTree = "<group>"; };
 		E4BA8A2B1B4B0A1600BC2E95 /* ViewLater.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ViewLater.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		E4BA8AA11B4B15EF00BC2E95 /* ActionRequestHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionRequestHandler.swift; sourceTree = "<group>"; };
 		E4BA8AA21B4B15EF00BC2E95 /* Fennec.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Fennec.entitlements; sourceTree = "<group>"; };
 		E4BA8AA31B4B15EF00BC2E95 /* FennecAurora.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = FennecAurora.entitlements; sourceTree = "<group>"; };
 		E4BA8AA41B4B15EF00BC2E95 /* FennecNightly.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = FennecNightly.entitlements; sourceTree = "<group>"; };
@@ -1599,11 +1599,13 @@
 		E635D41B1B73F06E0078962F /* NSFileManager+NRFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+NRFileManager.m"; sourceTree = "<group>"; };
 		E638F21D1B62B5E700B080C0 /* Breakpad.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Breakpad.xcodeproj; path = "ThirdParty/google-breakpad/src/client/ios/Breakpad.xcodeproj"; sourceTree = "<group>"; };
 		E65AB12B1B7CDADF00C2B47A /* SessionRestoreHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionRestoreHelper.swift; sourceTree = "<group>"; };
+		E6870E021B8E39BE00EE27A1 /* ToastView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		E68AEDAF1B18F81A00133D99 /* SwipeAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeAnimator.swift; sourceTree = "<group>"; };
 		E698FFD91B4AADF40001F623 /* BrowserScrollController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserScrollController.swift; sourceTree = "<group>"; };
 		E69966981B72674B0036F797 /* RollingFileLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RollingFileLogger.swift; sourceTree = "<group>"; };
 		E6A99D761B20D95800006EDD /* GeometryExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeometryExtensions.swift; sourceTree = "<group>"; };
 		E6D8D5E61B569D70009E5A58 /* BrowserTrayAnimators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserTrayAnimators.swift; sourceTree = "<group>"; };
+		E6E383EB1B8E3667008A23AB /* ViewLaterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewLaterViewController.swift; sourceTree = "<group>"; };
 		E6EAC5951B29CB3A00E1DE1E /* scrollablePage.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = scrollablePage.html; sourceTree = "<group>"; };
 		E6F9650C1B2F1CF20034B023 /* SharedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SharedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6F9650F1B2F1CF20034B023 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -2481,7 +2483,8 @@
 		E4BA8AA01B4B15EF00BC2E95 /* ViewLater */ = {
 			isa = PBXGroup;
 			children = (
-				E4BA8AA11B4B15EF00BC2E95 /* ActionRequestHandler.swift */,
+				E6E383EB1B8E3667008A23AB /* ViewLaterViewController.swift */,
+				E6870E021B8E39BE00EE27A1 /* ToastView.swift */,
 				E4BA8AA21B4B15EF00BC2E95 /* Fennec.entitlements */,
 				E4BA8AA31B4B15EF00BC2E95 /* FennecAurora.entitlements */,
 				E4BA8AA41B4B15EF00BC2E95 /* FennecNightly.entitlements */,
@@ -4125,10 +4128,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				E444F7E01B4B1C1A00FEB19B /* NSUserDefaultsPrefs.swift in Sources */,
-				E4BA8AA81B4B15EF00BC2E95 /* ActionRequestHandler.swift in Sources */,
 				E444F7E21B4B1C6800FEB19B /* SearchEngines.swift in Sources */,
 				E444F7DF1B4B1C1200FEB19B /* Profile.swift in Sources */,
 				E444F7E31B4B1C8000FEB19B /* OpenSearch.swift in Sources */,
+				E6870E041B8E3A2F00EE27A1 /* ViewLaterViewController.swift in Sources */,
+				E6870E031B8E39BE00EE27A1 /* ToastView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
