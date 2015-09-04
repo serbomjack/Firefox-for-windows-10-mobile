@@ -5,11 +5,15 @@
 import Foundation
 
 public protocol CrashReporter {
+    var previouslyCrashed: Bool { get }
+
     func start(onCurrentThread: Bool)
     func stop()
     func addUploadParameter(value: String!, forKey: String!)
     func setUploadingEnabled(enabled: Bool)
 }
+
+private let PreviouslyCrashedKey = "previouslyCrashed"
 
 /**
 *  A simple wrapper around the BreakpadController instance to allow us to create mocks for testing
@@ -17,8 +21,21 @@ public protocol CrashReporter {
 struct BreakpadCrashReporter: CrashReporter {
     let breakpadInstance: BreakpadController
 
+    var previouslyCrashed: Bool {
+        get {
+            return NSUserDefaults.standardUserDefaults().boolForKey(PreviouslyCrashedKey)
+        }
+        set(value) {
+            NSUserDefaults.standardUserDefaults().setBool(value, forKey: PreviouslyCrashedKey)
+        }
+    }
+
     func start(onCurrentThread: Bool) {
         breakpadInstance.start(onCurrentThread)
+        breakpadInstance.setFilterCallback { context in
+            NSUserDefaults.standardUserDefaults().setBool(true, forKey: PreviouslyCrashedKey)
+            return true
+        }
     }
 
     func stop() {

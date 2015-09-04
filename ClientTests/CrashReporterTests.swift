@@ -7,6 +7,8 @@ import XCTest
 import Client
 
 class MockCrashReporter: CrashReporter {
+    var previouslyCrashed = false
+
     var didStart = false
     var didStop = false
     var uploadParameters = [String: String]()
