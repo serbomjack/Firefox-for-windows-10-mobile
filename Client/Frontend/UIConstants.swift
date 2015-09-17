@@ -53,3 +53,12 @@ public struct UIConstants {
     /// JPEG compression quality for persisted screenshots. Must be between 0-1.
     static let ScreenshotQuality: Float = 0.3
 }
+
+private struct TempStrings {
+    // Bug 1196227 - (pbmode) [Meta] Private Browsing
+    let openInNewPrivateTab = NSLocalizedString("Open In New Private Tab", tableName: "PrivateBrowsing", comment: "Context menu option for opening a link in a new private tab")
+    let closePrivateTabsSettingsOption = NSLocalizedString("Close private tabs", tableName: "PrivateBrowsing", comment: "Setting for closing private tabs")
+    let whenLeavingOption = NSLocalizedString("When leaving private browsing", tableName: "PrivateBrowsing", comment: "Setting for when the user leaves private browsing mode")
+    let manually = NSLocalizedString("Manually", tableName: "PrivateBrowsing", comment: "Manual option")
+    let automatically = NSLocalizedString("Automatically", tableName: "PrivateBrowsing", comment: "Automatic option")
+}
