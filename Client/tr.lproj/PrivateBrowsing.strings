@@ -1,0 +1,15 @@
+/* Setting for closing private tabs */
+"Close Private Tabs" = "Gizli sekmeleri kapat";
+
+/* Text button displayed when there are no tabs open while in private mode */
+"Learn More" = "Daha fazla bilgi alın";
+
+/* Toggled OFF accessibility value */
+"Off" = "Kapalı";
+
+/* Toggled ON accessibility value */
+"On" = "Açık";
+
+/* Context menu option for opening a link in a new private tab */
+"Open In New Private Tab" = "Gizli sekmede aç";
+
