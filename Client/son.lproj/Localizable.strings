@@ -1,0 +1,313 @@
+/* Button for larger reader font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"+" = "+";
+
+/* Button for smaller reader font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"-" = "-";
+
+/* Button for reader mode font size. Keep this extremely short! This is shown in the reader mode toolbar. */
+"Aa" = "Aa";
+
+/* About settings section title */
+"About" = "Fahami";
+
+/* Accessibility label for the Add Tab button in the Tab Tray. */
+"Add Tab" = "Nor loku tonton";
+
+/* Add URL to the reading list - https://bugzilla.mozilla.org/attachment.cgi?id=8624438, https://bug1157303.bugzilla.mozilla.org/attachment.cgi?id=8624440 */
+"Add to Reading List" = "Tonton caw maašeedaa ga";
+
+/* Accessibility message e.g. spoken by VoiceOver after the current page gets added to the Reading List using the Reader View button, e.g. by long-pressing it or by its accessibility custom action. */
+"Added page to Reading List" = "Moɲoo tonton caw maašeedaa ga";
+
+/* Accessibility label for address and search field, both words (Address, Search) are therefore nouns. */
+"Address and Search" = "Aderesu nda ceeciyan";
+
+/* Pending feature; currently unused string! Used as a button label for crash dialog prompt */
+"Always Send" = "Sanba waati kul";
+
+/* Authentication prompt title */
+"Authentication required" = "Tabatandiyan ga waažibi";
+
+/* Accessibility Label for the browser toolbar Back button */
+"Back" = "Banda";
+
+/* Block pop-up windows setting */
+"Block Pop-up Windows" = "Ceberi bata zanfuney gagay";
+
+/* Bookmark a URL - https://bugzilla.mozilla.org/attachment.cgi?id=8624438, https://bug1157303.bugzilla.mozilla.org/attachment.cgi?id=8624440 */
+"Bookmark" = "Doo-šilbay";
+
+/* Panel accessibility label */
+"Bookmarks" = "Doo-šilbawey";
+
+/* Accessibility label for brightness adjustment slider in Reader Mode display settings */
+"Brightness" = "Gaayay";
+
+/* Alert Call Button */
+"Call" = "Ciya";
+
+/* Cancel button title in share dialog */
+"Cancel" = "Naŋ";
+
+/* Accessibility hint for the color theme setting buttons in reader mode display settings */
+"Changes color theme." = "Ga noone leeti barmay.";
+
+/* Accessibility hint for the font type buttons in reader mode display settings */
+"Changes font type." = "Ga šigira dumi barmay.";
+
+/* Label used as an item in Settings. When touched it will open a dialog prompting the user to make sure they want to clear all of their private data. */
+"Clear Private Data" = "Sutura bayhayey tuusu";
+
+/* Accessibility label for action denoting closing a tab in tab list (tray) */
+"Close" = "Daabu";
+
+/* No comment provided by engineer. */
+"Closing tab" = "Nor loku daabuyan";
+
+/* Copy the URL from the location bar */
+"Copy Address" = "Aderesu berandi";
+
+/* Context menu item for copying an image to the clipboard */
+"Copy Image" = "Biyoo berandi";
+
+/* Context menu item for copying a link URL to the clipboard */
+"Copy Link" = "Doboo bere";
+
+/* Accessibility message e.g. spoken by VoiceOver after the user wanted to add current page to the Reading List and this was not done, likely because it already was in the Reading List, but perhaps also because of real failures. */
+"Could not add page to Reading List. Maybe it's already there?" = "Mana hin ka moɲoo tonton caw maašeedaa ga. Adiši a goo no ka ben?";
+
+/* Accessibility message e.g. spoken by VoiceOver after adding current webpage to the Reading List failed. */
+"Could not add page to Reading list" = "Mana hin ka moɲoo tonton caw maašeedaa ga";
+
+/* Error message that is shown in settings when there was a problem loading */
+"Could not load page." = "Mana hin ka moɲoo zumandi.";
+
+/* See http://mzl.la/1Qtkf0j */
+"Create an account" = "Kontu tee";
+
+/* Dark theme setting in Reading View settings */
+"Dark" = "Kubay";
+
+/* Debug option */
+"Debug: forget Sync auth state" = "Hanse: dirŋa Sync duɲe alhaali";
+
+/* Debug option */
+"Debug: require password" = "Hanse: šennikufal ga waažibi";
+
+/* Debug option */
+"Debug: require upgrade" = "Hanse: taagandiyan ga waažibi";
+
+/* Accessibility label for button decreasing font size in display settings of reader mode */
+"Decrease text size" = "Hantum azzaati kaynandi";
+
+/* Accessibility label for default search engine setting.
+   Title for default search engine picker.
+   Title for default search engine settings section. */
+"Default Search Engine" = "Tilasu ceecijinay";
+
+/* Pending feature; currently unused string! Checkbox label shown after multiple alerts are shown */
+"Disable additional page dialogs" = "Moo willandi tontonantey kayandi";
+
+/* Name for display settings button in reader mode. Display in the meaning of presentation, not monitor. */
+"Display Settings" = "Kayandiyaney cebe";
+
+/* Prompt for saving a password. The first parameter is the username being saved. The second parameter is the hostname of the site. */
+"Do you want to save the password for %@ on %@?" = "War ga boona ka šennikufal gaabu %1$@ se %2$@ ga?";
+
+/* Prompt for saving a password with no username. The parameter is the hostname of the site. */
+"Do you want to save the password on %@?" = "War ga boona ka šennikufaloo gaabu %@ ga?";
+
+/* Prompt for updating a password. The first parameter is the username being saved. The second parameter is the hostname of the site. */
+"Do you want to update the password for %@ on %@?" = "War ga boona ka šennikufal taagandi %1$@ se %2$@ ga?";
+
+/* Prompt for updating a password with on username. The parameter is the hostname of the site. */
+"Do you want to update the password on %@?" = "War ga boona ka šennikufaloo taagandi %@ ga?";
+
+/* Pending feature; currently unused string! Used as a button label for crash dialog prompt */
+"Don't Send" = "Ma ši a sanba";
+
+/* Done button label for search settings table
+   Done button label on back forward list screen
+   Done button on left side of the Settings view controller title bar
+   Done editing button */
+"Done" = "A ben";
+
+/* No comment provided by engineer. */
+"Double tap and hold to open history" = "Karkar nd'a gaabu ka taarikoo feeri";
+
+/* Text message in the settings table view */
+"Enter your password to connect." = "War šennikufaloo dam ka ciya.";
+
+/* Tile title for App Help */
+"Firefox Help and Support" = "Firefox faaba nda gaakašinay";
+
+/* Text of the 'log out firefox account' alert */
+"Firefox will stop syncing with your account, but won’t delete any of your browsing data on this device." = "Firefox ši war kontoo hangandi koyne, amm'a ši war ceeciyan taariki bayhaya kul tuusu jinaa woo ga.";
+
+/* See http://mzl.la/1G7uHo7 */
+"Firefox would like to access your Photos" = "Firefox ga boona ka too war biyey do";
+
+/* Accessibility Label for the browser toolbar Forward button */
+"Forward" = "Jine";
+
+/* General settings section title */
+"General" = "Hayakul";
+
+/* A re-worded offer about Sync that emphasizes one-way data transfer, not syncing. */
+"Get your open tabs, bookmarks, and passwords from your other devices." = "War nor loku feerantey, doo-šilbawey nda šennikufaley zaa jinay taney ga.";
+
+/* Pending feature; currently unused string! Button to browse to URL on the clipboard when browser is opened */
+"Go" = "Koy";
+
+/* Pending feature; currently unused string! Prompt message shown when browser is opened with URL on the clipboard */
+"Go to copied URL?" = "Koy URL berantaa ga?";
+
+/* Show the SUMO support page from the Support section in the settings. see http://mzl.la/1dmM8tZ */
+"Help" = "Faaba";
+
+/* Panel accessibility label */
+"History" = "Taariki";
+
+/* History tableview section header */
+"Last month" = "Handu koraa";
+
+/* Last synced time label beside Sync Now setting option. Argument is the relative date string.
+   Remote tabs last synced time. Argument is the relative date string. */
+"Last synced: %@" = "Hangandiyan koraa: %@";
+
+/* History tableview section header */
+"Last week" = "Jirbiyye koraa";
+
+/* Light theme setting in Reading View settings */
+"Light" = "Gaayay";
+
+/* Name for Mark as read button in reader mode
+   Title for the button that marks a reading list item as read */
+"Mark as Read" = "Šilbay sand'a cawandi";
+
+/* Name for Mark as unread button in reader mode
+   Title for the button that marks a reading list item as unread */
+"Mark as Unread" = "Šilbay sand'a mana cawandi";
+
+/* Error for a missing remote error number */
+"Missing error" = "Firka kumante";
+
+/* Error for a missing remote error message */
+"Missing message" = "Alhabar kumante";
+
+/* Prompt title for application update */
+"New version available" = "Dumi taaga ga bara";
+
+/* Label for button to cancel application update prompt */
+"Not Now" = "Manti sohõ";
+
+/* Button to not save the user's password */
+"Not now" = "Manti sohõ";
+
+/* Alert OK Button
+   Label for OK button in the application update prompt
+   OK button */
+"OK" = "Ayyo";
+
+/* Opening an external URL */
+"Opening %@" = "Goo ma %@ feeri";
+
+/* Paste the URL into the location bar */
+"Paste" = "Dobu";
+
+/* Paste the URL into the location bar and visit */
+"Paste & Go" = "Dobu & Koy";
+
+/* Title for quick-search engines settings section. */
+"Quick-search Engines" = "Ceecijinay cahãntey";
+
+/* Panel accessibility label */
+"Reading list" = "Caw maašeede";
+
+/* Accessibility Label for the browser toolbar Reload button */
+"Reload" = "Dam taaga";
+
+/* Title for the button that removes a reading list item */
+"Remove" = "Kaa";
+
+/* Font type setting in the reading view settings */
+"Sans-serif" = "Šigira šerrante";
+
+/* Button to save the user's password */
+"Save" = "Gaabu";
+
+/* Navigation title for search settings.
+   Open search section of settings */
+"Search" = "Ceeci";
+
+/* The text shown in the URL bar on about:home */
+"Search or enter address" = "Ceeci wala aderesu dam";
+
+/* Accessibility label for the lock icon, which is only present if the connection is secure */
+"Secure connection" = "Ciyari saajante";
+
+/* Sepia theme setting in Reading View settings */
+"Sepia" = "Bokkaaray";
+
+/* Font type setting in the reading view settings */
+"Serif" = "Delbu šigira";
+
+/* Accessibility label for the Settings button in the Tab Tray.
+   Settings */
+"Settings" = "Kayandiyaney";
+
+/* Accessibility Label for the browser toolbar Share button */
+"Share" = "Žemna";
+
+/* Accessibility label for the tabs button in the (top) browser toolbar
+   Accessibility Label for the tabs button in the browser toolbar */
+"Show Tabs" = "Nor lokey cebe";
+
+/* Label for show search suggestions setting. */
+"Show search suggestions" = "Ceeci honnandiyaney cebe";
+
+/* Text message / button in the settings table view */
+"Sign in" = "Huru";
+
+/* Accessibility Label for the browser toolbar Stop button */
+"Stop" = "Kayandi";
+
+/* Panel accessibility label */
+"Synced tabs" = "Nor loku hangantey";
+
+/* Accessibility label for the Tabs Tray view. */
+"Tabs Tray" = "Nor loku daari";
+
+/* Prompt message for application update */
+"There is a new version available of Firefox Aurora. Tap OK to go to the download page." = "Firefox Aurora dumi taaga ga bara. Ayyo naagu ka koy zumandiyan moɲoo ga.";
+
+/* Error displayed when reader mode cannot be enabled */
+"There was an error converting the page" = "Firka foo bangay moɲoo barmayyanoo ra";
+
+/* Opening an external app */
+"This will open in another application" = "Woo ga porogaram tana foo feeri";
+
+/* History tableview section header */
+"Today" = "Hõ";
+
+/* Panel accessibility label */
+"Top sites" = "Nungu kaasey";
+
+/* Button to update the user's password */
+"Update" = "Taagandi";
+
+/* Text message in the settings table view */
+"Upgrade Firefox to connect." = "Firefox taagandi ka ciya.";
+
+/* Text message in the settings table view */
+"Verify your email address." = "War bataga aderesoo koroši.";
+
+/* Version number of Firefox shown in settings */
+"Version %@ (%@)" = "Dumi %1$@ (%2$@)";
+
+/* Accessibility label for the main web content view */
+"Web content" = "Interneti gundekuna";
+
+/* History tableview section header */
+"Yesterday" = "Bi";
+
