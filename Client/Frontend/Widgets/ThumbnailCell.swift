@@ -42,6 +42,8 @@ struct ThumbnailCellUX {
 }
 
 class ThumbnailCell: UICollectionViewCell {
+    static let Identifier = "Thumbnail"
+
     weak var delegate: ThumbnailCellDelegate?
 
     var imagePadding: CGFloat = 0 {
@@ -144,14 +146,14 @@ class ThumbnailCell: UICollectionViewCell {
         addGestureRecognizer(longPressGesture)
 
         contentView.addSubview(imageWrapper)
-        if let backgroundEffect = backgroundEffect {
-            imageWrapper.addSubview(backgroundImage)
-            imageWrapper.addSubview(backgroundEffect)
-            backgroundImage.snp_remakeConstraints { make in
-                make.top.bottom.left.right.equalTo(self.imageWrapper)
-            }
-
-        }
+//        if let backgroundEffect = backgroundEffect {
+//            imageWrapper.addSubview(backgroundImage)
+//            imageWrapper.addSubview(backgroundEffect)
+//            backgroundImage.snp_remakeConstraints { make in
+//                make.top.bottom.left.right.equalTo(self.imageWrapper)
+//            }
+//
+//        }
         imageWrapper.addSubview(imageView)
         imageWrapper.addSubview(textWrapper)
         textWrapper.addSubview(textLabel)
@@ -164,9 +166,9 @@ class ThumbnailCell: UICollectionViewCell {
             make.right.equalTo(self.contentView).inset(ThumbnailCellUX.Insets.right)
         }
 
-        backgroundEffect?.snp_remakeConstraints { make in
-            make.top.bottom.left.right.equalTo(self.imageWrapper)
-        }
+//        backgroundEffect?.snp_remakeConstraints { make in
+//            make.top.bottom.left.right.equalTo(self.imageWrapper)
+//        }
 
         imageView.snp_remakeConstraints { make in
             let imagePadding: CGFloat = (UIScreen.mainScreen().traitCollection.horizontalSizeClass == .Compact) ? ThumbnailCellUX.ImagePaddingCompact : ThumbnailCellUX.ImagePadding

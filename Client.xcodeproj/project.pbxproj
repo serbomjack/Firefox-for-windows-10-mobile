@@ -622,6 +622,7 @@
 		E635D41E1B73F41C0078962F /* NSFileManager+NRFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E635D41B1B73F06E0078962F /* NSFileManager+NRFileManager.m */; };
 		E65072A31B2737DA001A0AC6 /* GeometryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A99D761B20D95800006EDD /* GeometryExtensions.swift */; };
 		E65072A41B273824001A0AC6 /* GeometryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A99D761B20D95800006EDD /* GeometryExtensions.swift */; };
+		E652B8A41BC5B10E002203BD /* TopSitesDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E652B8A31BC5B10E002203BD /* TopSitesDataSource.swift */; settings = {ASSET_TAGS = (); }; };
 		E65AB12C1B7CDADF00C2B47A /* SessionRestoreHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65AB12B1B7CDADF00C2B47A /* SessionRestoreHelper.swift */; };
 		E660BDD91BB06521009AC090 /* TabsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E660BDD81BB06521009AC090 /* TabsButton.swift */; settings = {ASSET_TAGS = (); }; };
 		E660BE061BB0666D009AC090 /* InnerStrokedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E660BE051BB0666D009AC090 /* InnerStrokedView.swift */; settings = {ASSET_TAGS = (); }; };
@@ -1785,6 +1786,7 @@
 		E635D25D1B729DEE0078962F /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		E635D41A1B73F06E0078962F /* NSFileManager+NRFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+NRFileManager.h"; sourceTree = "<group>"; };
 		E635D41B1B73F06E0078962F /* NSFileManager+NRFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+NRFileManager.m"; sourceTree = "<group>"; };
+		E652B8A31BC5B10E002203BD /* TopSitesDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TopSitesDataSource.swift; sourceTree = "<group>"; };
 		E65AB12B1B7CDADF00C2B47A /* SessionRestoreHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionRestoreHelper.swift; sourceTree = "<group>"; };
 		E660BDD81BB06521009AC090 /* TabsButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsButton.swift; sourceTree = "<group>"; };
 		E660BE051BB0666D009AC090 /* InnerStrokedView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InnerStrokedView.swift; sourceTree = "<group>"; };
@@ -2886,6 +2888,15 @@
 			path = ThirdParty/NRFileManager;
 			sourceTree = "<group>";
 		};
+		E652B87D1BC5B0FC002203BD /* Top Sites */ = {
+			isa = PBXGroup;
+			children = (
+				0BF648101A9C54E900BA963C /* TopSitesPanel.swift */,
+				E652B8A31BC5B10E002203BD /* TopSitesDataSource.swift */,
+			);
+			name = "Top Sites";
+			sourceTree = "<group>";
+		};
 		E699220D1B94E3EF007C480D /* About */ = {
 			isa = PBXGroup;
 			children = (
@@ -3109,12 +3120,12 @@
 		F84B22211A09122500AAB793 /* Home */ = {
 			isa = PBXGroup;
 			children = (
+				E652B87D1BC5B0FC002203BD /* Top Sites */,
 				F84B22261A09127C00AAB793 /* Home.xcassets */,
 				F84B22221A09122500AAB793 /* HomePanelViewController.swift */,
 				D30B101D1AA7F9C600C01CA3 /* HomePanels.swift */,
 				59A6825233896FC846499289 /* HistoryPanel.swift */,
 				59A6839879D615FC1C0D71CE /* BookmarksPanel.swift */,
-				0BF648101A9C54E900BA963C /* TopSitesPanel.swift */,
 				59A685F4EAD19EDEC854BCA4 /* ReaderPanel.swift */,
 				2FDE87FD1ABB3817005317B1 /* RemoteTabsPanel.swift */,
 			);
@@ -4694,6 +4705,7 @@
 				59A68E0B4ABBF55E14819668 /* BookmarksPanel.swift in Sources */,
 				0B5B51AF1B4CDB9E00E3B6E9 /* RXMLElement.m in Sources */,
 				7B844E3D1BBDDB9D00E733A2 /* ChevronView.swift in Sources */,
+				E652B8A41BC5B10E002203BD /* TopSitesDataSource.swift in Sources */,
 				D38B2D491A8D96D00040E6B5 /* GCDWebServerDataResponse.m in Sources */,
 				E4C358551AF144BA00299F7E /* FSReadingList.m in Sources */,
 				E663D5781BB341C4001EF30E /* ToggleButton.swift in Sources */,
