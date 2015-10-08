@@ -15,16 +15,14 @@ extension UIView {
     }
 }
 
-/**
-*  A small protocol that contains information about the number of columns/rows and cell sizes that are not
-*  inferred from a data source. For example, when implemented by TopSitesPanel, these values are computed
-*  using the size of the collection view.
-*/
-protocol TopSitesLayoutData {
-    var numberOfColumns: Int { get }
-    var numberOfRows: Int { get }
-    var thumbnailWidth: CGFloat { get }
-    var thumbnailHeight: CGFloat { get }
+private class NonAnimatingFLowLayout: UICollectionViewFlowLayout {
+    private override func initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
+        return nil
+    }
+
+    private override func finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
+        return nil
+    }
 }
 
 class TopSitesPanel: UIViewController {
@@ -33,7 +31,7 @@ class TopSitesPanel: UIViewController {
     let profile: Profile
 
     private lazy var collectionView: UICollectionView = {
-        let collection = TopSitesCollectionView(frame: CGRectZero, collectionViewLayout: UICollectionViewFlowLayout())
+        let collection = TopSitesCollectionView(frame: CGRectZero, collectionViewLayout: NonAnimatingFLowLayout())
         collection.backgroundColor = UIConstants.PanelBackgroundColor
         collection.delegate = self
         collection.dataSource = self.dataSource
@@ -45,8 +43,7 @@ class TopSitesPanel: UIViewController {
     private lazy var dataSource: TopSitesDataSource = {
         return TopSitesDataSource(
             profile: self.profile,
-            data: Cursor(status: .Failure, msg: "Nothing loaded yet"),
-            layoutData: self
+            data: Cursor(status: .Failure, msg: "Nothing loaded yet")
         )
     }()
 
@@ -62,6 +59,28 @@ class TopSitesPanel: UIViewController {
                 updateRemoveButtonStates()
             }
         }
+    }
+
+    var numberOfColumns: Int {
+        if UIView.viewOrientationForSize(self.view.bounds.size).isLandscape {
+            return 5
+        } else if UIScreen.mainScreen().traitCollection.horizontalSizeClass == .Compact {
+            return 3
+        } else {
+            return 4
+        }
+    }
+
+    var numberOfRows: Int {
+        return Int((collectionView.bounds.height ?? self.thumbnailHeight) / self.thumbnailHeight)
+    }
+
+    var thumbnailWidth: CGFloat {
+        return floor((collectionView.bounds.width - ThumbnailCellUX.Insets.left - ThumbnailCellUX.Insets.right) / CGFloat(numberOfColumns))
+    }
+
+    var thumbnailHeight: CGFloat {
+        return thumbnailWidth / CGFloat(ThumbnailCellUX.ImageAspectRatio)
     }
 
     private let FrecencyQueryLimit = 24
@@ -95,51 +114,14 @@ class TopSitesPanel: UIViewController {
         refreshHistory(FrecencyQueryLimit)
     }
 
-    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
-        self.collectionView.collectionViewLayout.invalidateLayout()
-
-        // Figure out with cells we need to remove/add to satisfy the new layout without reloading the collection view
-        collectionView.performBatchUpdates({
-            let previousCount = self.numberOfRows * self.numberOfColumns
-            let indexPaths = [
-                NSIndexPath(forRow: 10, inSection: 0),
-                NSIndexPath(forRow: 11, inSection: 0)
-            ]
-
-            if previousCount == 10 {
-                // Add 2
-                self.collectionView.insertItemsAtIndexPaths(indexPaths)
-            } else {
-                // Remove 2
-                self.collectionView.deleteItemsAtIndexPaths(indexPaths)
-            }
-        }, completion: nil)
-    }
-}
-
-extension TopSitesPanel: TopSitesLayoutData {
-    var numberOfColumns: Int {
-        if UIView.viewOrientationForSize(self.view.bounds.size).isLandscape {
-            return 5
-        } else if UIScreen.mainScreen().traitCollection.horizontalSizeClass == .Compact {
-            return 3
-        } else {
-            return 4
-        }
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateTopSiteTiles()
     }
 
-    var numberOfRows: Int {
-        return Int((collectionView.bounds.height ?? self.thumbnailHeight) / self.thumbnailHeight)
-    }
-
-    var thumbnailWidth: CGFloat {
-        return floor((collectionView.bounds.width - ThumbnailCellUX.Insets.left - ThumbnailCellUX.Insets.right) / CGFloat(numberOfColumns))
-    }
-
-    var thumbnailHeight: CGFloat {
-        return thumbnailWidth / CGFloat(ThumbnailCellUX.ImageAspectRatio)
-    }
+//    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+//        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+//    }
 }
 
 // MARK: - Selectors
@@ -163,9 +145,45 @@ extension TopSitesPanel {
         if let data = result.successValue {
             self.dataSource.data = data
             self.dataSource.profile = self.profile
+            updateTopSiteTiles()
+        }
+    }
 
-            // redraw now we've updated our sources
-            self.collectionView.reloadData()
+    private func updateTopSiteTiles() {
+        let newSlotCount = numberOfRows * numberOfColumns
+        let oldSlotCount = dataSource.numberOfTilesToDisplay
+
+        // Number of available slots we can put tiles into has changed - make sure to add/remove cells from the 
+        // panel accordingly.
+        if newSlotCount != oldSlotCount {
+            let numberOfTiles: Int
+            if dataSource.data.status == .Failure {
+                numberOfTiles = 0
+            } else {
+                numberOfTiles = max(2, dataSource.data.count)
+            }
+
+            // Fill as many slots as we can
+            let numberOfTilesToDisplay = min(numberOfTiles, newSlotCount)
+            let oldNumberOfTilesToDisplay = dataSource.numberOfTilesToDisplay
+
+            dataSource.numberOfTilesToDisplay = numberOfTilesToDisplay
+
+            let delta = numberOfTilesToDisplay - oldNumberOfTilesToDisplay
+            collectionView.performBatchUpdates({
+                var cells = [NSIndexPath]()
+                if delta > 0 {
+                    for row in 0..<delta {
+                        cells.append(NSIndexPath(forRow: oldNumberOfTilesToDisplay + row, inSection: 0))
+                    }
+                    self.collectionView.insertItemsAtIndexPaths(cells)
+                } else if delta < 0 {
+                    for row in 0..<abs(delta) {
+                        cells.append(NSIndexPath(forRow: numberOfTilesToDisplay + row, inSection: 0))
+                    }
+                    self.collectionView.deleteItemsAtIndexPaths(cells)
+                }
+            }, completion: nil)
         }
     }
 

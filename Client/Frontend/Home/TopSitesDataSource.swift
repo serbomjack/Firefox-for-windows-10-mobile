@@ -11,13 +11,12 @@ import Storage
 class TopSitesDataSource: NSObject, UICollectionViewDataSource {
     var data: Cursor<Site>
     var profile: Profile
-    var layoutData: TopSitesLayoutData
     var editingThumbnails: Bool = false
+    var numberOfTilesToDisplay: Int = 0
 
-    init(profile: Profile, data: Cursor<Site>, layoutData: TopSitesLayoutData) {
+    init(profile: Profile, data: Cursor<Site>) {
         self.data = data
         self.profile = profile
-        self.layoutData = layoutData
     }
 
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -34,9 +33,9 @@ class TopSitesDataSource: NSObject, UICollectionViewDataSource {
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if data.status != .Success {
             return 0
+        } else {
+            return numberOfTilesToDisplay
         }
-
-        return min(data.count, layoutData.numberOfRows * layoutData.numberOfColumns)
     }
 }
 
