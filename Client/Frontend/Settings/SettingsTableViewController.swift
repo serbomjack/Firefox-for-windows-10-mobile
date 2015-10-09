@@ -7,6 +7,7 @@ import Base32
 import Shared
 import UIKit
 import XCGLogger
+import AdSupport
 
 private var ShowDebugSettings: Bool = false
 private var DebugSettingsClickCount: Int = 0
@@ -59,6 +60,7 @@ class Setting {
     func onConfigureCell(cell: UITableViewCell) {
         cell.detailTextLabel?.attributedText = status
         cell.textLabel?.attributedText = title
+        cell.textLabel?.adjustsFontSizeToFitWidth = true
         cell.accessoryType = accessoryType
         cell.accessoryView = nil
     }
@@ -520,6 +522,16 @@ private class YourRightsSetting: Setting {
     }
 }
 
+private class AdvertisingIdentifierSetting: Setting {
+    override var title: NSAttributedString? {
+        return NSAttributedString(string: ASIdentifierManager.sharedManager().advertisingIdentifier.UUIDString)
+    }
+
+    private override func onClick(navigationController: UINavigationController?) {
+        UIPasteboard.generalPasteboard().string = ASIdentifierManager.sharedManager().advertisingIdentifier.UUIDString
+    }
+}
+
 // Opens the on-boarding screen again
 private class ShowIntroductionSetting: Setting {
     let profile: Profile
@@ -814,6 +826,9 @@ class SettingsTableViewController: UITableViewController {
                 DisconnectSetting(settings: self),
                 ExportBrowserDataSetting(settings: self),
                 DeleteExportedDataSetting(settings: self),
+            ]),
+            SettingSection(title: NSAttributedString(string: "Advertising"), children: [
+                AdvertisingIdentifierSetting()
             ])
         ]
 
