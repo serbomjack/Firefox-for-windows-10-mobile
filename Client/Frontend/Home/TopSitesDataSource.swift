@@ -12,7 +12,8 @@ class TopSitesDataSource: NSObject, UICollectionViewDataSource {
     var data: Cursor<Site>
     var profile: Profile
     var editingThumbnails: Bool = false
-    var numberOfTilesToDisplay: Int = 0
+
+    private(set) internal var numberOfTilesToDisplay: Int = 0
 
     init(profile: Profile, data: Cursor<Site>) {
         self.data = data
@@ -31,11 +32,14 @@ class TopSitesDataSource: NSObject, UICollectionViewDataSource {
     }
 
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if data.status != .Success {
-            return 0
-        } else {
-            return numberOfTilesToDisplay
-        }
+        // Unlike your typical data source pattern, the number of tiles to display is not only inferred from 
+        // the data set but also the layout since we want to show a fixed amount of tiles depending on the
+        // device/orientation. See TopSitesPanel.updateTopSiteTilesForSize().
+        return numberOfTilesToDisplay
+    }
+
+    func updateNumberOfTilesToDisplay(numOfTiles: Int) {
+        numberOfTilesToDisplay = numOfTiles
     }
 }
 
@@ -110,6 +114,8 @@ extension TopSitesDataSource {
         cell.isAccessibilityElement = true
         cell.accessibilityLabel = cell.textLabel.text
         cell.removeButton.hidden = !editingThumbnails
+        cell.layer.shouldRasterize = true
+        cell.layer.rasterizationScale = UIScreen.mainScreen().scale
         return cell
     }
 

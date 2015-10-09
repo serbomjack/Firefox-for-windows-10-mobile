@@ -46,7 +46,7 @@ private let AllTables: Args = [
 private let AllViews: Args = [
     ViewHistoryIDsWithWidestFavicons,
     ViewWidestFaviconsForSites,
-    ViewIconForURL,
+    ViewIconForURL
 ]
 
 private let AllIndices: Args = [
