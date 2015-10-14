@@ -53,21 +53,43 @@ extension TopSitesDataSource {
     private func getFavicon(cell: ThumbnailCell, site: Site) {
         self.setDefaultThumbnailBackground(cell)
 
-        if let url = site.url.asURL {
-            FaviconFetcher.getForURL(url, profile: profile) >>== { icons in
-                if (icons.count > 0) {
-                    cell.imageView.sd_setImageWithURL(icons[0].url.asURL!) { (img, err, type, url) -> Void in
-                        if let img = img {
-                            cell.blurAndSetAsBackground(img)
-                            cell.image = img
-                        } else {
-                            let icon = Favicon(url: "", date: NSDate(), type: IconType.NoneFound)
-                            self.profile.favicons.addFavicon(icon, forSite: site)
-                            self.setDefaultThumbnailBackground(cell)
-                        }
-                    }
+        func takeFirstFaviconURL(icons: [Favicon]) -> Deferred<Maybe<NSURL>> {
+            let deferred = Deferred<Maybe<NSURL>>()
+            if let url = icons[0].url.asURL {
+                deferred.fill(Maybe(success: url))
+            }
+            return deferred
+        }
+
+        func setAndCacheFaviconForURL(url: NSURL) -> Deferred<Maybe<(UIImage, NSURL)>> {
+            let deferred = Deferred<Maybe<(UIImage, NSURL)>>()
+            cell.imageView.sd_setImageWithURL(url) { (img, err, type, url) -> Void in
+                if let img = img {
+                    cell.image = img
+                    deferred.fill(Maybe(success: (img, url)))
+                } else {
+                    let icon = Favicon(url: "", date: NSDate(), type: IconType.NoneFound)
+                    self.profile.favicons.addFavicon(icon, forSite: site)
+                    self.setDefaultThumbnailBackground(cell)
                 }
             }
+            return deferred
+        }
+
+        func blurAndCacheFavicon(faviconAndURL: (UIImage, NSURL)) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+                let blurred = faviconAndURL.0.applyLightEffect()
+                let blurredKey = "\(faviconAndURL.1.absoluteString)!blurred"
+                cell.backgroundImage.image = blurred
+                SDImageCache.sharedImageCache().storeImage(blurred, forKey: blurredKey)
+            }
+        }
+
+        if let url = site.url.asURL {
+            FaviconFetcher.getForURL(url, profile: profile)
+                >>== takeFirstFaviconURL
+                >>== setAndCacheFaviconForURL
+                >>== blurAndCacheFavicon
         }
     }
 

@@ -105,27 +105,27 @@
 - (UIImage *)applyLightEffect
 {
     UIColor *tintColor = [UIColor colorWithWhite:1.0 alpha:0.3];
-    return [self applyBlurWithRadius:30 blurType: BOXFILTER tintColor:tintColor saturationDeltaFactor:1.8 maskImage:nil];
+    return [self applyBlurWithRadius:30 blurType: TENTFILTER tintColor:tintColor saturationDeltaFactor:1.8 maskImage:nil addBaseImage:NO];
 }
 
 
 - (UIImage *)applyExtraLightEffect
 {
     UIColor *tintColor = [UIColor colorWithWhite:0.97 alpha:0.82];
-    return [self applyBlurWithRadius:20 blurType: BOXFILTER tintColor:tintColor saturationDeltaFactor:1.8 maskImage:nil];
+    return [self applyBlurWithRadius:20 blurType: BOXFILTER tintColor:tintColor saturationDeltaFactor:1.8 maskImage:nil addBaseImage:NO];
 }
 
 
 - (UIImage *)applyDarkEffect
 {
     UIColor *tintColor = [UIColor colorWithWhite:0.11 alpha:0.73];
-    return [self applyBlurWithRadius:10 blurType: BOXFILTER tintColor:tintColor saturationDeltaFactor:1.8 maskImage:nil];
+    return [self applyBlurWithRadius:10 blurType: BOXFILTER tintColor:tintColor saturationDeltaFactor:1.8 maskImage:nil addBaseImage:NO];
 }
 
 - (UIImage *) applyDarkEffectWithTent: (CGFloat) radius
 {
     UIColor *tintColor = [UIColor colorWithWhite:0.11 alpha:0.5];
-    return [self applyBlurWithRadius:radius blurType: TENTFILTER tintColor:tintColor saturationDeltaFactor:1.8 maskImage:nil];
+    return [self applyBlurWithRadius:radius blurType: TENTFILTER tintColor:tintColor saturationDeltaFactor:1.8 maskImage:nil addBaseImage:NO];
 }
 
 - (UIImage *)applyTintEffectWithColor:(UIColor *)tintColor
@@ -145,11 +145,20 @@
             effectColor = [UIColor colorWithRed:r green:g blue:b alpha:EffectColorAlpha];
         }
     }
-    return [self applyBlurWithRadius:10 blurType: BOXFILTER tintColor:effectColor saturationDeltaFactor:-1.0 maskImage:nil];
+    return [self applyBlurWithRadius:10 blurType: BOXFILTER tintColor:effectColor saturationDeltaFactor:-1.0 maskImage:nil addBaseImage:NO];
 }
 
 
-- (UIImage *)applyBlurWithRadius:(CGFloat)blurRadius blurType: (BlurType) blurType tintColor:(UIColor *)tintColor saturationDeltaFactor:(CGFloat)saturationDeltaFactor maskImage:(UIImage *)maskImage
+/**
+ *  Modified from original source. Added 'addBaseImage' flag to allow the caller to specify if they want the
+ *  original image to be added to the output image. With this set to NO, only the blurred image is returned.
+ */
+- (UIImage *)applyBlurWithRadius:(CGFloat)blurRadius
+                        blurType: (BlurType) blurType
+                       tintColor:(UIColor *)tintColor
+           saturationDeltaFactor:(CGFloat)saturationDeltaFactor
+                       maskImage:(UIImage *)maskImage
+                    addBaseImage:(BOOL)addBaseImage
 {
     // Check pre-conditions.
     if (self.size.width < 1 || self.size.height < 1) {
@@ -260,7 +269,9 @@
     CGContextTranslateCTM(outputContext, 0, -self.size.height);
 
     // Draw base image.
-    CGContextDrawImage(outputContext, imageRect, self.CGImage);
+    if (addBaseImage) {
+        CGContextDrawImage(outputContext, imageRect, self.CGImage);
+    }
 
     // Draw effect image.
     if (hasBlur) {

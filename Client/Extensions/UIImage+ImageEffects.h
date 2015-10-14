@@ -110,7 +110,12 @@ typedef enum {
 - (UIImage *) applyDarkEffectWithTent: (CGFloat) radius;
 - (UIImage *) applyTintEffectWithColor:(UIColor *)tintColor;
 
-- (UIImage *)applyBlurWithRadius:(CGFloat)blurRadius blurType: (BlurType) blurType tintColor:(UIColor *)tintColor saturationDeltaFactor:(CGFloat)saturationDeltaFactor maskImage:(UIImage *)maskImage;
+- (UIImage *)applyBlurWithRadius:(CGFloat)blurRadius
+                        blurType: (BlurType) blurType
+                       tintColor:(UIColor *)tintColor
+           saturationDeltaFactor:(CGFloat)saturationDeltaFactor
+                       maskImage:(UIImage *)maskImage
+                    addBaseImage:(BOOL)addBaseImage;
 
 @end
 

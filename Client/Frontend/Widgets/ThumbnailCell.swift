@@ -128,7 +128,7 @@ class ThumbnailCell: UICollectionViewCell {
         return removeButton
     }()
 
-    private lazy var backgroundImage: UIImageView = {
+    lazy var backgroundImage: UIImageView = {
         let backgroundImage = UIImageView()
         backgroundImage.contentMode = UIViewContentMode.ScaleAspectFill
         return backgroundImage
@@ -227,12 +227,7 @@ extension ThumbnailCell {
     }
 
     func blurAndSetAsBackground(img: UIImage) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-            let blurredImage = img.applyLightEffect()
-            dispatch_async(dispatch_get_main_queue()) {
-                self.backgroundImage.image = blurredImage;
-            }
-        }
+
     }
 }
 
