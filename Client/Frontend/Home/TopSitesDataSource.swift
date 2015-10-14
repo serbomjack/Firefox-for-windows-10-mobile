@@ -26,9 +26,9 @@ class TopSitesDataSource: NSObject, UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(ThumbnailCell.Identifier, forIndexPath: indexPath) as! ThumbnailCell
 
         if indexPath.item >= data.count {
-            return createTileForSuggestedSite(cell, site: site as! SuggestedSite)
+            return configureTileForSuggestedSite(cell, site: site as! SuggestedSite)
         }
-        return createTileForSite(cell, site: site)
+        return configureTileForSite(cell, site: site)
     }
 
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -58,7 +58,7 @@ extension TopSitesDataSource {
                 if (icons.count > 0) {
                     cell.imageView.sd_setImageWithURL(icons[0].url.asURL!) { (img, err, type, url) -> Void in
                         if let img = img {
-                            cell.backgroundImage.image = img
+                            cell.blurAndSetAsBackground(img)
                             cell.image = img
                         } else {
                             let icon = Favicon(url: "", date: NSDate(), type: IconType.NoneFound)
@@ -71,7 +71,7 @@ extension TopSitesDataSource {
         }
     }
 
-    private func createTileForSite(cell: ThumbnailCell, site: Site) -> ThumbnailCell {
+    private func configureTileForSite(cell: ThumbnailCell, site: Site) -> ThumbnailCell {
 
         // We always want to show the domain URL, not the title.
         //
@@ -90,7 +90,9 @@ extension TopSitesDataSource {
         cell.imageWrapper.backgroundColor = UIColor.clearColor()
 
         // Resets used cell's background image so that it doesn't get recycled when a tile doesn't update its background image.
-        cell.backgroundImage.image = nil
+        cell.clearBackgroundImg()
+        cell.accessibilityLabel = cell.textLabel.text
+        cell.removeButton.hidden = !editingThumbnails
 
         if let icon = site.icon {
             // We've looked before recently and didn't find a favicon
@@ -100,7 +102,7 @@ extension TopSitesDataSource {
             default:
                 cell.imageView.sd_setImageWithURL(icon.url.asURL, completed: { (img, err, type, url) -> Void in
                     if let img = img {
-                        cell.backgroundImage.image = img
+                        cell.blurAndSetAsBackground(img)
                         cell.image = img
                     } else {
                         self.getFavicon(cell, site: site)
@@ -111,18 +113,16 @@ extension TopSitesDataSource {
             getFavicon(cell, site: site)
         }
 
-        cell.isAccessibilityElement = true
-        cell.accessibilityLabel = cell.textLabel.text
-        cell.removeButton.hidden = !editingThumbnails
-        cell.layer.shouldRasterize = true
-        cell.layer.rasterizationScale = UIScreen.mainScreen().scale
         return cell
     }
 
-    private func createTileForSuggestedSite(cell: ThumbnailCell, site: SuggestedSite) -> ThumbnailCell {
+    private func configureTileForSuggestedSite(cell: ThumbnailCell, site: SuggestedSite) -> ThumbnailCell {
         cell.textLabel.text = site.title.isEmpty ? NSURL(string: site.url)?.normalizedHostAndPath() : site.title
         cell.imageWrapper.backgroundColor = site.backgroundColor
-        cell.backgroundImage.image = nil
+        cell.clearBackgroundImg()
+        cell.imageView.contentMode = UIViewContentMode.ScaleAspectFit
+        cell.accessibilityLabel = cell.textLabel.text
+        cell.removeButton.hidden = true
 
         if let icon = site.wordmark.url.asURL,
            let host = icon.host {
@@ -138,11 +138,6 @@ extension TopSitesDataSource {
         } else {
             self.setDefaultThumbnailBackground(cell)
         }
-
-        cell.imageView.contentMode = UIViewContentMode.ScaleAspectFit
-        cell.isAccessibilityElement = true
-        cell.accessibilityLabel = cell.textLabel.text
-        cell.removeButton.hidden = true
 
         return cell
     }

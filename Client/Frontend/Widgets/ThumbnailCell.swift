@@ -108,17 +108,6 @@ class ThumbnailCell: UICollectionViewCell {
         return imageView
     }()
 
-    lazy var backgroundImage: UIImageView = {
-        let backgroundImage = UIImageView()
-        backgroundImage.contentMode = UIViewContentMode.ScaleAspectFill
-        return backgroundImage
-    }()
-
-    lazy var backgroundEffect: UIVisualEffectView? = {
-        let blur = UIBlurEffect(style: UIBlurEffectStyle.Light)
-        let vib = UIVibrancyEffect(forBlurEffect: blur)
-        return DeviceInfo.isBlurSupported() ? UIVisualEffectView(effect: blur) : nil
-    }()
 
     lazy var imageWrapper: UIView = {
         let imageWrapper = UIView()
@@ -139,21 +128,26 @@ class ThumbnailCell: UICollectionViewCell {
         return removeButton
     }()
 
+    private lazy var backgroundImage: UIImageView = {
+        let backgroundImage = UIImageView()
+        backgroundImage.contentMode = UIViewContentMode.ScaleAspectFill
+        return backgroundImage
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
+
+        layer.shouldRasterize = true
+        layer.rasterizationScale = UIScreen.mainScreen().scale
 
         isAccessibilityElement = true
         addGestureRecognizer(longPressGesture)
 
         contentView.addSubview(imageWrapper)
-//        if let backgroundEffect = backgroundEffect {
-//            imageWrapper.addSubview(backgroundImage)
-//            imageWrapper.addSubview(backgroundEffect)
-//            backgroundImage.snp_remakeConstraints { make in
-//                make.top.bottom.left.right.equalTo(self.imageWrapper)
-//            }
-//
-//        }
+        imageWrapper.addSubview(backgroundImage)
+        backgroundImage.snp_remakeConstraints { make in
+            make.top.bottom.left.right.equalTo(self.imageWrapper)
+        }
         imageWrapper.addSubview(imageView)
         imageWrapper.addSubview(textWrapper)
         textWrapper.addSubview(textLabel)
@@ -165,10 +159,6 @@ class ThumbnailCell: UICollectionViewCell {
             make.bottom.equalTo(self.contentView).inset(ThumbnailCellUX.Insets.bottom)
             make.right.equalTo(self.contentView).inset(ThumbnailCellUX.Insets.right)
         }
-
-//        backgroundEffect?.snp_remakeConstraints { make in
-//            make.top.bottom.left.right.equalTo(self.imageWrapper)
-//        }
 
         imageView.snp_remakeConstraints { make in
             let imagePadding: CGFloat = (UIScreen.mainScreen().traitCollection.horizontalSizeClass == .Compact) ? ThumbnailCellUX.ImagePaddingCompact : ThumbnailCellUX.ImagePadding
@@ -207,20 +197,11 @@ class ThumbnailCell: UICollectionViewCell {
         removeButton.frame = frame
     }
 
-    func SELdidRemove() {
-        delegate?.didRemoveThumbnail(self)
-    }
+}
 
-    func SELdidLongPress() {
-        delegate?.didLongPressThumbnail(self)
-    }
-
+// MARK: - Accessors
+extension ThumbnailCell {
     func toggleRemoveButton(show: Bool) {
-        // Only toggle if we change state
-        if removeButton.hidden != show {
-            return
-        }
-
         if show {
             removeButton.hidden = false
         }
@@ -239,5 +220,29 @@ class ThumbnailCell: UICollectionViewCell {
                     self.removeButton.hidden = true
                 }
             })
+    }
+
+    func clearBackgroundImg() {
+        backgroundImage.image = nil
+    }
+
+    func blurAndSetAsBackground(img: UIImage) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+            let blurredImage = img.applyLightEffect()
+            dispatch_async(dispatch_get_main_queue()) {
+                self.backgroundImage.image = blurredImage;
+            }
+        }
+    }
+}
+
+// MARK: - Selectors
+extension ThumbnailCell {
+    func SELdidRemove() {
+        delegate?.didRemoveThumbnail(self)
+    }
+
+    func SELdidLongPress() {
+        delegate?.didLongPressThumbnail(self)
     }
 }

@@ -33,9 +33,7 @@ class TopSitesPanel: UIViewController {
         )
     }()
 
-    private lazy var layout: TopSitesLayout = {
-        return TopSitesLayout()
-    }()
+    private lazy var layout: TopSitesLayout = { return TopSitesLayout() }()
 
     private var editingThumbnails: Bool = false {
         didSet {
@@ -151,11 +149,14 @@ extension TopSitesPanel {
                     }
                     self.collectionView.deleteItemsAtIndexPaths(cells)
                 }
-            }, completion: nil)
+            }, completion: { _ in
+                self.updateRemoveButtonStates()
+            })
         }
     }
 
     private func updateRemoveButtonStates() {
+        print(collectionView.visibleCells().count)
         collectionView.visibleCells().forEach { cell in
             guard let thumbnailCell = cell as? ThumbnailCell else { return }
             guard let indexPath = self.collectionView.indexPathForCell(cell) else { return }
@@ -168,12 +169,14 @@ extension TopSitesPanel {
     }
 
     private func deleteHistoryTileForSite(site: Site, atIndexPath indexPath: NSIndexPath) {
-        profile.history.removeSiteFromTopSites(site).uponQueue(dispatch_get_main_queue(), block: { result in
-            self.collectionView.performBatchUpdates({
-                self.collectionView.deleteItemsAtIndexPaths([indexPath])
-                self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: self.dataSource.numberOfTilesToDisplay - 1, inSection: 0)])
-            }, completion: nil)
-        })
+//        profile.history.removeSiteFromTopSites(site).upon {
+//            self.profile.history.getSitesByFrecencyWithLimit(FrecencyQueryLimit).uponQueue(dispatch_get_main_queue()) {
+//                self.collectionView.performBatchUpdates({
+//                    self.collectionView.deleteItemsAtIndexPaths([indexPath])
+//                    self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: self.dataSource.numberOfTilesToDisplay - 1, inSection: 0)])
+//                }, completion: nil)
+//            }
+//        }
     }
 
     private func refreshHistory(frequencyLimit: Int) {
@@ -181,26 +184,6 @@ extension TopSitesPanel {
             self.updateDataSourceWithSites(result)
         })
     }
-
-//    private func deleteOrUpdateSites(result: Maybe<Cursor<Site>>, indexPath: NSIndexPath) {
-//        if let data = result.successValue {
-//            let numOfThumbnails = self.layout.thumbnailCount
-//            collectionView.performBatchUpdates({
-//                // If we have enough data to fill the tiles after the deletion, then delete and insert the next one from data
-//                if (data.count + SuggestedSites.count >= numOfThumbnails) {
-//                    self.collectionView.deleteItemsAtIndexPaths([indexPath])
-//                    self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: numOfThumbnails - 1, inSection: 0)])
-//                }
-//
-//                // If we don't have enough to fill the thumbnail tile area even with suggested tiles, just delete
-//                else if (data.count + SuggestedSites.count) < numOfThumbnails {
-//                    self.collectionView.deleteItemsAtIndexPaths([indexPath])
-//                }
-//            }, completion: { _ in
-//                self.updateRemoveButtonStates()
-//            })
-//        }
-//    }
 }
 
 extension TopSitesPanel: UICollectionViewDelegate {

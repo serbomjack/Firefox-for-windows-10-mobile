@@ -6,6 +6,7 @@
 
 #import "FSReadingList.h"
 #import "Try.h"
+#import "UIImage+ImageEffects.h"
 
 #import "GCDWebServer.h"
 #import "GCDWebServerDataResponse.h"
