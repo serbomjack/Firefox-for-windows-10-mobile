@@ -22,6 +22,8 @@ struct BookmarksPanelUX {
 class BookmarksPanel: SiteTableViewController, HomePanel {
     weak var homePanelDelegate: HomePanelDelegate? = nil
     var source: BookmarksModel?
+    var parentSource: BookmarksModel?
+
     var parentFolders = [GUID]()
     var bookmarkFolder = BookmarkRoots.MobileFolderGUID
 
@@ -82,7 +84,6 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
     private func onNewModel(model: BookmarksModel) {
         self.source = model
-        self.title = parentFolders.isEmpty ? NSLocalizedString("Bookmarks", comment: "Panel accessibility label") : model.current.title
         dispatch_async(dispatch_get_main_queue()) {
             self.tableView.reloadData()
         }
@@ -92,40 +93,62 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         log.error("Error: failed to get data: \(e)")
     }
 
-    // for each folder in the hierarchy, fetch the model and then push the next view controller
-    // on the stack and continue recursively till we've traversed the hierarchy
-    // we have to do this otherwise each BookmarksPanel does not have access to the right model in order
-    // to load the appropriate folder and create the backwards navigation
-    func restoreFolderHierarchy(hierarchy: [GUID], fromIndex: Int) {
-        if fromIndex < hierarchy.count {
-            profile.bookmarks.modelForFolder(bookmarkFolder).uponQueue(dispatch_get_main_queue()) { result in
-                self.onModelFetched(result)
-                let folder = hierarchy[fromIndex]
-
-                let nextPanel = self.newBookmarkPanel(forFolder: folder)
-                self.navigationController?.pushViewController(nextPanel, animated: false)
-
-                nextPanel.restoreFolderHierarchy(hierarchy, fromIndex: fromIndex + 1)
-            }
+    func fetchFolderHierarchyModels(
+        var hierarchy: [GUID],
+        var accumulator: [BookmarksModel] = [],
+        token: Deferred<[BookmarksModel]> = Deferred<[BookmarksModel]>()
+    ) -> Deferred<[BookmarksModel]> {
+        guard let folder = hierarchy.first else {
+            token.fill(accumulator)
+            return token
         }
+
+        profile.bookmarks.modelForFolder(folder).upon { result in
+            self.onModelFetched(result)
+            guard let model = result.successValue else {
+                token.fill(accumulator)
+                return
+            }
+            hierarchy.removeFirst()
+            accumulator.append(model)
+            self.fetchFolderHierarchyModels(hierarchy, accumulator: accumulator, token: token)
+        }
+        return token
     }
 
-    private func newBookmarkPanel(forFolder guid: GUID) -> BookmarksPanel {
+    func constructPanelsForBookmarkModels(models: [BookmarksModel]) -> [BookmarksPanel] {
+        var panels = [BookmarksPanel]()
+        for i in 0..<models.count {
+            let model = models[i]
+            var parents = [GUID]()
+
+            // Determine each panel's direct parent (for the title) and list of parents (for hierarchy pickling)
+            for parentIndex in 0..<i {
+                parents.append(models[parentIndex].current.guid)
+            }
+
+            panels.append(newBookmarkPanelFromBookmarkModel(model, parentFolders: parents))
+        }
+        return panels
+    }
+
+    private func newBookmarkPanelFromBookmarkModel(model: BookmarksModel , parentFolders: [GUID]) -> BookmarksPanel {
         let nextController = BookmarksPanel()
         nextController.profile = self.profile
-        if let source = source {
-            nextController.parentFolders = parentFolders + [source.current.guid]
-            nextController.source = source
-        }
-        nextController.bookmarkFolder = guid
+        nextController.parentFolders = parentFolders
+        nextController.source = model
+        nextController.bookmarkFolder = model.current.guid
         nextController.homePanelDelegate = self.homePanelDelegate
 
-        return nextController
-    }
+        let title: String
+        if model.current.title ==  BookmarkRoots.MobileFolderGUID {
+            title = NSLocalizedString("Bookmarks", comment: "Panel accessibility label")
+        } else {
+            title = model.current.title
+        }
 
-    private func updateBookmarkFolderState(withFolder guid: GUID) {
-        let bookmarkHierarchy: [GUID] = parentFolders + [guid]
-        self.homePanelDelegate?.homePanel?(self, didSelectBookmarkFolder: bookmarkHierarchy.joinWithSeparator(","))
+        nextController.title = title
+        return nextController
     }
 
     override func reloadData() {
@@ -217,16 +240,23 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         tableView.deselectRowAtIndexPath(indexPath, animated: false)
         if let source = source {
             let bookmark = source.current[indexPath.row]
-            updateBookmarkFolderState(withFolder: source.current.guid)
             switch (bookmark) {
             case let item as BookmarkItem:
                 homePanelDelegate?.homePanel(self, didSelectURL: NSURL(string: item.url)!, visitType: VisitType.Bookmark)
                 break
 
             case let folder as BookmarkFolder:
-                self.navigationController?.pushViewController(newBookmarkPanel(forFolder: folder.guid), animated: true)
-                break
+                source.selectFolder(folder) >>== { model in
+                    dispatch_async(dispatch_get_main_queue()) {
+                        let newParents = self.parentFolders + [source.current.guid]
+                        let parentsAndNew = self.parentFolders + [source.current.guid, folder.guid]
+                        let nextPanel = self.newBookmarkPanelFromBookmarkModel(model, parentFolders: newParents)
+                        self.navigationController?.pushViewController(nextPanel, animated: true)
 
+                        self.homePanelDelegate?.homePanel?(self, didSelectBookmarkFolder: parentsAndNew.joinWithSeparator(","))
+                    }
+                }
+                break
             default:
                 // Weird.
                 break        // Just here until there's another executable statement (compiler requires one).

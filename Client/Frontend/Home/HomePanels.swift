@@ -26,6 +26,7 @@ class HomePanels {
         HomePanelDescriptor(
             makeViewController: { profile in
                 let bookmarks = BookmarksPanel()
+                bookmarks.title = NSLocalizedString("Bookmarks", comment: "Panel accessibility label")
                 bookmarks.profile = profile
                 let controller = UINavigationController(rootViewController: bookmarks)
                 controller.setNavigationBarHidden(true, animated: false)

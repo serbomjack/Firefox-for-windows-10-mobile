@@ -749,7 +749,7 @@ class BrowserViewController: UIViewController {
             }
 
             if let tab = tabManager.selectedTab where tab.webView === webView && !tab.restoring {
-                updateUIForReaderHomeStateForTab(tab)
+//                updateUIForReaderHomeStateForTab(tab)
             }
         case KVOCanGoBack:
             guard let canGoBack = change?[NSKeyValueChangeNewKey] as? Bool else { break }
@@ -979,7 +979,7 @@ extension BrowserViewController: URLBarDelegate {
 
     func urlBarDidLeaveOverlayMode(urlBar: URLBarView) {
         hideSearchController()
-        updateInContentHomePanel(tabManager.selectedTab?.url)
+//        updateInContentHomePanel(tabManager.selectedTab?.url)
     }
 }
 
@@ -1283,6 +1283,7 @@ extension BrowserViewController: BrowserDelegate {
 extension BrowserViewController: HomePanelViewControllerDelegate {
     func homePanelViewController(homePanelViewController: HomePanelViewController, didSelectURL url: NSURL, visitType: VisitType) {
         finishEditingAndSubmit(url, visitType: visitType)
+        hideHomePanelController()
     }
 
     func homePanelViewController(homePanelViewController: HomePanelViewController, didSelectPanel panel: Int) {
@@ -1292,6 +1293,8 @@ extension BrowserViewController: HomePanelViewControllerDelegate {
     }
 
     func homePanelViewController(homePanelViewController: HomePanelViewController, didSelectBookmarkFolder folders: String) {
+        print("selected folder: \(folders)")
+
         if AboutUtils.isAboutHomeURL(tabManager.selectedTab?.url) {
             let panel = AboutUtils.getHomePanel(tabManager.selectedTab?.url?.fragment)
             tabManager.selectedTab?.webView?.evaluateJavaScript("history.replaceState({}, '', '#panel=\(panel)&bookmarkFolders=\(folders)')", completionHandler: nil)
