@@ -1,0 +1,21 @@
+/* Setting for closing private tabs */
+"Close Private Tabs" = "ปิดแท็บส่วนตัว";
+
+/* Text button displayed when there are no tabs open while in private mode */
+"Learn More" = "เรียนรู้เพิ่มเติม";
+
+/* Toggled OFF accessibility value */
+"Off" = "ปิด";
+
+/* Toggled ON accessibility value */
+"On" = "เปิด";
+
+/* Context menu option for opening a link in a new private tab */
+"Open In New Private Tab" = "เปิดในแท็บส่วนตัวใหม่";
+
+/* Title displayed for when there are no open tabs while in private mode */
+"Private Browsing" = "การท่องเว็บแบบส่วนตัว";
+
+/* Accessibility label for toggling on/off private mode */
+"Private Mode" = "โหมดส่วนตัว";
+
