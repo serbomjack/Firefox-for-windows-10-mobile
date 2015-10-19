@@ -197,6 +197,12 @@ class ThumbnailCell: UICollectionViewCell {
         removeButton.frame = frame
     }
 
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        backgroundImage.image = nil
+        removeButton.hidden = true
+        imageWrapper.backgroundColor = UIColor.clearColor()
+    }
 }
 
 // MARK: - Accessors
@@ -220,14 +226,6 @@ extension ThumbnailCell {
                     self.removeButton.hidden = true
                 }
             })
-    }
-
-    func clearBackgroundImg() {
-        backgroundImage.image = nil
-    }
-
-    func blurAndSetAsBackground(img: UIImage) {
-
     }
 }
 

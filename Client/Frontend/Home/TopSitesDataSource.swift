@@ -50,46 +50,43 @@ extension TopSitesDataSource {
         cell.imageView.contentMode = UIViewContentMode.Center
     }
 
+    private func blurredImage(image: UIImage, forURL url: NSURL) -> Deferred<UIImage> {
+        let deferred = Deferred<UIImage>()
+
+        let blurredKey = "\(url.absoluteString)!blurred"
+        SDImageCache.sharedImageCache().queryDiskCacheForKey(blurredKey) { image, _ in
+            if let image = image {
+                deferred.fill(image)
+            } else {
+                let blurred = image.applyLightEffect()
+                SDImageCache.sharedImageCache().storeImage(blurred, forKey: blurredKey)
+                deferred.fill(blurred)
+            }
+        }
+        return deferred
+    }
+
     private func getFavicon(cell: ThumbnailCell, site: Site) {
         self.setDefaultThumbnailBackground(cell)
+        guard let url = site.url.asURL else { return }
 
-        func takeFirstFaviconURL(icons: [Favicon]) -> Deferred<Maybe<NSURL>> {
-            let deferred = Deferred<Maybe<NSURL>>()
-            if let url = icons[0].url.asURL {
-                deferred.fill(Maybe(success: url))
-            }
-            return deferred
-        }
+        FaviconFetcher.getForURL(url, profile: profile) >>== { icons in
+            if icons.count == 0 { return }
+            guard let url = icons[0].url.asURL else { return }
 
-        func setAndCacheFaviconForURL(url: NSURL) -> Deferred<Maybe<(UIImage, NSURL)>> {
-            let deferred = Deferred<Maybe<(UIImage, NSURL)>>()
             cell.imageView.sd_setImageWithURL(url) { (img, err, type, url) -> Void in
-                if let img = img {
-                    cell.image = img
-                    deferred.fill(Maybe(success: (img, url)))
-                } else {
+                guard let img = img else {
                     let icon = Favicon(url: "", date: NSDate(), type: IconType.NoneFound)
                     self.profile.favicons.addFavicon(icon, forSite: site)
                     self.setDefaultThumbnailBackground(cell)
+                    return
+                }
+
+                cell.image = img
+                self.blurredImage(img, forURL: url).uponQueue(dispatch_get_main_queue()) { blurredImage in
+                    cell.backgroundImage.image = blurredImage
                 }
             }
-            return deferred
-        }
-
-        func blurAndCacheFavicon(faviconAndURL: (UIImage, NSURL)) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-                let blurred = faviconAndURL.0.applyLightEffect()
-                let blurredKey = "\(faviconAndURL.1.absoluteString)!blurred"
-                cell.backgroundImage.image = blurred
-                SDImageCache.sharedImageCache().storeImage(blurred, forKey: blurredKey)
-            }
-        }
-
-        if let url = site.url.asURL {
-            FaviconFetcher.getForURL(url, profile: profile)
-                >>== takeFirstFaviconURL
-                >>== setAndCacheFaviconForURL
-                >>== blurAndCacheFavicon
         }
     }
 
@@ -109,10 +106,6 @@ extension TopSitesDataSource {
 
         let domainURL = NSURL(string: site.url)?.normalizedHost() ?? site.url
         cell.textLabel.text = domainURL
-        cell.imageWrapper.backgroundColor = UIColor.clearColor()
-
-        // Resets used cell's background image so that it doesn't get recycled when a tile doesn't update its background image.
-        cell.clearBackgroundImg()
         cell.accessibilityLabel = cell.textLabel.text
         cell.removeButton.hidden = !editingThumbnails
 
@@ -124,8 +117,10 @@ extension TopSitesDataSource {
             default:
                 cell.imageView.sd_setImageWithURL(icon.url.asURL, completed: { (img, err, type, url) -> Void in
                     if let img = img {
-                        cell.blurAndSetAsBackground(img)
                         cell.image = img
+                        self.blurredImage(img, forURL: url).uponQueue(dispatch_get_main_queue()) { blurredImage in
+                            cell.backgroundImage.image = blurredImage
+                        }
                     } else {
                         self.getFavicon(cell, site: site)
                     }
@@ -141,10 +136,8 @@ extension TopSitesDataSource {
     private func configureTileForSuggestedSite(cell: ThumbnailCell, site: SuggestedSite) -> ThumbnailCell {
         cell.textLabel.text = site.title.isEmpty ? NSURL(string: site.url)?.normalizedHostAndPath() : site.title
         cell.imageWrapper.backgroundColor = site.backgroundColor
-        cell.clearBackgroundImg()
         cell.imageView.contentMode = UIViewContentMode.ScaleAspectFit
         cell.accessibilityLabel = cell.textLabel.text
-        cell.removeButton.hidden = true
 
         if let icon = site.wordmark.url.asURL,
            let host = icon.host {
