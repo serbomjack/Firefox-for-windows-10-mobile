@@ -78,7 +78,7 @@ class TopSitesLayout: UICollectionViewLayout {
 
     override func finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
         let attributes = layoutAttributesForItemAtIndexPath(itemIndexPath)
-        attributes?.alpha = 1
+        attributes?.alpha = 0
         return attributes
     }
 }
@@ -86,6 +86,38 @@ class TopSitesLayout: UICollectionViewLayout {
 extension TopSitesLayout {
     func numberOfSlotsAvailableForSize(size: CGSize) -> Int {
         return columnsForSize(size) * rowsForSize(size)
+    }
+
+    /**
+    Calculates an approximation of the number of tiles we want to display for the given orientation. This
+    method uses the screen's size as it's basis for the calculation instead of the collectionView's since the
+    collectionView's bounds is determined until the next layout pass.
+    - parameter orientation: Orientation to calculate number of tiles for
+    - returns: Rough tile count we will be displaying for the passed in orientation
+    */
+    func calculateApproxThumbnailCountForOrientation(orientation: UIInterfaceOrientation) -> Int {
+        let size = UIScreen.mainScreen().bounds.size
+        let portraitSize = CGSize(width: min(size.width, size.height), height: max(size.width, size.height))
+
+        func calculateRowsForSize(size: CGSize, columns: Int) -> Int {
+            let insets = ThumbnailCellUX.Insets
+            let thumbnailWidth = (size.width - insets.left - insets.right) / CGFloat(columns)
+            let thumbnailHeight = thumbnailWidth / CGFloat(ThumbnailCellUX.ImageAspectRatio)
+            return max(2, Int(size.height / thumbnailHeight))
+        }
+
+        let numberOfColumns: Int
+        let numberOfRows: Int
+
+        if UIInterfaceOrientationIsLandscape(orientation) {
+            numberOfColumns = 5
+            numberOfRows = calculateRowsForSize(CGSize(width: portraitSize.height, height: portraitSize.width), columns: numberOfColumns)
+        } else {
+            numberOfColumns = 4
+            numberOfRows = calculateRowsForSize(portraitSize, columns: numberOfColumns)
+        }
+
+        return numberOfColumns * numberOfRows
     }
 
     private func columnsForSize(size: CGSize) -> Int {

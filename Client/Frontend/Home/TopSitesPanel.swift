@@ -8,7 +8,6 @@ import XCGLogger
 import Storage
 
 private let log = Logger.browserLogger
-private let FrecencyQueryLimit = 100
 
 /// Displays the Top Sites panel in the HomeViewController
 class TopSitesPanel: UIViewController {
@@ -34,6 +33,13 @@ class TopSitesPanel: UIViewController {
     }()
 
     private lazy var layout: TopSitesLayout = { return TopSitesLayout() }()
+
+    private lazy var maxFrecencyLimit: Int = {
+        return max(
+            self.layout.calculateApproxThumbnailCountForOrientation(UIInterfaceOrientation.LandscapeLeft),
+            self.layout.calculateApproxThumbnailCountForOrientation(UIInterfaceOrientation.Portrait)
+        )
+    }()
 
     private var editingThumbnails: Bool = false {
         didSet {
@@ -74,7 +80,7 @@ extension TopSitesPanel {
         collectionView.snp_makeConstraints { make in
             make.edges.equalTo(self.view)
         }
-        refreshHistory(FrecencyQueryLimit)
+        refreshHistory(maxFrecencyLimit)
     }
 
     override func viewDidLayoutSubviews() {
@@ -95,7 +101,7 @@ extension TopSitesPanel {
     func SELnotificationReceived(notification: NSNotification) {
         switch notification.name {
         case NotificationFirefoxAccountChanged, NotificationPrivateDataClearedHistory:
-            refreshHistory(FrecencyQueryLimit)
+            refreshHistory(maxFrecencyLimit)
             break
         default:
             // no need to do anything at all
@@ -156,7 +162,6 @@ extension TopSitesPanel {
     }
 
     private func updateRemoveButtonStates() {
-        print(collectionView.visibleCells().count)
         collectionView.visibleCells().forEach { cell in
             guard let thumbnailCell = cell as? ThumbnailCell else { return }
             guard let indexPath = self.collectionView.indexPathForCell(cell) else { return }
@@ -166,17 +171,18 @@ extension TopSitesPanel {
                 thumbnailCell.toggleRemoveButton(false)
             }
         }
+
     }
 
     private func deleteHistoryTileForSite(site: Site, atIndexPath indexPath: NSIndexPath) {
-//        profile.history.removeSiteFromTopSites(site).upon {
-//            self.profile.history.getSitesByFrecencyWithLimit(FrecencyQueryLimit).uponQueue(dispatch_get_main_queue()) {
-//                self.collectionView.performBatchUpdates({
-//                    self.collectionView.deleteItemsAtIndexPaths([indexPath])
-//                    self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: self.dataSource.numberOfTilesToDisplay - 1, inSection: 0)])
-//                }, completion: nil)
-//            }
-//        }
+        profile.history.removeSiteFromTopSites(site) >>== {
+            self.profile.history.getSitesByFrecencyWithLimit(self.maxFrecencyLimit).uponQueue(dispatch_get_main_queue(), block: { result in
+                self.collectionView.performBatchUpdates({
+                    self.collectionView.deleteItemsAtIndexPaths([indexPath])
+                    self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: self.dataSource.numberOfTilesToDisplay - 1, inSection: 0)])
+                }, completion: nil)
+            })
+        }
     }
 
     private func refreshHistory(frequencyLimit: Int) {
