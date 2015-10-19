@@ -24,11 +24,12 @@ class TopSitesDataSource: NSObject, UICollectionViewDataSource {
         // Cells for the top site thumbnails.
         let site = self[indexPath.item]!
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(ThumbnailCell.Identifier, forIndexPath: indexPath) as! ThumbnailCell
-
         if indexPath.item >= data.count {
-            return configureTileForSuggestedSite(cell, site: site as! SuggestedSite)
+            cell.configureTileForSuggestedSite(site as! SuggestedSite)
+        } else {
+            cell.configureTileForSite(site, isEditing: editingThumbnails, profile: profile)
         }
-        return configureTileForSite(cell, site: site)
+        return cell
     }
 
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -41,56 +42,70 @@ class TopSitesDataSource: NSObject, UICollectionViewDataSource {
     func updateNumberOfTilesToDisplay(numOfTiles: Int) {
         numberOfTilesToDisplay = numOfTiles
     }
+
+    subscript(index: Int) -> Site? {
+        if data.status != .Success {
+            return nil
+        }
+
+        if index >= data.count {
+            return SuggestedSites[index - data.count]
+        }
+        return data[index] as Site?
+    }
 }
 
-// MARK: - Private Helpers
-extension TopSitesDataSource {
-    private func setDefaultThumbnailBackground(cell: ThumbnailCell) {
-        cell.imageView.image = UIImage(named: "defaultTopSiteIcon")!
-        cell.imageView.contentMode = UIViewContentMode.Center
+// MARK: Cell Decorators
+private extension ThumbnailCell {
+    func setDefaultThumbnailBackground() {
+        imageView.image = UIImage(named: "defaultTopSiteIcon")!
+        imageView.contentMode = UIViewContentMode.Center
     }
 
-    private func blurredImage(image: UIImage, forURL url: NSURL) -> Deferred<UIImage> {
+    func blurredImage(iconImage: UIImage, forURL url: NSURL) -> Deferred<UIImage> {
         let deferred = Deferred<UIImage>()
 
         let blurredKey = "\(url.absoluteString)!blurred"
-        SDImageCache.sharedImageCache().queryDiskCacheForKey(blurredKey) { image, _ in
-            if let image = image {
-                deferred.fill(image)
+        SDImageCache.sharedImageCache().queryDiskCacheForKey(blurredKey) { cachedImage, _ in
+            if let cachedImage = cachedImage {
+                deferred.fill(cachedImage)
             } else {
-                let blurred = image.applyLightEffect()
-                SDImageCache.sharedImageCache().storeImage(blurred, forKey: blurredKey)
-                deferred.fill(blurred)
+                // Since blurring can be an expensive operation, perform the blur in a background thread
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+                    let blurred = iconImage.applyLightEffect()
+                    SDImageCache.sharedImageCache().storeImage(blurred, forKey: blurredKey)
+                    deferred.fill(blurred)
+                }
             }
         }
         return deferred
     }
 
-    private func getFavicon(cell: ThumbnailCell, site: Site) {
-        self.setDefaultThumbnailBackground(cell)
+    func getFavicon(site: Site, profile: Profile) {
+        setDefaultThumbnailBackground()
         guard let url = site.url.asURL else { return }
 
         FaviconFetcher.getForURL(url, profile: profile) >>== { icons in
             if icons.count == 0 { return }
             guard let url = icons[0].url.asURL else { return }
 
-            cell.imageView.sd_setImageWithURL(url) { (img, err, type, url) -> Void in
+            self.imageView.sd_setImageWithURL(url) { (img, err, type, url) -> Void in
                 guard let img = img else {
                     let icon = Favicon(url: "", date: NSDate(), type: IconType.NoneFound)
-                    self.profile.favicons.addFavicon(icon, forSite: site)
-                    self.setDefaultThumbnailBackground(cell)
+                    profile.favicons.addFavicon(icon, forSite: site)
+                    self.setDefaultThumbnailBackground()
                     return
                 }
 
-                cell.image = img
+                self.image = img
                 self.blurredImage(img, forURL: url).uponQueue(dispatch_get_main_queue()) { blurredImage in
-                    cell.backgroundImage.image = blurredImage
+                    self.backgroundImage.image = blurredImage
                 }
             }
         }
     }
 
-    private func configureTileForSite(cell: ThumbnailCell, site: Site) -> ThumbnailCell {
+    func configureTileForSite(site: Site, isEditing editing: Bool, profile: Profile) {
 
         // We always want to show the domain URL, not the title.
         //
@@ -105,66 +120,53 @@ extension TopSitesDataSource {
         // Instead we'll painstakingly re-extract those things here.
 
         let domainURL = NSURL(string: site.url)?.normalizedHost() ?? site.url
-        cell.textLabel.text = domainURL
-        cell.accessibilityLabel = cell.textLabel.text
-        cell.removeButton.hidden = !editingThumbnails
+        textLabel.text = domainURL
+        accessibilityLabel = textLabel.text
+        removeButton.hidden = !editing
 
-        if let icon = site.icon {
-            // We've looked before recently and didn't find a favicon
-            switch icon.type {
-            case .NoneFound where NSDate().timeIntervalSinceDate(icon.date) < FaviconFetcher.ExpirationTime:
-                self.setDefaultThumbnailBackground(cell)
-            default:
-                cell.imageView.sd_setImageWithURL(icon.url.asURL, completed: { (img, err, type, url) -> Void in
-                    if let img = img {
-                        cell.image = img
-                        self.blurredImage(img, forURL: url).uponQueue(dispatch_get_main_queue()) { blurredImage in
-                            cell.backgroundImage.image = blurredImage
-                        }
-                    } else {
-                        self.getFavicon(cell, site: site)
-                    }
-                })
-            }
-        } else {
-            getFavicon(cell, site: site)
+        guard let icon = site.icon else {
+            getFavicon(site, profile: profile)
+            return
         }
 
-        return cell
+        // We've looked before recently and didn't find a favicon
+        switch icon.type {
+        case .NoneFound where NSDate().timeIntervalSinceDate(icon.date) < FaviconFetcher.ExpirationTime:
+            self.setDefaultThumbnailBackground()
+        default:
+            imageView.sd_setImageWithURL(icon.url.asURL, completed: { (img, err, type, url) -> Void in
+                if let img = img {
+                    self.image = img
+                    self.blurredImage(img, forURL: url).uponQueue(dispatch_get_main_queue()) { blurredImage in
+                        self.backgroundImage.image = blurredImage
+                    }
+                } else {
+                    self.getFavicon(site, profile: profile)
+                }
+            })
+        }
     }
 
-    private func configureTileForSuggestedSite(cell: ThumbnailCell, site: SuggestedSite) -> ThumbnailCell {
-        cell.textLabel.text = site.title.isEmpty ? NSURL(string: site.url)?.normalizedHostAndPath() : site.title
-        cell.imageWrapper.backgroundColor = site.backgroundColor
-        cell.imageView.contentMode = UIViewContentMode.ScaleAspectFit
-        cell.accessibilityLabel = cell.textLabel.text
+    func configureTileForSuggestedSite(site: SuggestedSite) {
+        textLabel.text = site.title.isEmpty ? NSURL(string: site.url)?.normalizedHostAndPath() : site.title
+        imageWrapper.backgroundColor = site.backgroundColor
+        imageView.contentMode = UIViewContentMode.ScaleAspectFit
+        accessibilityLabel = textLabel.text
 
-        if let icon = site.wordmark.url.asURL,
-           let host = icon.host {
-            if icon.scheme == "asset" {
-                cell.imageView.image = UIImage(named: host)
-            } else {
-                cell.imageView.sd_setImageWithURL(icon, completed: { img, err, type, key in
-                    if img == nil {
-                        self.setDefaultThumbnailBackground(cell)
-                    }
-                })
-            }
+        guard let icon = site.wordmark.url.asURL,
+              let host = icon.host else {
+            self.setDefaultThumbnailBackground()
+            return
+        }
+
+        if icon.scheme == "asset" {
+            imageView.image = UIImage(named: host)
         } else {
-            self.setDefaultThumbnailBackground(cell)
+            imageView.sd_setImageWithURL(icon, completed: { img, err, type, key in
+                if img == nil {
+                    self.setDefaultThumbnailBackground()
+                }
+            })
         }
-
-        return cell
-    }
-
-    subscript(index: Int) -> Site? {
-        if data.status != .Success {
-            return nil
-        }
-
-        if index >= data.count {
-            return SuggestedSites[index - data.count]
-        }
-        return data[index] as Site?
     }
 }
