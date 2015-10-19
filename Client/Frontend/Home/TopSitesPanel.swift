@@ -35,10 +35,7 @@ class TopSitesPanel: UIViewController {
     private lazy var layout: TopSitesLayout = { return TopSitesLayout() }()
 
     private lazy var maxFrecencyLimit: Int = {
-        return max(
-            self.layout.calculateApproxThumbnailCountForOrientation(UIInterfaceOrientation.LandscapeLeft),
-            self.layout.calculateApproxThumbnailCountForOrientation(UIInterfaceOrientation.Portrait)
-        )
+        return 30
     }()
 
     private var editingThumbnails: Bool = false {
@@ -80,19 +77,22 @@ extension TopSitesPanel {
         collectionView.snp_makeConstraints { make in
             make.edges.equalTo(self.view)
         }
-        refreshHistory(maxFrecencyLimit)
     }
 
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-
-        // Update the number of tiles we can show based on the size of the collection view if
-        // the size has changed since last layout
-        updateTopSiteTilesForSize(collectionView.bounds.size)
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        refreshHistory(maxFrecencyLimit)
     }
 
     override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.AllButUpsideDown
+    }
+
+    override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        layout.reflowLayoutForTraitCollection(traitCollection)
+        dataSource.numberOfTilesToDisplay = layout.numberOfColumns * layout.numberOfRows
+        collectionView.reloadData()
     }
 }
 
@@ -115,49 +115,11 @@ extension TopSitesPanel {
 extension TopSitesPanel {
     private func updateDataSourceWithSites(result: Maybe<Cursor<Site>>) {
         if let data = result.successValue {
-            self.dataSource.data = data
-            self.dataSource.profile = self.profile
-            updateTopSiteTilesForSize(collectionView.bounds.size)
-        }
-    }
-
-    private func updateTopSiteTilesForSize(size: CGSize) {
-        let oldSlotCount = dataSource.numberOfTilesToDisplay
-        let newSlotCount = layout.numberOfSlotsAvailableForSize(size)
-
-        // Number of available slots we can put tiles into has changed - make sure to add/remove cells from the 
-        // panel accordingly.
-        if oldSlotCount != newSlotCount {
-            let numberOfTiles: Int
-            if dataSource.data.status == .Failure {
-                numberOfTiles = 0
-            } else {
-                numberOfTiles = dataSource.data.count + SuggestedSites.count
-            }
-
-            // Fill as many slots as we can
-            let numberOfTilesToDisplay = min(numberOfTiles, newSlotCount)
-            let oldNumberOfTilesToDisplay = dataSource.numberOfTilesToDisplay
-
-            dataSource.updateNumberOfTilesToDisplay(numberOfTilesToDisplay)
-
-            let delta = numberOfTilesToDisplay - oldNumberOfTilesToDisplay
-            collectionView.performBatchUpdates({
-                var cells = [NSIndexPath]()
-                if delta > 0 {
-                    for row in 0..<delta {
-                        cells.append(NSIndexPath(forRow: oldNumberOfTilesToDisplay + row, inSection: 0))
-                    }
-                    self.collectionView.insertItemsAtIndexPaths(cells)
-                } else if delta < 0 {
-                    for row in 0..<abs(delta) {
-                        cells.append(NSIndexPath(forRow: numberOfTilesToDisplay + row, inSection: 0))
-                    }
-                    self.collectionView.deleteItemsAtIndexPaths(cells)
-                }
-            }, completion: { _ in
-                self.updateRemoveButtonStates()
-            })
+            layout.reflowLayoutForTraitCollection(traitCollection)
+            dataSource.numberOfTilesToDisplay = layout.numberOfColumns * layout.numberOfRows
+            dataSource.data = data
+            dataSource.profile = profile
+            collectionView.reloadData()
         }
     }
 
@@ -171,7 +133,6 @@ extension TopSitesPanel {
                 thumbnailCell.toggleRemoveButton(false)
             }
         }
-
     }
 
     private func deleteHistoryTileForSite(site: Site, atIndexPath indexPath: NSIndexPath) {
@@ -192,7 +153,24 @@ extension TopSitesPanel {
     }
 }
 
-extension TopSitesPanel: UICollectionViewDelegate {
+// MARK: - UICollectionViewDelegateFlowLayout
+extension TopSitesPanel: UICollectionViewDelegateFlowLayout {
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
+        return layout.currentParams?.horizontalSpacing ?? 0
+    }
+
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
+        return layout.currentParams?.verticalSpacing ?? 0
+    }
+
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        return layout.currentParams?.itemSizeForCollectionViewSize(collectionView.frame.size) ?? CGSizeZero
+    }
+
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
+        return layout.currentParams?.sectionInsets ?? UIEdgeInsetsZero
+    }
+
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         if editingThumbnails {
             return
@@ -217,12 +195,14 @@ extension TopSitesPanel: UICollectionViewDelegate {
     }
 }
 
+// MARK: - HomePanel
 extension TopSitesPanel: HomePanel {
     func endEditing() {
         editingThumbnails = false
     }
 }
 
+// MARK: - ThumbnailCellDelegate
 extension TopSitesPanel: ThumbnailCellDelegate {
     func didRemoveThumbnail(thumbnailCell: ThumbnailCell) {
         if let indexPath = collectionView.indexPathForCell(thumbnailCell) {

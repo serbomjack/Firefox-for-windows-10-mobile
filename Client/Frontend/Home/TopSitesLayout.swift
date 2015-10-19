@@ -4,145 +4,87 @@
 
 import UIKit
 
-/// A custom UICollectionViewLayout for Top Site items. A unique characteristic of this layout is that 
-/// when rotated, the cells do not change alpha but flow into the correct place. The layout also calculates
-/// the frame of each cell by factoring in the number of columns/rows available. Based on a fixed number of
-/// columns for a given device orientation/size, the height of the cells are calculated based on a specific
-/// aspect ratio and insets to allow the cells to fit snug in the collection view.
-class TopSitesLayout: UICollectionViewLayout {
-    var aspectRatio: CGFloat = 1.0
+/**
+*  A Basic POD struct that contains parameters for laying out items in Top Sites
+*/
+struct TopSitesLayoutParams {
+    let numberOfColumns: Int
+    let numberOfRows: Int
+    let horizontalSpacing: CGFloat
+    let verticalSpacing: CGFloat
+    let sectionInsets: UIEdgeInsets
 
-    var numberOfColumns: Int { return columnsForSize(collectionViewContentSize()) }
-
-    var itemWidth: CGFloat { return itemWidthForSize(collectionViewContentSize()) }
-
-    var itemHeight: CGFloat { return itemHeightForSize(collectionViewContentSize()) }
-
-    var numberOfRows: Int { return rowsForSize(collectionViewContentSize()) }
-
-    private var layoutAttributes:[UICollectionViewLayoutAttributes]?
-
-    override func prepareLayout() {
-        var layoutAttributes = [UICollectionViewLayoutAttributes]()
-        for section in 0..<(self.collectionView?.numberOfSections() ?? 0) {
-            for item in 0..<(self.collectionView?.numberOfItemsInSection(section) ?? 0) {
-                let indexPath = NSIndexPath(forItem: item, inSection: section)
-                guard let attrs = self.layoutAttributesForItemAtIndexPath(indexPath) else { continue }
-                layoutAttributes.append(attrs)
-            }
-        }
-        self.layoutAttributes = layoutAttributes
-    }
-
-    override func collectionViewContentSize() -> CGSize {
-        let size = collectionView?.bounds.size ?? CGSizeZero
-        return size
-    }
-
-    override func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-        var attrs = [UICollectionViewLayoutAttributes]()
-        if let layoutAttributes = self.layoutAttributes {
-            for attr in layoutAttributes {
-                if CGRectIntersectsRect(rect, attr.frame) {
-                    attrs.append(attr)
-                }
-            }
-        }
-        return attrs
-    }
-
-    override func shouldInvalidateLayoutForBoundsChange(newBounds: CGRect) -> Bool {
-        let oldBounds = self.collectionView?.bounds ?? CGRectZero
-        if !CGSizeEqualToSize(oldBounds.size, newBounds.size) {
-            return true
-        }
-        return false
-    }
-
-    override func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
-        let attr = UICollectionViewLayoutAttributes(forCellWithIndexPath: indexPath)
-        let row = floor(Double(indexPath.item / numberOfColumns))
-        let col = indexPath.item % numberOfColumns
-        let insets = ThumbnailCellUX.Insets
-        let x = insets.left + itemWidth * CGFloat(col)
-        let y = insets.top + CGFloat(row) * itemHeight
-        attr.frame = CGRectMake(ceil(x), ceil(y), itemWidth, itemHeight)
-        return attr
-    }
-
-    override func initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
-        let attributes = layoutAttributesForItemAtIndexPath(itemIndexPath)
-        attributes?.alpha = 1
-        return attributes
-    }
-
-    override func finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
-        let attributes = layoutAttributesForItemAtIndexPath(itemIndexPath)
-        attributes?.alpha = 0
-        return attributes
+    func itemSizeForCollectionViewSize(size: CGSize) -> CGSize {
+        // Trim off the amount of whitespace we'll need in between the cells so we can simply divide the left
+        // over space by the number of rows/columns to determine the size of each item
+        let horizontalSpacingAmount = CGFloat(numberOfColumns - 1) * horizontalSpacing + sectionInsets.left + sectionInsets.right
+        let verticalSpacingAmount = CGFloat(numberOfRows - 1) * verticalSpacing + sectionInsets.top + sectionInsets.bottom
+        let leftOverSpace = CGSize(width: size.width - horizontalSpacingAmount, height: size.height - verticalSpacingAmount)
+        let itemWidth = floor(leftOverSpace.width / CGFloat(numberOfColumns))
+        let itemHeight = floor(leftOverSpace.height / CGFloat(numberOfRows))
+        let minLength = min(itemHeight, itemWidth)
+        return CGSize(width: minLength, height: minLength)
     }
 }
 
-extension TopSitesLayout {
-    func numberOfSlotsAvailableForSize(size: CGSize) -> Int {
-        return columnsForSize(size) * rowsForSize(size)
+/// A UICollectionFlowLayout subclass that responds to traitCollection changes in order to
+/// update it's current set of layout parameters for Top Sites
+class TopSitesLayout: UICollectionViewFlowLayout {
+    private let portraitParams = TopSitesLayoutParams(
+        numberOfColumns: 3,
+        numberOfRows: 4,
+        horizontalSpacing: 10,
+        verticalSpacing: 10,
+        sectionInsets: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+    )
+
+    private let landscapeParams = TopSitesLayoutParams(
+        numberOfColumns: 5,
+        numberOfRows: 2,
+        horizontalSpacing: 10,
+        verticalSpacing: 10,
+        sectionInsets: UIEdgeInsets(top: 5, left: 8, bottom: 8, right: 5)
+    )
+
+    private let ipadParams = TopSitesLayoutParams(
+        numberOfColumns: 5,
+        numberOfRows: 6,
+        horizontalSpacing: 10,
+        verticalSpacing: 10,
+        sectionInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+    )
+
+    private(set) var currentParams: TopSitesLayoutParams?
+
+    var numberOfColumns: Int {
+        return currentParams?.numberOfColumns ?? 0
     }
 
-    /**
-    Calculates an approximation of the number of tiles we want to display for the given orientation. This
-    method uses the screen's size as it's basis for the calculation instead of the collectionView's since the
-    collectionView's bounds is determined until the next layout pass.
-    - parameter orientation: Orientation to calculate number of tiles for
-    - returns: Rough tile count we will be displaying for the passed in orientation
-    */
-    func calculateApproxThumbnailCountForOrientation(orientation: UIInterfaceOrientation) -> Int {
-        let size = UIScreen.mainScreen().bounds.size
-        let portraitSize = CGSize(width: min(size.width, size.height), height: max(size.width, size.height))
+    var numberOfRows: Int {
+        return currentParams?.numberOfRows ?? 0
+    }
 
-        func calculateRowsForSize(size: CGSize, columns: Int) -> Int {
-            let insets = ThumbnailCellUX.Insets
-            let thumbnailWidth = (size.width - insets.left - insets.right) / CGFloat(columns)
-            let thumbnailHeight = thumbnailWidth / CGFloat(ThumbnailCellUX.ImageAspectRatio)
-            return max(2, Int(size.height / thumbnailHeight))
+    func reflowLayoutForTraitCollection(traitCollection: UITraitCollection) {
+        guard let size = collectionView?.frame.size where !CGSizeEqualToSize(size, CGSizeZero) else {
+            return
         }
 
-        let numberOfColumns: Int
-        let numberOfRows: Int
+        // iPhone 4S/5/5s/6/6 plus landscape
+        if (traitCollection.horizontalSizeClass == .Compact && traitCollection.verticalSizeClass == .Compact) ||
+            (traitCollection.horizontalSizeClass == .Regular && traitCollection.verticalSizeClass == .Compact) {
+            currentParams = landscapeParams
+        }
 
-        if UIInterfaceOrientationIsLandscape(orientation) {
-            numberOfColumns = 5
-            numberOfRows = calculateRowsForSize(CGSize(width: portraitSize.height, height: portraitSize.width), columns: numberOfColumns)
+        // iPhone 4S/5/5s/6/6 plus portrait
+        else if (traitCollection.horizontalSizeClass == .Compact && traitCollection.verticalSizeClass == .Regular) {
+            currentParams = portraitParams
+        }
+
+        // All iPads portrait and landscape
+        else if (traitCollection.horizontalSizeClass == .Regular && traitCollection.verticalSizeClass == .Regular) {
+            currentParams = ipadParams
         } else {
-            numberOfColumns = 4
-            numberOfRows = calculateRowsForSize(portraitSize, columns: numberOfColumns)
+            currentParams = portraitParams
         }
-
-        return numberOfColumns * numberOfRows
-    }
-
-    private func columnsForSize(size: CGSize) -> Int {
-        if viewOrientationForSize(size).isLandscape {
-            return 5
-        } else if UIScreen.mainScreen().traitCollection.horizontalSizeClass == .Compact {
-            return 3
-        } else {
-            return 4
-        }
-    }
-
-    private func rowsForSize(size: CGSize) -> Int {
-        return Int((size.height ?? itemHeightForSize(size)) / itemHeightForSize(size))
-    }
-
-    private func itemWidthForSize(size: CGSize) -> CGFloat {
-        return floor((size.width - ThumbnailCellUX.Insets.left - ThumbnailCellUX.Insets.right) / CGFloat(columnsForSize(size)))
-    }
-
-    private func itemHeightForSize(size: CGSize) -> CGFloat {
-        return floor(itemWidthForSize(size) / aspectRatio)
-    }
-
-    private func viewOrientationForSize(size: CGSize) -> UIInterfaceOrientation {
-        return size.width > size.height ? UIInterfaceOrientation.LandscapeRight : UIInterfaceOrientation.Portrait
     }
 }
