@@ -33,10 +33,11 @@ class TopSitesDataSource: NSObject, UICollectionViewDataSource {
     }
 
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        // Unlike your typical data source pattern, the number of tiles to display is not only inferred from 
-        // the data set but also the layout since we want to show a fixed amount of tiles depending on the
-        // device/orientation. See TopSitesPanel.updateTopSiteTilesForSize().
-        return min(numberOfTilesToDisplay, data.count)
+        if data.status != .Success {
+            return 0
+        }
+
+        return min(numberOfTilesToDisplay, data.count + SuggestedSites.count)
     }
 
     subscript(index: Int) -> Site? {
@@ -58,23 +59,16 @@ private extension ThumbnailCell {
         imageView.contentMode = UIViewContentMode.Center
     }
 
-    func blurredImage(iconImage: UIImage, forURL url: NSURL) -> Deferred<UIImage> {
-        let deferred = Deferred<UIImage>()
-
+    func blurredImage(iconImage: UIImage, forURL url: NSURL) -> UIImage {
         let blurredKey = "\(url.absoluteString)!blurred"
-        SDImageCache.sharedImageCache().queryDiskCacheForKey(blurredKey) { cachedImage, _ in
-            if let cachedImage = cachedImage {
-                deferred.fill(cachedImage)
-            } else {
-                // Since blurring can be an expensive operation, perform the blur in a background thread
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-                    let blurred = iconImage.applyLightEffect()
-                    SDImageCache.sharedImageCache().storeImage(blurred, forKey: blurredKey)
-                    deferred.fill(blurred)
-                }
-            }
+        let blurredImage: UIImage
+        if let cachedImage = SDImageCache.sharedImageCache().imageFromDiskCacheForKey(blurredKey) {
+            blurredImage = cachedImage
+        } else {
+            blurredImage = iconImage.applyLightEffect()
+            SDImageCache.sharedImageCache().storeImage(blurredImage, forKey: blurredKey)
         }
-        return deferred
+        return blurredImage
     }
 
     func getFavicon(site: Site, profile: Profile) {
@@ -94,9 +88,7 @@ private extension ThumbnailCell {
                 }
 
                 self.image = img
-                self.blurredImage(img, forURL: url).uponQueue(dispatch_get_main_queue()) { blurredImage in
-                    self.backgroundImage.image = blurredImage
-                }
+                self.backgroundImage.image = self.blurredImage(img, forURL: url)
             }
         }
     }
@@ -133,9 +125,7 @@ private extension ThumbnailCell {
             imageView.sd_setImageWithURL(icon.url.asURL, completed: { (img, err, type, url) -> Void in
                 if let img = img {
                     self.image = img
-                    self.blurredImage(img, forURL: url).uponQueue(dispatch_get_main_queue()) { blurredImage in
-                        self.backgroundImage.image = blurredImage
-                    }
+                    self.backgroundImage.image = self.blurredImage(img, forURL: url)
                 } else {
                     self.getFavicon(site, profile: profile)
                 }

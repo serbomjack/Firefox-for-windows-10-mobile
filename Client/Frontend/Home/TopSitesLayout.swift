@@ -27,64 +27,125 @@ struct TopSitesLayoutParams {
     }
 }
 
+private let IPhoneSmallLandscapeParams = TopSitesLayoutParams(
+    numberOfColumns: 4,
+    numberOfRows: 2,
+    horizontalSpacing: 2,
+    verticalSpacing: 2,
+    sectionInsets: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+)
+
+private let IPhoneSmallPortraitParams = TopSitesLayoutParams(
+    numberOfColumns: 3,
+    numberOfRows: 3,
+    horizontalSpacing: 2,
+    verticalSpacing: 2,
+    sectionInsets: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+)
+
+private let IPhonePortraitParams = TopSitesLayoutParams(
+    numberOfColumns: 3,
+    numberOfRows: 4,
+    horizontalSpacing: 5,
+    verticalSpacing: 5,
+    sectionInsets: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+)
+
+private let IPhoneLandscapeParams = TopSitesLayoutParams(
+    numberOfColumns: 5,
+    numberOfRows: 2,
+    horizontalSpacing: 5,
+    verticalSpacing: 5,
+    sectionInsets: UIEdgeInsets(top: 5, left: 8, bottom: 8, right: 5)
+)
+
+private let IPadPortraitParams = TopSitesLayoutParams(
+    numberOfColumns: 4,
+    numberOfRows: 5,
+    horizontalSpacing: 10,
+    verticalSpacing: 10,
+    sectionInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+)
+
+private let IPadLandscapeParams = TopSitesLayoutParams(
+    numberOfColumns: 5,
+    numberOfRows: 3,
+    horizontalSpacing: 10,
+    verticalSpacing: 10,
+    sectionInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+)
+
+/**
+*  A simple delegate that emits events for when the size classes have changed for the layout
+*/
+protocol TopSitesLayoutDelegate {
+    func topSitesLayoutDidChangeSizeClass()
+}
+
 /// A UICollectionFlowLayout subclass that responds to traitCollection changes in order to
 /// update it's current set of layout parameters for Top Sites
 class TopSitesLayout: UICollectionViewFlowLayout {
-    private let portraitParams = TopSitesLayoutParams(
-        numberOfColumns: 3,
-        numberOfRows: 4,
-        horizontalSpacing: 10,
-        verticalSpacing: 10,
-        sectionInsets: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
-    )
 
-    private let landscapeParams = TopSitesLayoutParams(
-        numberOfColumns: 5,
-        numberOfRows: 2,
-        horizontalSpacing: 10,
-        verticalSpacing: 10,
-        sectionInsets: UIEdgeInsets(top: 5, left: 8, bottom: 8, right: 5)
-    )
+    private(set) var layoutParams: TopSitesLayoutParams?
 
-    private let ipadParams = TopSitesLayoutParams(
-        numberOfColumns: 5,
-        numberOfRows: 6,
-        horizontalSpacing: 10,
-        verticalSpacing: 10,
-        sectionInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-    )
+    private var horizontalSize: FXSizeClass = .SizeUndefined
 
-    private(set) var currentParams: TopSitesLayoutParams?
+    private var verticalSize: FXSizeClass = .SizeUndefined
+
+    var topSitesDelegate: TopSitesLayoutDelegate?
 
     var numberOfColumns: Int {
-        return currentParams?.numberOfColumns ?? 0
+        return layoutParams?.numberOfColumns ?? 0
     }
 
     var numberOfRows: Int {
-        return currentParams?.numberOfRows ?? 0
+        return layoutParams?.numberOfRows ?? 0
     }
 
-    func reflowLayoutForTraitCollection(traitCollection: UITraitCollection) {
-        guard let size = collectionView?.frame.size where !CGSizeEqualToSize(size, CGSizeZero) else {
+    func setHorizontalSize(horizontalSize: FXSizeClass, andVerticalSize verticalSize: FXSizeClass) {
+        // Don't do anything if nothing has changed
+        if horizontalSize == self.horizontalSize && verticalSize == self.verticalSize {
             return
         }
 
-        // iPhone 4S/5/5s/6/6 plus landscape
-        if (traitCollection.horizontalSizeClass == .Compact && traitCollection.verticalSizeClass == .Compact) ||
-            (traitCollection.horizontalSizeClass == .Regular && traitCollection.verticalSizeClass == .Compact) {
-            currentParams = landscapeParams
+        switch (horizontalSize, verticalSize) {
+
+        // Portrait small iPhone
+        case let (h, v) where h == .Size320 && v == .Size480:
+            layoutParams = IPhoneSmallPortraitParams
+
+        // Portrait tall iPhone
+        case let (h, v) where h == .Size320 && v == .Size568:
+            layoutParams = IPhonePortraitParams
+        case let (h, v) where h == .Size375 && v == .Size667:
+            layoutParams = IPhonePortraitParams
+        case let (h, v) where h == .Size414 && v == .Size736:
+            layoutParams = IPhonePortraitParams
+
+        // Landscape small iPhone
+        case let (h, v) where h == .Size480 && v == .Size320:
+            layoutParams = IPhoneSmallLandscapeParams
+
+        // Landscape tall iPhone
+        case let (h, v) where h == .Size568 && v == .Size320:
+            layoutParams = IPhoneLandscapeParams
+        case let (h, v) where h == .Size667 && v == .Size375:
+            layoutParams = IPhoneLandscapeParams
+        case let (h, v) where h == .Size736 && v == .Size414:
+            layoutParams = IPhoneLandscapeParams
+
+        // Landscape iPad
+        case let (h, v) where h == .Size1024 && v == .Size768:
+            layoutParams = IPadLandscapeParams
+
+        // Portrait iPad
+        case let (h, v) where h == .Size768 && v == .Size1024:
+            layoutParams = IPadPortraitParams
+
+        default:
+            break
         }
 
-        // iPhone 4S/5/5s/6/6 plus portrait
-        else if (traitCollection.horizontalSizeClass == .Compact && traitCollection.verticalSizeClass == .Regular) {
-            currentParams = portraitParams
-        }
-
-        // All iPads portrait and landscape
-        else if (traitCollection.horizontalSizeClass == .Regular && traitCollection.verticalSizeClass == .Regular) {
-            currentParams = ipadParams
-        } else {
-            currentParams = portraitParams
-        }
+        topSitesDelegate?.topSitesLayoutDidChangeSizeClass()
     }
 }

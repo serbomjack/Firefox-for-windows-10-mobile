@@ -635,6 +635,7 @@
 		E69966991B72674B0036F797 /* RollingFileLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E69966981B72674B0036F797 /* RollingFileLogger.swift */; };
 		E6C05DB21BA1CDAB00CDDD08 /* Breakpad.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = E69E4E2A1B9F709A00646EDB /* Breakpad.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E6D8D5E71B569D70009E5A58 /* BrowserTrayAnimators.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D8D5E61B569D70009E5A58 /* BrowserTrayAnimators.swift */; };
+		E6E5E9321BD6AD2800D45759 /* FXSizeClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E5E9311BD6AD2800D45759 /* FXSizeClass.swift */; settings = {ASSET_TAGS = (); }; };
 		E6E967E51BCDA277007A1032 /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = E6E967E41BCDA277007A1032 /* UIImage+ImageEffects.m */; settings = {ASSET_TAGS = (); }; };
 		E6EAC5961B29CB3A00E1DE1E /* scrollablePage.html in Resources */ = {isa = PBXBuildFile; fileRef = E6EAC5951B29CB3A00E1DE1E /* scrollablePage.html */; };
 		E6F965121B2F1CF20034B023 /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288A2D861AB8B3260023ABC3 /* Shared.framework */; };
@@ -1802,6 +1803,7 @@
 		E69E4E241B9F709A00646EDB /* Breakpad.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Breakpad.xcodeproj; path = "Carthage/Checkouts/google-breakpad-ios/src/client/ios/Breakpad.xcodeproj"; sourceTree = "<group>"; };
 		E6A99D761B20D95800006EDD /* GeometryExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeometryExtensions.swift; sourceTree = "<group>"; };
 		E6D8D5E61B569D70009E5A58 /* BrowserTrayAnimators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserTrayAnimators.swift; sourceTree = "<group>"; };
+		E6E5E9311BD6AD2800D45759 /* FXSizeClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FXSizeClass.swift; sourceTree = "<group>"; };
 		E6E967E31BCDA277007A1032 /* UIImage+ImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+ImageEffects.h"; path = "Extensions/UIImage+ImageEffects.h"; sourceTree = "<group>"; };
 		E6E967E41BCDA277007A1032 /* UIImage+ImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+ImageEffects.m"; path = "Extensions/UIImage+ImageEffects.m"; sourceTree = "<group>"; };
 		E6EAC5951B29CB3A00E1DE1E /* scrollablePage.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = scrollablePage.html; sourceTree = "<group>"; };
@@ -2672,6 +2674,7 @@
 				287DAA1E1AE06E5D0055AC35 /* DeviceInfo.swift */,
 				0B71FFF41B4C49E50046AF87 /* FaviconFetcher.swift */,
 				283306E81AB3BB87008999AC /* Functions.swift */,
+				E6E5E9311BD6AD2800D45759 /* FXSizeClass.swift */,
 				D39999A81AA01D65005AED21 /* KeyboardHelper.swift */,
 				2F0624D41AE58C7800FA022C /* KeychainCache.swift */,
 				D339C2821AD354B400C087BD /* Loader.swift */,
@@ -4637,6 +4640,7 @@
 				E4B3344F1BBF2393004E2BFF /* ADJActivityPackage.m in Sources */,
 				2F44FC721A9E840300FD20CC /* SettingsNavigationController.swift in Sources */,
 				D3BA7E0E1B0E934F00153782 /* ContextMenuHelper.swift in Sources */,
+				E6E5E9321BD6AD2800D45759 /* FXSizeClass.swift in Sources */,
 				0AE491A61A41C88C0046C724 /* BackForwardListViewController.swift in Sources */,
 				E660BE061BB0666D009AC090 /* InnerStrokedView.swift in Sources */,
 				0BF648111A9C54E900BA963C /* TopSitesPanel.swift in Sources */,

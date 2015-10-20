@@ -32,7 +32,11 @@ class TopSitesPanel: UIViewController {
         )
     }()
 
-    private lazy var layout: TopSitesLayout = { return TopSitesLayout() }()
+    private lazy var layout: TopSitesLayout = {
+        let layout = TopSitesLayout()
+        layout.topSitesDelegate = self
+        return layout
+    }()
 
     private lazy var maxFrecencyLimit: Int = {
         return 30
@@ -88,9 +92,15 @@ extension TopSitesPanel {
         return UIInterfaceOrientationMask.AllButUpsideDown
     }
 
-    override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        layout.reflowLayoutForTraitCollection(traitCollection)
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        layout.setHorizontalSize(fx_horizontalSizeClass, andVerticalSize: fx_verticalSizeClass)
+    }
+}
+
+// MARK: - TopSitesLayoutDelegate
+extension TopSitesPanel: TopSitesLayoutDelegate {
+    func topSitesLayoutDidChangeSizeClass() {
         dataSource.numberOfTilesToDisplay = layout.numberOfColumns * layout.numberOfRows
         collectionView.reloadData()
     }
@@ -115,7 +125,6 @@ extension TopSitesPanel {
 extension TopSitesPanel {
     private func updateDataSourceWithSites(result: Maybe<Cursor<Site>>) {
         if let data = result.successValue {
-            layout.reflowLayoutForTraitCollection(traitCollection)
             dataSource.numberOfTilesToDisplay = layout.numberOfColumns * layout.numberOfRows
             dataSource.data = data
             dataSource.profile = profile
@@ -136,13 +145,11 @@ extension TopSitesPanel {
     }
 
     private func deleteHistoryTileForSite(site: Site, atIndexPath indexPath: NSIndexPath) {
-        profile.history.removeSiteFromTopSites(site) >>== {
-            self.profile.history.getSitesByFrecencyWithLimit(self.maxFrecencyLimit).uponQueue(dispatch_get_main_queue(), block: { result in
-                self.collectionView.performBatchUpdates({
-                    self.collectionView.deleteItemsAtIndexPaths([indexPath])
-                    self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: self.dataSource.numberOfTilesToDisplay - 1, inSection: 0)])
-                }, completion: nil)
-            })
+        profile.history.removeSiteFromTopSites(site).uponQueue(dispatch_get_main_queue()) { _ in
+            self.collectionView.performBatchUpdates({
+                self.collectionView.deleteItemsAtIndexPaths([indexPath])
+                self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: self.dataSource.numberOfTilesToDisplay - 1, inSection: 0)])
+            }, completion: nil)
         }
     }
 
@@ -156,19 +163,19 @@ extension TopSitesPanel {
 // MARK: - UICollectionViewDelegateFlowLayout
 extension TopSitesPanel: UICollectionViewDelegateFlowLayout {
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
-        return layout.currentParams?.horizontalSpacing ?? 0
+        return layout.layoutParams?.horizontalSpacing ?? 0
     }
 
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
-        return layout.currentParams?.verticalSpacing ?? 0
+        return layout.layoutParams?.verticalSpacing ?? 0
     }
 
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        return layout.currentParams?.itemSizeForCollectionViewSize(collectionView.frame.size) ?? CGSizeZero
+        return layout.layoutParams?.itemSizeForCollectionViewSize(collectionView.frame.size) ?? CGSizeZero
     }
 
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
-        return layout.currentParams?.sectionInsets ?? UIEdgeInsetsZero
+        return layout.layoutParams?.sectionInsets ?? UIEdgeInsetsZero
     }
 
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
