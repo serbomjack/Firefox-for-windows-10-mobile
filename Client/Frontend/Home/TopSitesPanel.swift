@@ -33,17 +33,11 @@ class TopSitesPanel: UIViewController {
     }()
 
     private lazy var layout: TopSitesLayout = {
-        let layout = TopSitesLayout()
-        layout.itemSize = CGSize(width: 160, height: 160)
-        layout.minimumInteritemSpacing = 5
-        layout.minimumLineSpacing = 5
-        layout.sectionInset = UIEdgeInsets(top: 60, left: 60, bottom: 60, right: 60)
-//        layout.topSitesDelegate = self
-        return layout
+        return TopSitesLayout()
     }()
 
     private lazy var maxFrecencyLimit: Int = {
-        return 20
+        return 100
     }()
 
     private var editingThumbnails: Bool = false {
@@ -96,18 +90,27 @@ extension TopSitesPanel {
         return UIInterfaceOrientationMask.AllButUpsideDown
     }
 
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-//        layout.setHorizontalSize(fx_horizontalSizeClass, andVerticalSize: fx_verticalSizeClass)
-    }
-}
+    override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
 
-// MARK: - TopSitesLayoutDelegate
-extension TopSitesPanel: TopSitesLayoutDelegate {
-    func topSitesLayoutDidChangeSizeClass() {
-//        dataSource.numberOfTilesToDisplay = layout.numberOfColumns * layout.numberOfRows
-//        collectionView.collectionViewLayout.invalidateLayout()
-//        collectionView.reloadData()
+        if traitCollection.horizontalSizeClass == .Compact && traitCollection.verticalSizeClass == .Regular {
+            layout.numberOfColumns = 3
+            layout.spacing = 10
+            layout.minimumVerticalSectionInset = 5
+            layout.minimumHorizontalSectionInset = 5
+        } else if traitCollection.horizontalSizeClass == .Compact && traitCollection.verticalSizeClass == .Compact {
+            layout.numberOfColumns = 5
+            layout.spacing = 10
+            layout.minimumVerticalSectionInset = 5
+            layout.minimumHorizontalSectionInset = 5
+        } else if traitCollection.horizontalSizeClass == .Regular && traitCollection.verticalSizeClass == .Regular {
+            layout.numberOfColumns = 5
+            layout.spacing = 10
+            layout.minimumVerticalSectionInset = 20
+            layout.minimumHorizontalSectionInset = 20
+        }
+
+        layout.invalidateLayout()
     }
 }
 
@@ -130,10 +133,10 @@ extension TopSitesPanel {
 extension TopSitesPanel {
     private func updateDataSourceWithSites(result: Maybe<Cursor<Site>>) {
         if let data = result.successValue {
-//            dataSource.numberOfTilesToDisplay = layout.numberOfColumns * layout.numberOfRows
+            dataSource.numberOfTilesToDisplay = min(layout.numberOfColumns * layout.numberOfRows, data.count)
             dataSource.data = data
             dataSource.profile = profile
-            dataSource.numberOfTilesToDisplay = 20
+            layout.invalidateLayout()
             collectionView.reloadData()
         }
     }
@@ -167,23 +170,7 @@ extension TopSitesPanel {
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
-extension TopSitesPanel: UICollectionViewDelegateFlowLayout {
-//    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
-//        return layout.layoutParams?.horizontalSpacing ?? 0
-//    }
-//
-//    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
-//        return layout.layoutParams?.verticalSpacing ?? 0
-//    }
-//
-//    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-//        return layout.layoutParams?.itemSizeForCollectionViewSize(collectionView.frame.size) ?? CGSizeZero
-//    }
-//
-//    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
-//        return layout.layoutParams?.sectionInsets ?? UIEdgeInsetsZero
-//    }
-
+extension TopSitesPanel: UICollectionViewDelegate {
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         if editingThumbnails {
             return

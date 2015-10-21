@@ -4,97 +4,45 @@
 
 import UIKit
 
-/**
-*  A Basic POD struct that contains parameters for laying out items in Top Sites
-*/
-struct TopSitesLayoutParams {
-    let numberOfColumns: Int
-    let numberOfRows: Int
-    let horizontalSpacing: CGFloat
-    let verticalSpacing: CGFloat
-    let sectionInsets: UIEdgeInsets
-
-    func itemSizeForCollectionViewSize(size: CGSize) -> CGSize {
-        // Trim off the amount of whitespace we'll need in between the cells so we can simply divide the left
-        // over space by the number of rows/columns to determine the size of each item
-        let horizontalSpacingAmount = CGFloat(numberOfColumns - 1) * horizontalSpacing + sectionInsets.left + sectionInsets.right
-        let verticalSpacingAmount = CGFloat(numberOfRows - 1) * verticalSpacing + sectionInsets.top + sectionInsets.bottom
-        let leftOverSpace = CGSize(width: size.width - horizontalSpacingAmount, height: size.height - verticalSpacingAmount)
-        let itemWidth = floor(leftOverSpace.width / CGFloat(numberOfColumns))
-        let itemHeight = floor(leftOverSpace.height / CGFloat(numberOfRows))
-        let minLength = min(itemHeight, itemWidth)
-        return CGSize(width: minLength, height: minLength)
-    }
-}
-
-private let IPhoneSmallLandscapeParams = TopSitesLayoutParams(
-    numberOfColumns: 4,
-    numberOfRows: 2,
-    horizontalSpacing: 2,
-    verticalSpacing: 2,
-    sectionInsets: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
-)
-
-private let IPhoneSmallPortraitParams = TopSitesLayoutParams(
-    numberOfColumns: 3,
-    numberOfRows: 3,
-    horizontalSpacing: 2,
-    verticalSpacing: 2,
-    sectionInsets: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
-)
-
-private let IPhonePortraitParams = TopSitesLayoutParams(
-    numberOfColumns: 3,
-    numberOfRows: 4,
-    horizontalSpacing: 5,
-    verticalSpacing: 5,
-    sectionInsets: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
-)
-
-private let IPhoneLandscapeParams = TopSitesLayoutParams(
-    numberOfColumns: 5,
-    numberOfRows: 2,
-    horizontalSpacing: 5,
-    verticalSpacing: 5,
-    sectionInsets: UIEdgeInsets(top: 5, left: 8, bottom: 8, right: 5)
-)
-
-private let IPadPortraitParams = TopSitesLayoutParams(
-    numberOfColumns: 4,
-    numberOfRows: 5,
-    horizontalSpacing: 10,
-    verticalSpacing: 10,
-    sectionInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-)
-
-private let IPadLandscapeParams = TopSitesLayoutParams(
-    numberOfColumns: 5,
-    numberOfRows: 3,
-    horizontalSpacing: 10,
-    verticalSpacing: 10,
-    sectionInsets: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-)
-
-/**
-*  A simple delegate that emits events for when the size classes have changed for the layout
-*/
-protocol TopSitesLayoutDelegate {
-    func topSitesLayoutDidChangeSizeClass()
-}
-
-/// A UICollectionFlowLayout subclass that responds to traitCollection changes in order to
-/// update it's current set of layout parameters for Top Sites
+/// Layout that assigns positions to the tiles in the Top Sites panel. This layout does makes:
+///     - Items have an aspect ratio of 1:1 (square)
+///     - Spacing between each item vertically and horizontally are the same
+///     - Group of items will be centered within the collection view
+///     - No scrolling for the collection view. This is static grid.
 class TopSitesLayout: UICollectionViewLayout {
 
-    var numberOfColumns: Int = 0
+    /// Number of items to place horizontally
+    var numberOfColumns: Int = 1
 
-    var numberOfRows: Int = 0
+    /// Number of items to place vertically. This is a computed property that is calculated by considering
+    /// how large the content size is and the width of an item. The assumption is that each cell is a square
+    /// so we can safely assume this.
+    var numberOfRows: Int {
+        let itemWidth = floor(collectionViewContentSize().width / CGFloat(numberOfColumns))
+        return Int(collectionViewContentSize().height / itemWidth)
+    }
 
+    /// The amount of spacing between the items vertically and horizontally
     var spacing: CGFloat = 0
 
-    var minEdgeSpacing: CGFloat = 0
+    /// The minimum amount of inset on the top/bottom of the layout rect.
+    var minimumVerticalSectionInset: CGFloat = 0
 
-    private var layoutRect: CGRect
+    /// The minimum amount of inset on the left/bottom of the layout rect.
+    var minimumHorizontalSectionInset: CGFloat = 0
+
+    /// The layout rect is the area in which we will layout out items. This is calculated by considering the
+    /// number of columns, inferring an item width, and calculating the height that will fit the most square 
+    /// top site tiles we can fit in our container rect without going outside of it.
+    private var layoutRect: CGRect = CGRectZero
+
+    /// The CGRect that will fit our layout rect (the rect that will hold the items). When the section insets
+    /// are zero, this is the same as a rect that is the size of the collection view with it's origin at zero.
+    /// With section insets, it returns a CGRect that is insetted by those amounts origined at zero.
+    private var containerRect: CGRect {
+        let contentRect = CGRect(origin: CGPointZero, size: collectionViewContentSize())
+        return CGRectInset(contentRect, minimumHorizontalSectionInset, minimumVerticalSectionInset)
+    }
 
     override init() {
         super.init()
@@ -104,31 +52,96 @@ class TopSitesLayout: UICollectionViewLayout {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func prepareLayout() {
+        super.prepareLayout()
+        layoutRect = centerRectInContainer(calculateLayoutRectForContentSize())
+    }
+
+    override func shouldInvalidateLayoutForBoundsChange(newBounds: CGRect) -> Bool {
+        return true
+    }
+
     override func collectionViewContentSize() -> CGSize {
         // We want Top Sites to never be scrollable so set the content size the same as our collection view size
         return collectionView?.bounds.size ?? CGSizeZero
     }
 
-    override func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
-    }
-
     override func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+        var attributes = [UICollectionViewLayoutAttributes]()
+
+        guard let collectionView = collectionView else {
+            return nil
+        }
+
+        // Confer with the data source to see what the least amount of items we need to show is
+        let itemCount = min(numberOfColumns * numberOfRows, collectionView.dataSource?.collectionView(collectionView, numberOfItemsInSection: 0) ?? 0)
+        for i in 0..<itemCount {
+            if let itemAttributes = layoutAttributesForItemAtIndexPath(NSIndexPath(forItem: i, inSection: 0)) {
+                attributes.append(itemAttributes)
+            }
+        }
+        return attributes
     }
 
-    private func calculateLayoutRectForContentSize(size: CGSize, columns: Int, rows: Int) -> CGRect {
-        let floatColumns = CGFloat(columns)
-        let floatRows = CGFloat(rows)
-        let scale = min(size.width / floatColumns, size.height / floatRows)
-        return CGRect(origin: CGPointZero, size: CGSize(width: floatColumns * scale, height: floatRows * scale))
+    override func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
+        let attributes = UICollectionViewLayoutAttributes(forCellWithIndexPath: indexPath)
+        let itemSize = itemSizeForLayoutRect(layoutRect)
+
+        let column = CGFloat(indexPath.item % numberOfColumns)
+        let row = CGFloat(indexPath.item / numberOfColumns)
+
+        // Calculate the offset for the item based on column/row/spacing
+        let origin = CGPoint(
+            x: floor(layoutRect.origin.x + (itemSize.width * column) + (spacing * column)),
+            y: floor(layoutRect.origin.y + (itemSize.height * row) + (spacing * row)))
+
+        attributes.frame = CGRect(origin: origin, size: itemSize)
+        return attributes
+    }
+}
+
+// MARK: - Private Helpers
+extension TopSitesLayout {
+
+    /**
+    Returns the layout rectangle that all of the items will be put into
+    */
+    private func calculateLayoutRectForContentSize() -> CGRect {
+        let floatColumns = CGFloat(numberOfColumns)
+        let floatRows = CGFloat(numberOfRows)
+        let itemWidth = floor(containerRect.width / floatColumns)
+        return CGRect(origin: CGPointZero, size: CGSize(width: floatColumns * itemWidth, height: floatRows * itemWidth))
     }
 
-    private func itemSizeForLayoutRect(rect: CGRect, spacing: CGFloat, columns: Int, rows: Int) -> CGSize {
-        let floatColumns = CGFloat(columns)
-        let floatRows = CGFloat(rows)
+    /**
+    Calculates item size from the given layout rect. This takes the spacing into account to return the correct size....
+
+    - parameter rect: Rect to fit all of the items in
+
+    - returns: CGSize for an item
+    */
+    private func itemSizeForLayoutRect(rect: CGRect) -> CGSize {
+        let floatColumns = CGFloat(numberOfColumns)
+        let floatRows = CGFloat(numberOfRows)
         let totalHorizontalSpacing = (floatColumns - 1) * spacing
         let totalVerticalSpacing = (floatRows - 1) * spacing
         let leftOverWidth = rect.width - totalHorizontalSpacing
         let leftOverHeight = rect.height - totalVerticalSpacing
         return CGSize(width: floor(leftOverWidth / floatColumns), height: floor(leftOverHeight / floatRows))
     }
+
+    /**
+    Updates the origin of the given rect to place it in the center of our container rect.
+
+    - parameter rect: Rect to center in containerRect
+
+    - returns: Updated rect origin that places it in the center of containerRect
+    */
+    private func centerRectInContainer(var rect: CGRect) -> CGRect {
+        let x = (containerRect.width - rect.width) / 2 + containerRect.origin.x
+        let y = (containerRect.height - rect.height) / 2 + containerRect.origin.y
+        rect.origin = CGPoint(x: x, y: y)
+        return rect
+    }
 }
+
