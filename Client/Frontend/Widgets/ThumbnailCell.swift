@@ -17,10 +17,6 @@ struct ThumbnailCellUX {
     static let LabelAlignment: NSTextAlignment = .Center
     static let InsetSize: CGFloat = 20
     static let InsetSizeCompact: CGFloat = 6
-    static var Insets: UIEdgeInsets {
-        let inset: CGFloat = (UIScreen.mainScreen().traitCollection.horizontalSizeClass == .Compact) ? ThumbnailCellUX.InsetSizeCompact : ThumbnailCellUX.InsetSize
-        return UIEdgeInsets(top: inset, left: inset, bottom: inset, right: inset)
-    }
     static let ImagePadding: CGFloat = 20
     static let ImagePaddingCompact: CGFloat = 10
     static let LabelInsets = UIEdgeInsetsMake(10, 3, 10, 3)
@@ -154,10 +150,10 @@ class ThumbnailCell: UICollectionViewCell {
         contentView.addSubview(removeButton)
 
         imageWrapper.snp_remakeConstraints { make in
-            make.top.equalTo(self.contentView).inset(ThumbnailCellUX.Insets.top)
-            make.left.equalTo(self.contentView).inset(ThumbnailCellUX.Insets.left)
-            make.bottom.equalTo(self.contentView).inset(ThumbnailCellUX.Insets.bottom)
-            make.right.equalTo(self.contentView).inset(ThumbnailCellUX.Insets.right)
+            make.top.equalTo(self.contentView)
+            make.left.equalTo(self.contentView)
+            make.bottom.equalTo(self.contentView)
+            make.right.equalTo(self.contentView)
         }
 
         imageView.snp_remakeConstraints { make in
@@ -184,17 +180,6 @@ class ThumbnailCell: UICollectionViewCell {
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-
-        // TODO: We can avoid creating this button at all if we're not in editing mode.
-        var frame = removeButton.frame
-        let insets = ThumbnailCellUX.Insets
-        frame.size = CGSize(width: ThumbnailCellUX.RemoveButtonSize, height: ThumbnailCellUX.RemoveButtonSize)
-        frame.center = CGPoint(x: insets.left, y: insets.top)
-        removeButton.frame = frame
     }
 
     override func prepareForReuse() {

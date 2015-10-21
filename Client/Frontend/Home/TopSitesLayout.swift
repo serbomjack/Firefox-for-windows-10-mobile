@@ -84,68 +84,51 @@ protocol TopSitesLayoutDelegate {
 
 /// A UICollectionFlowLayout subclass that responds to traitCollection changes in order to
 /// update it's current set of layout parameters for Top Sites
-class TopSitesLayout: UICollectionViewFlowLayout {
+class TopSitesLayout: UICollectionViewLayout {
 
-    private(set) var layoutParams: TopSitesLayoutParams?
+    var numberOfColumns: Int = 0
 
-    private var horizontalSize: FXSizeClass = .SizeUndefined
+    var numberOfRows: Int = 0
 
-    private var verticalSize: FXSizeClass = .SizeUndefined
+    var spacing: CGFloat = 0
 
-    var topSitesDelegate: TopSitesLayoutDelegate?
+    var minEdgeSpacing: CGFloat = 0
 
-    var numberOfColumns: Int {
-        return layoutParams?.numberOfColumns ?? 0
+    private var layoutRect: CGRect
+
+    override init() {
+        super.init()
     }
 
-    var numberOfRows: Int {
-        return layoutParams?.numberOfRows ?? 0
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
-    func setHorizontalSize(horizontalSize: FXSizeClass, andVerticalSize verticalSize: FXSizeClass) {
-        // Don't do anything if nothing has changed
-        if horizontalSize == self.horizontalSize && verticalSize == self.verticalSize {
-            return
-        }
+    override func collectionViewContentSize() -> CGSize {
+        // We want Top Sites to never be scrollable so set the content size the same as our collection view size
+        return collectionView?.bounds.size ?? CGSizeZero
+    }
 
-        switch (horizontalSize, verticalSize) {
+    override func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
+    }
 
-        // Portrait small iPhone
-        case let (h, v) where h == .Size320 && v == .Size480:
-            layoutParams = IPhoneSmallPortraitParams
+    override func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+    }
 
-        // Portrait tall iPhone
-        case let (h, v) where h == .Size320 && v == .Size568:
-            layoutParams = IPhonePortraitParams
-        case let (h, v) where h == .Size375 && v == .Size667:
-            layoutParams = IPhonePortraitParams
-        case let (h, v) where h == .Size414 && v == .Size736:
-            layoutParams = IPhonePortraitParams
+    private func calculateLayoutRectForContentSize(size: CGSize, columns: Int, rows: Int) -> CGRect {
+        let floatColumns = CGFloat(columns)
+        let floatRows = CGFloat(rows)
+        let scale = min(size.width / floatColumns, size.height / floatRows)
+        return CGRect(origin: CGPointZero, size: CGSize(width: floatColumns * scale, height: floatRows * scale))
+    }
 
-        // Landscape small iPhone
-        case let (h, v) where h == .Size480 && v == .Size320:
-            layoutParams = IPhoneSmallLandscapeParams
-
-        // Landscape tall iPhone
-        case let (h, v) where h == .Size568 && v == .Size320:
-            layoutParams = IPhoneLandscapeParams
-        case let (h, v) where h == .Size667 && v == .Size375:
-            layoutParams = IPhoneLandscapeParams
-        case let (h, v) where h == .Size736 && v == .Size414:
-            layoutParams = IPhoneLandscapeParams
-
-        // Landscape iPad
-        case let (h, v) where h == .Size1024 && v == .Size768:
-            layoutParams = IPadLandscapeParams
-
-        // Portrait iPad
-        case let (h, v) where h == .Size768 && v == .Size1024:
-            layoutParams = IPadPortraitParams
-
-        default:
-            break
-        }
-
-        topSitesDelegate?.topSitesLayoutDidChangeSizeClass()
+    private func itemSizeForLayoutRect(rect: CGRect, spacing: CGFloat, columns: Int, rows: Int) -> CGSize {
+        let floatColumns = CGFloat(columns)
+        let floatRows = CGFloat(rows)
+        let totalHorizontalSpacing = (floatColumns - 1) * spacing
+        let totalVerticalSpacing = (floatRows - 1) * spacing
+        let leftOverWidth = rect.width - totalHorizontalSpacing
+        let leftOverHeight = rect.height - totalVerticalSpacing
+        return CGSize(width: floor(leftOverWidth / floatColumns), height: floor(leftOverHeight / floatRows))
     }
 }
