@@ -10,19 +10,19 @@ import UIKit
   orientations for iPad, the size class is the same regardless of it's orientation. This abstraction
   jallows more control over how to display content for the given window size.
 */
-public enum FXSizeClass {
-    case SizeUndefined
-    case SizeBelow320
-    case Size320
-    case Size375
-    case Size414
-    case Size480
-    case Size568
-    case Size667
-    case Size736
-    case Size768
-    case Size1024
-    case Size1366AndAbove
+public enum FXSizeClass: Int {
+    case SizeUndefined = 0
+    case SizeBelow320 = 1
+    case Size320 = 2
+    case Size375 = 3
+    case Size414 = 4
+    case Size480 = 5
+    case Size568 = 6
+    case Size667 = 7
+    case Size736 = 8
+    case Size768 = 9
+    case Size1024 = 10
+    case Size1366AndAbove = 11
 
     static func sizeClassFromLength(length: CGFloat) -> FXSizeClass {
         switch length {
@@ -53,6 +53,12 @@ public enum FXSizeClass {
         default:
             return SizeUndefined
         }
+    }
+}
+
+extension FXSizeClass: ForwardIndexType {
+    public func successor() -> FXSizeClass {
+        return FXSizeClass(rawValue: self.rawValue + 1)
     }
 }
 
