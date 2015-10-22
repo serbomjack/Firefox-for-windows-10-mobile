@@ -16,7 +16,7 @@ class TopSitesPanel: UIViewController {
     private let profile: Profile
 
     private lazy var collectionView: UICollectionView = {
-        let collection = TopSitesCollectionView(frame: CGRectZero, collectionViewLayout: self.layout)
+        let collection = TopSitesCollectionView(frame: CGRectZero, collectionViewLayout: self.narrowLayout)
         collection.backgroundColor = UIConstants.PanelBackgroundColor
         collection.delegate = self
         collection.dataSource = self.dataSource
@@ -32,8 +32,31 @@ class TopSitesPanel: UIViewController {
         )
     }()
 
-    private lazy var layout: TopSitesLayout = {
-        return TopSitesLayout()
+    private lazy var wideLayout: TopSitesLayout = {
+        let layout = TopSitesLayout()
+        layout.numberOfColumns = 5
+        layout.spacing = 10
+        layout.minimumVerticalSectionInset = 16
+        layout.minimumHorizontalSectionInset = 16
+        return layout
+    }()
+
+    private lazy var narrowLayout: TopSitesLayout = {
+        let layout = TopSitesLayout()
+        layout.numberOfColumns = 3
+        layout.spacing = 10
+        layout.minimumVerticalSectionInset = 16
+        layout.minimumHorizontalSectionInset = 16
+        return layout
+    }()
+
+    private lazy var largeLayout: TopSitesLayout = {
+        let layout = TopSitesLayout()
+        layout.numberOfColumns = 4
+        layout.spacing = 10
+        layout.minimumVerticalSectionInset = 20
+        layout.minimumHorizontalSectionInset = 20
+        return layout
     }()
 
     private lazy var maxFrecencyLimit: Int = {
@@ -83,6 +106,7 @@ extension TopSitesPanel {
 
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        self.collectionView.collectionViewLayout.invalidateLayout()
         refreshHistory(maxFrecencyLimit)
     }
 
@@ -90,32 +114,25 @@ extension TopSitesPanel {
         return UIInterfaceOrientationMask.AllButUpsideDown
     }
 
-    override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        print("H: \(fx_horizontalSizeClass)")
+        print("V: \(fx_verticalSizeClass)")
 
-        if traitCollection.horizontalSizeClass == .Compact && traitCollection.verticalSizeClass == .Regular {
-            layout.numberOfColumns = 3
-            layout.spacing = 10
-            layout.minimumVerticalSectionInset = 5
-            layout.minimumHorizontalSectionInset = 5
-        } else if traitCollection.horizontalSizeClass == .Compact && traitCollection.verticalSizeClass == .Compact {
-            layout.numberOfColumns = 5
-            layout.spacing = 10
-            layout.minimumVerticalSectionInset = 5
-            layout.minimumHorizontalSectionInset = 5
-        } else if traitCollection.horizontalSizeClass == .Regular && traitCollection.verticalSizeClass == .Regular {
-            layout.numberOfColumns = 5
-            layout.spacing = 10
-            layout.minimumVerticalSectionInset = 20
-            layout.minimumHorizontalSectionInset = 20
-        }
-
-        layout.invalidateLayout()
+        coordinator.animateAlongsideTransition({ context in
+            if self.traitCollection.horizontalSizeClass == .Compact && self.traitCollection.verticalSizeClass == .Regular {
+                self.collectionView.setCollectionViewLayout(self.narrowLayout, animated: true)
+            } else if self.traitCollection.horizontalSizeClass == .Compact && self.traitCollection.verticalSizeClass == .Compact {
+                self.collectionView.setCollectionViewLayout(self.wideLayout, animated: true)
+            } else if self.traitCollection.horizontalSizeClass == .Regular && self.traitCollection.verticalSizeClass == .Regular {
+                self.collectionView.setCollectionViewLayout(self.largeLayout, animated: true)
+            }
+        }, completion: nil)
     }
 }
 
 // MARK: - Selectors
 extension TopSitesPanel {
+
     func SELnotificationReceived(notification: NSNotification) {
         switch notification.name {
         case NotificationFirefoxAccountChanged, NotificationPrivateDataClearedHistory:
@@ -131,8 +148,17 @@ extension TopSitesPanel {
 
 // MARK: - Private Helpers
 extension TopSitesPanel {
+
     private func updateDataSourceWithSites(result: Maybe<Cursor<Site>>) {
         if let data = result.successValue {
+            if self.traitCollection.horizontalSizeClass == .Compact && self.traitCollection.verticalSizeClass == .Regular {
+                self.collectionView.setCollectionViewLayout(self.narrowLayout, animated: true)
+            } else if self.traitCollection.horizontalSizeClass == .Compact && self.traitCollection.verticalSizeClass == .Compact {
+                self.collectionView.setCollectionViewLayout(self.wideLayout, animated: true)
+            } else if self.traitCollection.horizontalSizeClass == .Regular && self.traitCollection.verticalSizeClass == .Regular {
+                self.collectionView.setCollectionViewLayout(self.largeLayout, animated: true)
+            }
+            let layout = collectionView.collectionViewLayout as! TopSitesLayout
             dataSource.numberOfTilesToDisplay = min(layout.numberOfColumns * layout.numberOfRows, data.count)
             dataSource.data = data
             dataSource.profile = profile
@@ -171,6 +197,7 @@ extension TopSitesPanel {
 
 // MARK: - UICollectionViewDelegateFlowLayout
 extension TopSitesPanel: UICollectionViewDelegate {
+
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         if editingThumbnails {
             return
@@ -197,6 +224,7 @@ extension TopSitesPanel: UICollectionViewDelegate {
 
 // MARK: - HomePanel
 extension TopSitesPanel: HomePanel {
+
     func endEditing() {
         editingThumbnails = false
     }
@@ -204,6 +232,7 @@ extension TopSitesPanel: HomePanel {
 
 // MARK: - ThumbnailCellDelegate
 extension TopSitesPanel: ThumbnailCellDelegate {
+
     func didRemoveThumbnail(thumbnailCell: ThumbnailCell) {
         if let indexPath = collectionView.indexPathForCell(thumbnailCell) {
             if let site = dataSource[indexPath.item] {

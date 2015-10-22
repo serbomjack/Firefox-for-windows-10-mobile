@@ -4,6 +4,17 @@
 
 import UIKit
 
+/**
+Specifies the alignment of layout rect for top site tiles
+
+- Center:     Centers the tile group in the collection view
+- TopAligned: Top aligns the tile group in the collection view
+*/
+enum TopSitesAlignment {
+    case Center
+    case TopAlign
+}
+
 /// Layout that assigns positions to the tiles in the Top Sites panel. This layout does makes:
 ///     - Items have an aspect ratio of 1:1 (square)
 ///     - Spacing between each item vertically and horizontally are the same
@@ -31,6 +42,9 @@ class TopSitesLayout: UICollectionViewLayout {
     /// The minimum amount of inset on the left/bottom of the layout rect.
     var minimumHorizontalSectionInset: CGFloat = 0
 
+    /// The alignment of the layout rect to place the tiles in
+    var alignment: TopSitesAlignment = .TopAlign
+
     /// The layout rect is the area in which we will layout out items. This is calculated by considering the
     /// number of columns, inferring an item width, and calculating the height that will fit the most square 
     /// top site tiles we can fit in our container rect without going outside of it.
@@ -54,11 +68,14 @@ class TopSitesLayout: UICollectionViewLayout {
 
     override func prepareLayout() {
         super.prepareLayout()
-        layoutRect = centerRectInContainer(calculateLayoutRectForContentSize())
+        layoutRect = alignRectInContainer(calculateLayoutRectForContentSize())
     }
 
     override func shouldInvalidateLayoutForBoundsChange(newBounds: CGRect) -> Bool {
-        return true
+        guard let oldBounds = collectionView?.bounds else {
+            return false
+        }
+        return !CGSizeEqualToSize(oldBounds.size, newBounds.size)
     }
 
     override func collectionViewContentSize() -> CGSize {
@@ -86,7 +103,6 @@ class TopSitesLayout: UICollectionViewLayout {
     override func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
         let attributes = UICollectionViewLayoutAttributes(forCellWithIndexPath: indexPath)
         let itemSize = itemSizeForLayoutRect(layoutRect)
-
         let column = CGFloat(indexPath.item % numberOfColumns)
         let row = CGFloat(indexPath.item / numberOfColumns)
 
@@ -131,16 +147,25 @@ extension TopSitesLayout {
     }
 
     /**
-    Updates the origin of the given rect to place it in the center of our container rect.
+    Aligns the given layout rect inside our container rect.
 
-    - parameter rect: Rect to center in containerRect
+    - parameter rect: Layout rect to align
 
-    - returns: Updated rect origin that places it in the center of containerRect
+    - returns: Updated rect origin that reflects alignment
     */
-    private func centerRectInContainer(var rect: CGRect) -> CGRect {
-        let x = (containerRect.width - rect.width) / 2 + containerRect.origin.x
-        let y = (containerRect.height - rect.height) / 2 + containerRect.origin.y
-        rect.origin = CGPoint(x: x, y: y)
+    private func alignRectInContainer(var rect: CGRect) -> CGRect {
+        let newOrigin: CGPoint
+        switch alignment {
+        case .Center:
+            newOrigin = CGPoint(
+                x: (containerRect.width - rect.width) / 2 + containerRect.origin.x,
+                y: (containerRect.height - rect.height) / 2 + containerRect.origin.y)
+        case .TopAlign:
+            newOrigin = CGPoint(
+                x: (containerRect.width - rect.width) / 2 + containerRect.origin.x,
+                y: minimumVerticalSectionInset)
+        }
+        rect.origin = newOrigin
         return rect
     }
 }
