@@ -352,6 +352,11 @@ class TabTrayController: UIViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELappDidBecomeActiveNotification", name: UIApplicationDidBecomeActiveNotification, object: nil)
     }
 
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+//        tabManager.restoreTabs()
+    }
+
     override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
 
@@ -528,7 +533,8 @@ extension TabTrayController: TabSelectionDelegate {
     func didSelectTabAtIndex(index: Int) {
         let tab = tabsToDisplay[index]
         tabManager.selectTab(tab)
-        self.navigationController?.popViewControllerAnimated(true)
+        let bvc = BrowserViewController(profile: self.profile, tabManager: self.tabManager, tab: tab)
+        self.navigationController?.pushViewController(bvc, animated: true)
     }
 }
 

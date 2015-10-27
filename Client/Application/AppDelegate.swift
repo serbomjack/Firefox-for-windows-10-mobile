@@ -12,7 +12,8 @@ private let log = Logger.browserLogger
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-    var browserViewController: BrowserViewController!
+    var tabTray: TabTrayController!
+//    var browserViewController: BrowserViewController!
     var rootViewController: UINavigationController!
     weak var profile: BrowserProfile?
     var tabManager: TabManager!
@@ -48,15 +49,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let imageStore = DiskImageStore(files: profile.files, namespace: "TabManagerScreenshots", quality: UIConstants.ScreenshotQuality)
         self.tabManager = TabManager(defaultNewTabRequest: defaultRequest, prefs: profile.prefs, imageStore: imageStore)
         self.tabManager.stateDelegate = self
-        browserViewController = BrowserViewController(profile: profile, tabManager: self.tabManager)
 
-        // Add restoration class, the factory that will return the ViewController we 
-        // will restore with.
-        browserViewController.restorationIdentifier = NSStringFromClass(BrowserViewController.self)
-        browserViewController.restorationClass = AppDelegate.self
-        browserViewController.automaticallyAdjustsScrollViewInsets = false
+        tabTray = TabTrayController(tabManager: tabManager, profile: profile)
 
-        rootViewController = UINavigationController(rootViewController: browserViewController)
+//        browserViewController = BrowserViewController(profile: profile, tabManager: self.tabManager)
+//
+//        // Add restoration class, the factory that will return the ViewController we 
+//        // will restore with.
+//        browserViewController.restorationIdentifier = NSStringFromClass(BrowserViewController.self)
+//        browserViewController.restorationClass = AppDelegate.self
+//        browserViewController.automaticallyAdjustsScrollViewInsets = false
+
+//        rootViewController = UINavigationController(rootViewController: browserViewController)
+        rootViewController = UINavigationController(rootViewController: tabTray)
         rootViewController.automaticallyAdjustsScrollViewInsets = false
         rootViewController.delegate = self
         rootViewController.navigationBarHidden = true
@@ -123,7 +128,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             if let url = url,
                    newURL = NSURL(string: url.unescape()) {
-                self.browserViewController.openURLInNewTab(newURL)
+//                self.browserViewController.openURLInNewTab(newURL)
                 return true
             }
         }
@@ -137,7 +142,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // We could load these here, but then we have to futz with the tab counter
         // and making NSURLRequests.
-        self.browserViewController.loadQueuedTabs()
+//        self.browserViewController.loadQueuedTabs()
     }
 
     func applicationDidEnterBackground(application: UIApplication) {
@@ -211,7 +216,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func viewURLInNewTab(notification: UILocalNotification) {
         if let alertURL = notification.userInfo?[TabSendURLKey] as? String {
             if let urlToOpen = NSURL(string: alertURL) {
-                browserViewController.openURLInNewTab(urlToOpen)
+//                browserViewController.openURLInNewTab(urlToOpen)
             }
         }
     }
@@ -219,7 +224,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func addBookmark(notification: UILocalNotification) {
         if let alertURL = notification.userInfo?[TabSendURLKey] as? String,
             let title = notification.userInfo?[TabSendTitleKey] as? String {
-                browserViewController.addBookmark(alertURL, title: title)
+//                browserViewController.addBookmark(alertURL, title: title)
         }
     }
 
@@ -240,9 +245,9 @@ extension AppDelegate: UINavigationControllerDelegate {
         fromViewController fromVC: UIViewController,
         toViewController toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
             if operation == UINavigationControllerOperation.Push {
-                return BrowserToTrayAnimator()
-            } else if operation == UINavigationControllerOperation.Pop {
                 return TrayToBrowserAnimator()
+            } else if operation == UINavigationControllerOperation.Pop {
+                return BrowserToTrayAnimator()
             } else {
                 return nil
             }

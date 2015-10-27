@@ -48,7 +48,7 @@ class AuralProgressBar {
             progressPlayer.pan = +Float(AuralProgressBarUX.TickProgressPanSpread)
             engine.attachNode(progressPlayer)
 
-            connectPlayerNodes()
+//            connectPlayerNodes()
 
             NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("handleAudioEngineConfigurationDidChangeNotification:"), name: AVAudioEngineConfigurationChangeNotification, object: nil)
             NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("handleAudioSessionInterruptionNotification:"), name: AVAudioSessionInterruptionNotification, object: nil)

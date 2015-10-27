@@ -38,7 +38,7 @@ private extension TrayToBrowserAnimator {
         guard let expandFromIndex = displayedTabs.indexOf(selectedTab) else { return }
 
         // Hide browser components
-        bvc.toggleSnackBarVisibility(show: false)
+//        bvc.toggleSnackBarVisibility(show: false)
         toggleWebViewVisibility(show: false, usingTabManager: bvc.tabManager)
         bvc.homePanelController?.view.hidden = true
         bvc.webViewContainerBackdrop.hidden = true

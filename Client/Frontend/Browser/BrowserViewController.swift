@@ -41,6 +41,8 @@ class BrowserViewController: UIViewController {
     var readerModeBar: ReaderModeBarView?
     var readerModeCache: ReaderModeCache
 
+    private let tab: Browser?
+
     private var statusBarOverlay: UIView!
     private(set) var toolbar: BrowserToolbar?
     private var searchController: SearchViewController?
@@ -58,8 +60,6 @@ class BrowserViewController: UIViewController {
     private var pasteGoAction: AccessibleAction!
     private var pasteAction: AccessibleAction!
     private var copyAddressAction: AccessibleAction!
-
-    private weak var tabTrayController: TabTrayController!
 
     private let profile: Profile
     let tabManager: TabManager
@@ -89,9 +89,10 @@ class BrowserViewController: UIViewController {
         return toolbar ?? urlBar
     }
 
-    init(profile: Profile, tabManager: TabManager) {
+    init(profile: Profile, tabManager: TabManager, tab: Browser?) {
         self.profile = profile
         self.tabManager = tabManager
+        self.tab = tab
         self.readerModeCache = DiskReaderModeCache.sharedInstance
         super.init(nibName: nil, bundle: nil)
         didInit()
@@ -414,30 +415,32 @@ class BrowserViewController: UIViewController {
             self.view.alpha = (profile.prefs.intForKey(IntroViewControllerSeenProfileKey) != nil) ? 1.0 : 0.0
         }
 
-        if activeCrashReporter?.previouslyCrashed ?? false {
-            // Reset previous crash state
-            activeCrashReporter?.resetPreviousCrashState()
+        tabManager(self.tabManager, didSelectedTabChange: tab, previous: nil)
 
-            // Only ask to restore tabs from a crash if we had non-home tabs or tabs with some kind of history in them
-            guard let tabsToRestore = tabManager.tabsToRestore() else { return }
-            let onlyNoHistoryTabs = !tabsToRestore.every { $0.sessionData?.urls.count > 1 }
-            if onlyNoHistoryTabs {
-                tabManager.addTabAndSelect();
-                return
-            }
-
-            let optedIntoCrashReporting = profile.prefs.boolForKey("crashreports.send.always")
-            if optedIntoCrashReporting == nil {
-                // Offer a chance to allow the user to opt into crash reporting
-                showCrashOptInAlert()
-            } else {
-                showRestoreTabsAlert()
-            }
-        } else {
-            tabManager.restoreTabs()
-        }
-
-        updateTabCountUsingTabManager(tabManager, animated: false)
+//        if activeCrashReporter?.previouslyCrashed ?? false {
+//            // Reset previous crash state
+//            activeCrashReporter?.resetPreviousCrashState()
+//
+//            // Only ask to restore tabs from a crash if we had non-home tabs or tabs with some kind of history in them
+//            guard let tabsToRestore = tabManager.tabsToRestore() else { return }
+//            let onlyNoHistoryTabs = !tabsToRestore.every { $0.sessionData?.urls.count > 1 }
+//            if onlyNoHistoryTabs {
+//                tabManager.addTabAndSelect();
+//                return
+//            }
+//
+//            let optedIntoCrashReporting = profile.prefs.boolForKey("crashreports.send.always")
+//            if optedIntoCrashReporting == nil {
+//                // Offer a chance to allow the user to opt into crash reporting
+//                showCrashOptInAlert()
+//            } else {
+//                showRestoreTabsAlert()
+//            }
+//        } else {
+//            tabManager.restoreTabs()
+//        }
+//
+//        updateTabCountUsingTabManager(tabManager, animated: false)
     }
 
     private func showCrashOptInAlert() {
@@ -829,13 +832,13 @@ class BrowserViewController: UIViewController {
     }
 
     func openURLInNewTab(url: NSURL) {
-        let tab: Browser
-        if #available(iOS 9, *) {
-            tab = tabManager.addTab(NSURLRequest(URL: url), isPrivate: tabTrayController?.privateMode ?? false)
-        } else {
-            tab = tabManager.addTab(NSURLRequest(URL: url))
-        }
-        tabManager.selectTab(tab)
+//        let tab: Browser
+//        if #available(iOS 9, *) {
+//            tab = tabManager.addTab(NSURLRequest(URL: url), isPrivate: tabTrayController?.privateMode ?? false)
+//        } else {
+//            tab = tabManager.addTab(NSURLRequest(URL: url))
+//        }
+//        tabManager.selectTab(tab)
     }
 }
 
@@ -880,14 +883,12 @@ extension BrowserViewController: URLBarDelegate {
 
     func urlBarDidPressTabs(urlBar: URLBarView) {
         self.webViewContainerToolbar.hidden = true
-        let tabTrayController = TabTrayController(tabManager: tabManager, profile: profile)
 
         if let tab = tabManager.selectedTab {
             tab.setScreenshot(screenshotHelper.takeScreenshot(tab, aspectRatio: 0, quality: 1))
         }
 
-        self.navigationController?.pushViewController(tabTrayController, animated: true)
-        self.tabTrayController = tabTrayController
+        self.navigationController?.popToRootViewControllerAnimated(true)
     }
 
     func urlBarDidPressReaderMode(urlBar: URLBarView) {
