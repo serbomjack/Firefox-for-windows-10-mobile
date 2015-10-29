@@ -2246,7 +2246,7 @@ extension BrowserViewController {
         ToolbarTextField.appearance().backgroundColor = UIConstants.PrivateModeLocationBackgroundColor
         ToolbarTextField.appearance().textColor = UIColor.whiteColor()
         ToolbarTextField.appearance().clearButtonTintColor = UIColor.whiteColor()
-        ToolbarTextField.appearance().highlightColor = UIConstants.PrivateModeTextHighlightColor
+        ToolbarTextField.appearance().highlightColor = UIConstants.PrivateModeInputHighlightColor
 
         URLBarView.appearance().locationBorderColor = UIConstants.PrivateModeLocationBorderColor
         URLBarView.appearance().locationActiveBorderColor = UIConstants.PrivateModePurple
