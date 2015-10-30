@@ -61,7 +61,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        browserViewController.automaticallyAdjustsScrollViewInsets = false
 
 //        rootViewController = UINavigationController(rootViewController: browserViewController)
-        rootViewController = UINavigationController(rootViewController: tabTray)
+        let tab = tabManager.addTab()
+
+        let bvc2 = BrowserViewController2(tab: tab)
+        rootViewController = UINavigationController(rootViewController: bvc2)
         rootViewController.automaticallyAdjustsScrollViewInsets = false
         rootViewController.delegate = self
         rootViewController.navigationBarHidden = true

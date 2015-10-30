@@ -478,7 +478,8 @@ class BrowserViewController: UIViewController {
 
     override func viewDidAppear(animated: Bool) {
         startTrackingAccessibilityStatus()
-        presentIntroViewController()
+        // TODO: What??
+//        presentIntroViewController()
         self.webViewContainerToolbar.hidden = false
         super.viewDidAppear(animated)
     }
@@ -1313,11 +1314,12 @@ extension BrowserViewController: HomePanelViewControllerDelegate {
     }
 
     func homePanelViewControllerDidRequestToCreateAccount(homePanelViewController: HomePanelViewController) {
-        presentSignInViewController() // TODO UX Right now the flow for sign in and create account is the same
+        // TODO: restore intro view controller presentation
+//        presentSignInViewController() // TODO UX Right now the flow for sign in and create account is the same
     }
 
     func homePanelViewControllerDidRequestToSignIn(homePanelViewController: HomePanelViewController) {
-        presentSignInViewController() // TODO UX Right now the flow for sign in and create account is the same
+//        presentSignInViewController() // TODO UX Right now the flow for sign in and create account is the same
     }
 }
 
@@ -1365,13 +1367,13 @@ extension BrowserViewController: TabManagerDelegate {
             let count = tab.isPrivate ? tabManager.privateTabs.count : tabManager.normalTabs.count
             urlBar.updateTabCount(count, animated: false)
 
-            if tab.isPrivate {
-                readerModeCache = MemoryReaderModeCache.sharedInstance
-                applyPrivateModeTheme()
-            } else {
-                readerModeCache = DiskReaderModeCache.sharedInstance
-                applyNormalModeTheme()
-            }
+//            if tab.isPrivate {
+//                readerModeCache = MemoryReaderModeCache.sharedInstance
+//                applyPrivateModeTheme()
+//            } else {
+//                readerModeCache = DiskReaderModeCache.sharedInstance
+//                applyNormalModeTheme()
+//            }
             ReaderModeHandlers.readerModeCache = readerModeCache
 
             scrollController.browser = selected
@@ -1989,89 +1991,6 @@ extension BrowserViewController: ReaderModeBarViewDelegate {
     }
 }
 
-private class BrowserScreenshotHelper: ScreenshotHelper {
-    private weak var controller: BrowserViewController?
-
-    init(controller: BrowserViewController) {
-        self.controller = controller
-    }
-
-    func takeScreenshot(tab: Browser, aspectRatio: CGFloat, quality: CGFloat) -> UIImage? {
-        if let url = tab.url {
-            if AboutUtils.isAboutHomeURL(url) {
-                if let homePanel = controller?.homePanelController {
-                    return homePanel.view.screenshot(aspectRatio, quality: quality)
-                }
-            } else {
-                let offset = CGPointMake(0, -(tab.webView?.scrollView.contentInset.top ?? 0))
-                return tab.webView?.screenshot(aspectRatio, offset: offset, quality: quality)
-            }
-        }
-
-        return nil
-    }
-}
-
-extension BrowserViewController: IntroViewControllerDelegate {
-    func presentIntroViewController(force: Bool = false) -> Bool{
-        if force || profile.prefs.intForKey(IntroViewControllerSeenProfileKey) == nil {
-            let introViewController = IntroViewController()
-            introViewController.delegate = self
-            // On iPad we present it modally in a controller
-            if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
-                introViewController.preferredContentSize = CGSize(width: IntroViewControllerUX.Width, height: IntroViewControllerUX.Height)
-                introViewController.modalPresentationStyle = UIModalPresentationStyle.FormSheet
-            }
-            presentViewController(introViewController, animated: true) {
-                self.profile.prefs.setInt(1, forKey: IntroViewControllerSeenProfileKey)
-            }
-
-            return true
-        }
-
-        return false
-    }
-
-    func introViewControllerDidFinish(introViewController: IntroViewController) {
-        introViewController.dismissViewControllerAnimated(true) { finished in
-            if self.navigationController?.viewControllers.count > 1 {
-                self.navigationController?.popToRootViewControllerAnimated(true)
-            }
-        }
-    }
-
-    func presentSignInViewController() {
-        // Show the settings page if we have already signed in. If we haven't then show the signin page
-        let vcToPresent: UIViewController
-        if profile.hasAccount() {
-            let settingsTableViewController = SettingsTableViewController()
-            settingsTableViewController.profile = profile
-            settingsTableViewController.tabManager = tabManager
-            vcToPresent = settingsTableViewController
-        } else {
-            let signInVC = FxAContentViewController()
-            signInVC.delegate = self
-            signInVC.url = profile.accountConfiguration.signInURL
-            signInVC.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: "dismissSignInViewController")
-            vcToPresent = signInVC
-        }
-
-        let settingsNavigationController = SettingsNavigationController(rootViewController: vcToPresent)
-		settingsNavigationController.modalPresentationStyle = .FormSheet
-        self.presentViewController(settingsNavigationController, animated: true, completion: nil)
-    }
-
-    func dismissSignInViewController() {
-        self.dismissViewControllerAnimated(true, completion: nil)
-    }
-
-    func introViewControllerDidRequestToLogin(introViewController: IntroViewController) {
-        introViewController.dismissViewControllerAnimated(true, completion: { () -> Void in
-            self.presentSignInViewController()
-        })
-    }
-}
-
 extension BrowserViewController: FxAContentViewControllerDelegate {
     func contentViewControllerDidSignIn(viewController: FxAContentViewController, data: JSON) -> Void {
         if data["keyFetchToken"].asString == nil || data["unwrapBKey"].asString == nil {
@@ -2208,7 +2127,6 @@ extension BrowserViewController: ContextMenuHelperDelegate {
 }
 
 extension BrowserViewController: KeyboardHelperDelegate {
-
     func keyboardHelper(keyboardHelper: KeyboardHelper, keyboardWillShowWithState state: KeyboardState) {
         keyboardState = state
         // if we are already showing snack bars, adjust them so they sit above the keyboard
@@ -2239,109 +2157,3 @@ extension BrowserViewController: SessionRestoreHelperDelegate {
     }
 }
 
-// MARK: Browser Chrome Theming
-extension BrowserViewController {
-
-    func applyPrivateModeTheme() {
-        BrowserLocationView.appearance().baseURLFontColor = UIColor.lightGrayColor()
-        BrowserLocationView.appearance().hostFontColor = UIColor.whiteColor()
-        BrowserLocationView.appearance().backgroundColor = UIConstants.PrivateModeLocationBackgroundColor
-
-        ToolbarTextField.appearance().backgroundColor = UIConstants.PrivateModeLocationBackgroundColor
-        ToolbarTextField.appearance().textColor = UIColor.whiteColor()
-        ToolbarTextField.appearance().clearButtonTintColor = UIColor.whiteColor()
-        ToolbarTextField.appearance().highlightColor = UIConstants.PrivateModeTextHighlightColor
-
-        URLBarView.appearance().locationBorderColor = UIConstants.PrivateModeLocationBorderColor
-        URLBarView.appearance().locationActiveBorderColor = UIConstants.PrivateModePurple
-        URLBarView.appearance().progressBarTint = UIConstants.PrivateModePurple
-        URLBarView.appearance().cancelTextColor = UIColor.whiteColor()
-        URLBarView.appearance().actionButtonTintColor = UIConstants.PrivateModeActionButtonTintColor
-
-        BrowserToolbar.appearance().actionButtonTintColor = UIConstants.PrivateModeActionButtonTintColor
-
-        TabsButton.appearance().borderColor = UIConstants.PrivateModePurple
-        TabsButton.appearance().borderWidth = 1
-        TabsButton.appearance().titleFont = UIConstants.DefaultMediumBoldFont
-        TabsButton.appearance().titleBackgroundColor = UIConstants.AppBackgroundColor
-        TabsButton.appearance().textColor = UIConstants.PrivateModePurple
-        TabsButton.appearance().insets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-
-        ReaderModeBarView.appearance().backgroundColor = UIConstants.PrivateModeReaderModeBackgroundColor
-        ReaderModeBarView.appearance().buttonTintColor = UIColor.whiteColor()
-
-        header.blurStyle = .Dark
-        footerBackground?.blurStyle = .Dark
-    }
-
-    func applyNormalModeTheme() {
-        BrowserLocationView.appearance().baseURLFontColor = BrowserLocationViewUX.BaseURLFontColor
-        BrowserLocationView.appearance().hostFontColor = BrowserLocationViewUX.HostFontColor
-        BrowserLocationView.appearance().backgroundColor = UIColor.whiteColor()
-
-        ToolbarTextField.appearance().backgroundColor = UIColor.whiteColor()
-        ToolbarTextField.appearance().textColor = UIColor.blackColor()
-        ToolbarTextField.appearance().highlightColor = AutocompleteTextFieldUX.HighlightColor
-        ToolbarTextField.appearance().clearButtonTintColor = nil
-
-        URLBarView.appearance().locationBorderColor = URLBarViewUX.TextFieldBorderColor
-        URLBarView.appearance().locationActiveBorderColor = URLBarViewUX.TextFieldActiveBorderColor
-        URLBarView.appearance().progressBarTint = URLBarViewUX.ProgressTintColor
-        URLBarView.appearance().cancelTextColor = UIColor.blackColor()
-        URLBarView.appearance().actionButtonTintColor = UIColor.darkGrayColor()
-
-        BrowserToolbar.appearance().actionButtonTintColor = UIColor.darkGrayColor()
-
-        TabsButton.appearance().borderColor = TabsButtonUX.BorderColor
-        TabsButton.appearance().borderWidth = TabsButtonUX.BorderStrokeWidth
-        TabsButton.appearance().titleFont = TabsButtonUX.TitleFont
-        TabsButton.appearance().titleBackgroundColor = TabsButtonUX.TitleBackgroundColor
-        TabsButton.appearance().textColor = TabsButtonUX.TitleColor
-        TabsButton.appearance().insets = TabsButtonUX.TitleInsets
-
-        ReaderModeBarView.appearance().backgroundColor = UIColor.whiteColor()
-        ReaderModeBarView.appearance().buttonTintColor = UIColor.darkGrayColor()
-
-        header.blurStyle = .ExtraLight
-        footerBackground?.blurStyle = .ExtraLight
-    }
-}
-
-// A small convienent class for wrapping a view with a blur background that can be modified
-class BlurWrapper: UIView {
-    var blurStyle: UIBlurEffectStyle = .ExtraLight {
-        didSet {
-            let newEffect = UIVisualEffectView(effect: UIBlurEffect(style: blurStyle))
-            effectView.removeFromSuperview()
-            effectView = newEffect
-            insertSubview(effectView, belowSubview: wrappedView)
-            effectView.snp_remakeConstraints { make in
-                make.edges.equalTo(self)
-            }
-        }
-    }
-
-    private var effectView: UIVisualEffectView
-    private var wrappedView: UIView
-
-    init(view: UIView) {
-        wrappedView = view
-        effectView = UIVisualEffectView(effect: UIBlurEffect(style: blurStyle))
-        super.init(frame: CGRectZero)
-
-        addSubview(effectView)
-        addSubview(wrappedView)
-
-        effectView.snp_makeConstraints { make in
-            make.edges.equalTo(self)
-        }
-
-        wrappedView.snp_makeConstraints { make in
-            make.edges.equalTo(self)
-        }
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
