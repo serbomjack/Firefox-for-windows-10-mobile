@@ -350,6 +350,10 @@ class TabTrayController: UIViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELappDidBecomeActiveNotification", name: UIApplicationDidBecomeActiveNotification, object: nil)
     }
 
+    override func viewWillAppear(animated: Bool) {
+        checkForPreviousCrashes()
+    }
+
     override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
 
@@ -885,5 +889,66 @@ private class EmptyPrivateTabsView: UIView {
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension TabTrayController {
+
+    private func checkForPreviousCrashes() {
+        if activeCrashReporter?.previouslyCrashed ?? false {
+            // Reset previous crash state
+            activeCrashReporter?.resetPreviousCrashState()
+
+            // Only ask to restore tabs from a crash if we had non-home tabs or tabs with some kind of history in them
+            guard let tabsToRestore = tabManager.tabsToRestore() else { return }
+            let onlyNoHistoryTabs = !tabsToRestore.every { $0.sessionData?.urls.count > 1 }
+            if onlyNoHistoryTabs {
+                tabManager.addTabAndSelect();
+                return
+            }
+
+            let optedIntoCrashReporting = profile.prefs.boolForKey("crashreports.send.always")
+            if optedIntoCrashReporting == nil {
+                // Offer a chance to allow the user to opt into crash reporting
+                showCrashOptInAlert()
+            } else {
+                showRestoreTabsAlert()
+            }
+        } else {
+            tabManager.restoreTabs()
+        }
+    }
+
+    private func showCrashOptInAlert() {
+        let alert = UIAlertController.crashOptInAlert(
+            sendReportCallback: { _ in
+                // Turn on uploading but don't save opt-in flag to profile because this is a one time send.
+                configureActiveCrashReporter(true)
+                self.showRestoreTabsAlert()
+            },
+            alwaysSendCallback: { _ in
+                self.profile.prefs.setBool(true, forKey: "crashreports.send.always")
+                configureActiveCrashReporter(true)
+                self.showRestoreTabsAlert()
+            },
+            dontSendCallback: { _ in
+                // no-op: Do nothing if we don't want to send it
+                self.showRestoreTabsAlert()
+            }
+        )
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+
+    private func showRestoreTabsAlert() {
+        let alert = UIAlertController.restoreTabsAlert(
+            okayCallback: { _ in
+                self.tabManager.restoreTabs()
+            },
+            noCallback: { _ in
+                self.tabManager.addTabAndSelect()
+            }
+        )
+
+        self.presentViewController(alert, animated: true, completion: nil)
     }
 }
