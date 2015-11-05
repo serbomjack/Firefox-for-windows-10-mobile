@@ -12,7 +12,7 @@ private let log = Logger.browserLogger
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-    var browserViewController: BrowserViewController!
+    var tabTrayController: TabTrayController!
     var rootViewController: UINavigationController!
     weak var profile: BrowserProfile?
     var tabManager: TabManager!
@@ -51,15 +51,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Restore tabs and assign the first one for now for testing
         self.tabManager.restoreTabs()
-        browserViewController = BrowserViewController(profile: profile, tabManager: tabManager, tab: tabManager.tabs.first)
 
-        // Add restoration class, the factory that will return the ViewController we 
-        // will restore with.
-        browserViewController.restorationIdentifier = NSStringFromClass(BrowserViewController.self)
-        browserViewController.restorationClass = AppDelegate.self
-        browserViewController.automaticallyAdjustsScrollViewInsets = false
+        tabTrayController = TabTrayController(tabManager: tabManager, profile: profile)
 
-        rootViewController = UINavigationController(rootViewController: browserViewController)
+        rootViewController = UINavigationController(rootViewController: tabTrayController)
         rootViewController.automaticallyAdjustsScrollViewInsets = false
         rootViewController.delegate = self
         rootViewController.navigationBarHidden = true
@@ -126,7 +121,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             if let url = url,
                    newURL = NSURL(string: url.unescape()) {
-                self.browserViewController.openURLInNewTab(newURL)
+//                self.browserViewController.openURLInNewTab(newURL)
                 return true
             }
         }
@@ -214,7 +209,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func viewURLInNewTab(notification: UILocalNotification) {
         if let alertURL = notification.userInfo?[TabSendURLKey] as? String {
             if let urlToOpen = NSURL(string: alertURL) {
-                browserViewController.openURLInNewTab(urlToOpen)
+//                browserViewController.openURLInNewTab(urlToOpen)
             }
         }
     }
@@ -222,7 +217,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func addBookmark(notification: UILocalNotification) {
         if let alertURL = notification.userInfo?[TabSendURLKey] as? String,
             let title = notification.userInfo?[TabSendTitleKey] as? String {
-                browserViewController.addBookmark(alertURL, title: title)
+//                browserViewController.addBookmark(alertURL, title: title)
         }
     }
 
@@ -243,9 +238,9 @@ extension AppDelegate: UINavigationControllerDelegate {
         fromViewController fromVC: UIViewController,
         toViewController toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
             if operation == UINavigationControllerOperation.Push {
-                return BrowserToTrayAnimator()
-            } else if operation == UINavigationControllerOperation.Pop {
                 return TrayToBrowserAnimator()
+            } else if operation == UINavigationControllerOperation.Pop {
+                return BrowserToTrayAnimator()
             } else {
                 return nil
             }

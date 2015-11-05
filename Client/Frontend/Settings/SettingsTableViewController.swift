@@ -529,7 +529,7 @@ private class ShowIntroductionSetting: Setting {
     override func onClick(navigationController: UINavigationController?) {
         navigationController?.dismissViewControllerAnimated(true, completion: {
             if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate {
-                appDelegate.browserViewController.presentIntroViewController(true)
+//                appDelegate.browserViewController.presentIntroViewController(true)
             }
         })
     }
@@ -562,7 +562,7 @@ private class OpenSupportPageSetting: Setting {
                 let rootNavigationController = appDelegate.rootViewController
                 rootNavigationController.popViewControllerAnimated(true)
                 if let url = NSURL(string: "https://support.mozilla.org/products/ios") {
-                    appDelegate.browserViewController.openURLInNewTab(url)
+//                    appDelegate.browserViewController.openURLInNewTab(url)
                 }
             }
         })

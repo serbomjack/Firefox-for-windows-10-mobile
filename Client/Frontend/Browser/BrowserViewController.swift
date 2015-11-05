@@ -58,7 +58,6 @@ class BrowserViewController: UIViewController {
     private var pasteAction: AccessibleAction!
     private var copyAddressAction: AccessibleAction!
 
-    private weak var tabTrayController: TabTrayController!
     var tab: Browser?
 
     private let profile: Profile
@@ -276,14 +275,14 @@ class BrowserViewController: UIViewController {
         view.addSubview(header)
 
         // UIAccessibilityCustomAction subclass holding an AccessibleAction instance does not work, thus unable to generate AccessibleActions and UIAccessibilityCustomActions "on-demand" and need to make them "persistent" e.g. by being stored in BVC
-        pasteGoAction = AccessibleAction(name: NSLocalizedString("Paste & Go", comment: "Paste the URL into the location bar and visit"), handler: { () -> Bool in
+        pasteGoAction = AccessibleAction(name: NSLocalizedString("Paste & Go", comment: "Paste the URL into the location bar and visit"), handler: { [unowned self] _ in
             if let pasteboardContents = UIPasteboard.generalPasteboard().string {
                 self.urlBar(self.urlBar, didSubmitText: pasteboardContents)
                 return true
             }
             return false
         })
-        pasteAction = AccessibleAction(name: NSLocalizedString("Paste", comment: "Paste the URL into the location bar"), handler: { () -> Bool in
+        pasteAction = AccessibleAction(name: NSLocalizedString("Paste", comment: "Paste the URL into the location bar"), handler: { [unowned self] _ in
             if let pasteboardContents = UIPasteboard.generalPasteboard().string {
                 // Enter overlay mode and fire the text entered callback to make the search controller appear.
                 self.urlBar.enterOverlayMode(pasteboardContents, pasted: true)
@@ -292,13 +291,12 @@ class BrowserViewController: UIViewController {
             }
             return false
         })
-        copyAddressAction = AccessibleAction(name: NSLocalizedString("Copy Address", comment: "Copy the URL from the location bar"), handler: { () -> Bool in
+        copyAddressAction = AccessibleAction(name: NSLocalizedString("Copy Address", comment: "Copy the URL from the location bar"), handler: { [unowned self] _ in
             if let urlString = self.urlBar.currentURL?.absoluteString {
                 UIPasteboard.generalPasteboard().string = urlString
             }
             return true
         })
-
 
         searchLoader = SearchLoader(profile: profile, urlBar: urlBar)
 
@@ -369,13 +367,15 @@ class BrowserViewController: UIViewController {
             self.view.alpha = (profile.prefs.intForKey(IntroViewControllerSeenProfileKey) != nil) ? 1.0 : 0.0
         }
 
-        tab?.createWebview()
+        if (tab?.webView ?? nil) == nil {
+            tab?.createWebview()
+        }
+
         setupWebView((tab?.webView)!, forTab: tab!)
         setup()
 
         updateTabCountUsingTabManager(tabManager, animated: false)
     }
-
 
     override func viewDidAppear(animated: Bool) {
         presentIntroViewController()
@@ -391,6 +391,24 @@ class BrowserViewController: UIViewController {
         screenshotHelper.viewIsVisible = false
 
         super.viewWillDisappear(animated)
+    }
+
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        guard let webView = tab?.webView else { return }
+
+        webView.removeObserver(self, forKeyPath: KVOEstimatedProgress)
+        webView.removeObserver(self, forKeyPath: KVOLoading)
+        webView.removeObserver(self, forKeyPath: KVOCanGoBack)
+        webView.removeObserver(self, forKeyPath: KVOCanGoForward)
+        webView.removeObserver(self, forKeyPath: KVOURL)
+
+        webView.scrollView.removeObserver(self.scrollController, forKeyPath: KVOContentSize)
+
+        webView.UIDelegate = nil
+        webView.scrollView.delegate = nil
+        webView.removeFromSuperview()
     }
 
     override func updateViewConstraints() {
@@ -731,12 +749,12 @@ class BrowserViewController: UIViewController {
     }
 
     func openURLInNewTab(url: NSURL) {
-        let tab: Browser
-        if #available(iOS 9, *) {
-            tab = tabManager.addTab(NSURLRequest(URL: url), isPrivate: tabTrayController?.privateMode ?? false)
-        } else {
-            tab = tabManager.addTab(NSURLRequest(URL: url))
-        }
+//        let tab: Browser
+//        if #available(iOS 9, *) {
+//            tab = tabManager.addTab(NSURLRequest(URL: url), isPrivate: tabTrayController?.privateMode ?? false)
+//        } else {
+//            tab = tabManager.addTab(NSURLRequest(URL: url))
+//        }
         // TODO: Move this out of BVC?
 //        tabManager.selectTab(tab)
     }
@@ -783,14 +801,12 @@ extension BrowserViewController: URLBarDelegate {
 
     func urlBarDidPressTabs(urlBar: URLBarView) {
         self.webViewContainerToolbar.hidden = true
-        let tabTrayController = TabTrayController(tabManager: tabManager, profile: profile)
 
         if let tab = self.tab {
             screenshotHelper.takeScreenshot(tab)
         }
 
-        self.navigationController?.pushViewController(tabTrayController, animated: true)
-        self.tabTrayController = tabTrayController
+        self.navigationController?.popToRootViewControllerAnimated(true)
     }
 
     func urlBarDidPressReaderMode(urlBar: URLBarView) {
@@ -1015,64 +1031,10 @@ extension BrowserViewController: WindowCloseHelperDelegate {
 extension BrowserViewController: BrowserDelegate {
 
     func browser(browser: Browser, didCreateWebView webView: WKWebView) {
-        webViewContainer.insertSubview(webView, atIndex: 0)
-        webView.snp_makeConstraints { make in
-            make.top.equalTo(webViewContainerToolbar.snp_bottom)
-            make.left.right.bottom.equalTo(self.webViewContainer)
-        }
-
-        // Observers that live as long as the tab. Make sure these are all cleared
-        // in willDeleteWebView below!
-        webView.addObserver(self, forKeyPath: KVOEstimatedProgress, options: .New, context: nil)
-        webView.addObserver(self, forKeyPath: KVOLoading, options: .New, context: nil)
-        webView.addObserver(self, forKeyPath: KVOCanGoBack, options: .New, context: nil)
-        webView.addObserver(self, forKeyPath: KVOCanGoForward, options: .New, context: nil)
-        browser.webView?.addObserver(self, forKeyPath: KVOURL, options: .New, context: nil)
-
-        webView.scrollView.addObserver(self.scrollController, forKeyPath: KVOContentSize, options: .New, context: nil)
-
-        webView.UIDelegate = self
-
-        let readerMode = ReaderMode(browser: browser)
-        readerMode.delegate = self
-        browser.addHelper(readerMode, name: ReaderMode.name())
-
-        let favicons = FaviconManager(browser: browser, profile: profile)
-        browser.addHelper(favicons, name: FaviconManager.name())
-        
-        // only add the logins helper if the tab is not a private browsing tab
-        if !browser.isPrivate {
-            let logins = LoginsHelper(browser: browser, profile: profile)
-            browser.addHelper(logins, name: LoginsHelper.name())
-        }
-
-        let contextMenuHelper = ContextMenuHelper(browser: browser)
-        contextMenuHelper.delegate = self
-        browser.addHelper(contextMenuHelper, name: ContextMenuHelper.name())
-
-        let errorHelper = ErrorPageHelper()
-        browser.addHelper(errorHelper, name: ErrorPageHelper.name())
-
-        let windowCloseHelper = WindowCloseHelper(browser: browser)
-        windowCloseHelper.delegate = self
-        browser.addHelper(windowCloseHelper, name: WindowCloseHelper.name())
-
-        let sessionRestoreHelper = SessionRestoreHelper(browser: browser)
-        sessionRestoreHelper.delegate = self
-        browser.addHelper(sessionRestoreHelper, name: SessionRestoreHelper.name())
     }
 
     func browser(browser: Browser, willDeleteWebView webView: WKWebView) {
-        webView.removeObserver(self, forKeyPath: KVOEstimatedProgress)
-        webView.removeObserver(self, forKeyPath: KVOLoading)
-        webView.removeObserver(self, forKeyPath: KVOCanGoBack)
-        webView.removeObserver(self, forKeyPath: KVOCanGoForward)
-        webView.scrollView.removeObserver(self.scrollController, forKeyPath: KVOContentSize)
-        webView.removeObserver(self, forKeyPath: KVOURL)
 
-        webView.UIDelegate = nil
-        webView.scrollView.delegate = nil
-        webView.removeFromSuperview()
     }
 
     private func findSnackbar(barToFind: SnackBar) -> Int? {
@@ -1237,7 +1199,7 @@ extension BrowserViewController {
         webView.addObserver(self, forKeyPath: KVOLoading, options: .New, context: nil)
         webView.addObserver(self, forKeyPath: KVOCanGoBack, options: .New, context: nil)
         webView.addObserver(self, forKeyPath: KVOCanGoForward, options: .New, context: nil)
-        browser.webView?.addObserver(self, forKeyPath: KVOURL, options: .New, context: nil)
+        webView.addObserver(self, forKeyPath: KVOURL, options: .New, context: nil)
 
         webView.scrollView.addObserver(self.scrollController, forKeyPath: KVOContentSize, options: .New, context: nil)
 

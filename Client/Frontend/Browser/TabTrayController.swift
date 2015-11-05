@@ -352,6 +352,9 @@ class TabTrayController: UIViewController {
     }
 
     override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        collectionView.alpha = 1;
+        collectionView.reloadData()
         checkForPreviousCrashes()
     }
 
