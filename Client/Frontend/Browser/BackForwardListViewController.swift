@@ -5,6 +5,7 @@
 import UIKit
 import WebKit
 
+// TODO: Not used - delete?
 class BackForwardListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     var listData: [WKBackForwardListItem]?
     var tabManager: TabManager!
@@ -53,7 +54,7 @@ class BackForwardListViewController: UIViewController, UITableViewDelegate, UITa
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        tabManager.selectedTab?.goToBackForwardListItem(listData![indexPath.item])
+//        tabManager.selectedTab?.goToBackForwardListItem(listData![indexPath.item])
         dismissViewControllerAnimated(true, completion: nil)
     }
 }

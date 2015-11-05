@@ -8,7 +8,6 @@ import Storage
 import Shared
 
 protocol TabManagerDelegate: class {
-    func tabManager(tabManager: TabManager, didSelectedTabChange selected: Browser?, previous: Browser?)
     func tabManager(tabManager: TabManager, didCreateTab tab: Browser, restoring: Bool)
     func tabManager(tabManager: TabManager, didAddTab tab: Browser, restoring: Bool)
     func tabManager(tabManager: TabManager, didRemoveTab tab: Browser)
@@ -55,7 +54,6 @@ class TabManager : NSObject {
     }
 
     private(set) var tabs = [Browser]()
-    private var _selectedIndex = -1
     private let defaultNewTabRequest: NSURLRequest
     private let navDelegate: TabManagerNavDelegate
 
@@ -80,7 +78,6 @@ class TabManager : NSObject {
     private let imageStore: DiskImageStore?
 
     private let prefs: Prefs
-    var selectedIndex: Int { return _selectedIndex }
 
     var normalTabs: [Browser] {
         return tabs.filter { !$0.isPrivate }
@@ -118,14 +115,6 @@ class TabManager : NSObject {
         return tabs.count
     }
 
-    var selectedTab: Browser? {
-        if !(0..<count ~= _selectedIndex) {
-            return nil
-        }
-
-        return tabs[_selectedIndex]
-    }
-
     subscript(index: Int) -> Browser? {
         if index >= tabs.count {
             return nil
@@ -143,31 +132,6 @@ class TabManager : NSObject {
         return nil
     }
 
-    func selectTab(tab: Browser?) {
-        assert(NSThread.isMainThread())
-
-        if selectedTab === tab {
-            return
-        }
-
-        let previous = selectedTab
-
-        if let tab = tab {
-            _selectedIndex = tabs.indexOf(tab) ?? -1
-        } else {
-            _selectedIndex = -1
-        }
-
-        preserveTabs()
-
-        assert(tab === selectedTab, "Expected tab is selected")
-        selectedTab?.createWebview()
-
-        for delegate in delegates {
-            delegate.get()?.tabManager(self, didSelectedTabChange: tab, previous: previous)
-        }
-    }
-
     func expireSnackbars() {
         for tab in tabs {
             tab.expireSnackbars()
@@ -177,12 +141,6 @@ class TabManager : NSObject {
     @available(iOS 9, *)
     func addTab(request: NSURLRequest! = nil, configuration: WKWebViewConfiguration! = nil, isPrivate: Bool) -> Browser {
         return self.addTab(request, configuration: configuration, flushToDisk: true, zombie: false, isPrivate: isPrivate)
-    }
-
-    func addTabAndSelect(request: NSURLRequest! = nil, configuration: WKWebViewConfiguration! = nil) -> Browser {
-        let tab = addTab(request, configuration: configuration)
-        selectTab(tab)
-        return tab
     }
 
     // This method is duplicated to hide the flushToDisk option from consumers.
@@ -195,16 +153,12 @@ class TabManager : NSObject {
             return
         }
 
-        var tab: Browser!
         for url in urls {
-            tab = self.addTab(NSURLRequest(URL: url), flushToDisk: false, zombie: zombie, restoring: true)
+            self.addTab(NSURLRequest(URL: url), flushToDisk: false, zombie: zombie, restoring: true)
         }
 
         // Flush.
         storeChanges()
-
-        // Select the most recent.
-        self.selectTab(tab)
 
         // Notify that we bulk-loaded so we can adjust counts.
         for delegate in delegates {
@@ -264,17 +218,6 @@ class TabManager : NSObject {
     private func removeTab(tab: Browser, flushToDisk: Bool) {
         assert(NSThread.isMainThread())
         // If the removed tab was selected, find the new tab to select.
-        if tab === selectedTab {
-            let index = getIndex(tab)
-            if index + 1 < count {
-                selectTab(tabs[index + 1])
-            } else if index - 1 >= 0 {
-                selectTab(tabs[index - 1])
-            } else {
-                assert(count == 1, "Removing last tab")
-                selectTab(nil)
-            }
-        }
 
         let prevCount = count
         for i in 0..<count {
@@ -284,10 +227,6 @@ class TabManager : NSObject {
             }
         }
         assert(count == prevCount - 1, "Tab removed")
-
-        if tab != selectedTab {
-            _selectedIndex = selectedTab == nil ? -1 : tabs.indexOf(selectedTab!) ?? 0
-        }
 
         // There's still some time between this and the webView being destroyed.
         // We don't want to pick up any stray events.
@@ -354,15 +293,13 @@ class TabManager : NSObject {
 
 extension TabManager {
     class SavedTab: NSObject, NSCoding {
-        let isSelected: Bool
         let title: String?
         let isPrivate: Bool
         var sessionData: SessionData?
         var screenshotUUID: NSUUID?
 
-        init?(browser: Browser, isSelected: Bool) {
+        init?(browser: Browser) {
             self.screenshotUUID = browser.screenshotUUID
-            self.isSelected = isSelected
             self.title = browser.displayTitle
             self.isPrivate = browser.isPrivate
             super.init()
@@ -389,7 +326,6 @@ extension TabManager {
         required init?(coder: NSCoder) {
             self.sessionData = coder.decodeObjectForKey("sessionData") as? SessionData
             self.screenshotUUID = coder.decodeObjectForKey("screenshotUUID") as? NSUUID
-            self.isSelected = coder.decodeBoolForKey("isSelected")
             self.title = coder.decodeObjectForKey("title") as? String
             self.isPrivate = coder.decodeBoolForKey("isPrivate")
         }
@@ -397,7 +333,6 @@ extension TabManager {
         func encodeWithCoder(coder: NSCoder) {
             coder.encodeObject(sessionData, forKey: "sessionData")
             coder.encodeObject(screenshotUUID, forKey: "screenshotUUID")
-            coder.encodeBool(isSelected, forKey: "isSelected")
             coder.encodeObject(title, forKey: "title")
             coder.encodeBool(isPrivate, forKey: "isPrivate")
         }
@@ -412,8 +347,8 @@ extension TabManager {
         let path = tabsStateArchivePath()
         var savedTabs = [SavedTab]()
         var savedUUIDs = Set<String>()
-        for (tabIndex, tab) in tabs.enumerate() {
-            if let savedTab = SavedTab(browser: tab, isSelected: tabIndex == selectedIndex) {
+        for tab in tabs {
+            if let savedTab = SavedTab(browser: tab) {
                 savedTabs.append(savedTab)
 
                 if let screenshot = tab.screenshot,
@@ -458,7 +393,6 @@ extension TabManager {
     private func restoreTabsInternal() {
         guard let savedTabs = tabsToRestore() else { return }
 
-        var tabToSelect: Browser?
         for (_, savedTab) in savedTabs.enumerate() {
             let tab: Browser
             if #available(iOS 9, *) {
@@ -479,16 +413,8 @@ extension TabManager {
                 }
             }
 
-            if savedTab.isSelected {
-                tabToSelect = tab
-            }
-
             tab.sessionData = savedTab.sessionData
             tab.lastTitle = savedTab.title
-        }
-
-        if tabToSelect == nil {
-            tabToSelect = tabs.first
         }
 
         // Only tell our delegates that we restored tabs if we actually restored a tab(s)
@@ -496,11 +422,6 @@ extension TabManager {
             for delegate in delegates {
                 delegate.get()?.tabManagerDidRestoreTabs(self)
             }
-        }
-
-        if let tab = tabToSelect {
-            selectTab(tab)
-            tab.createWebview()
         }
     }
 
@@ -518,8 +439,7 @@ extension TabManager {
         }
 
         if count == 0 {
-            let tab = addTab()
-            selectTab(tab)
+            addTab()
         }
     }
 }
@@ -561,9 +481,7 @@ extension TabManager : WKNavigationDelegate {
     /// then we immediately reload it.
 
     func webViewWebContentProcessDidTerminate(webView: WKWebView) {
-        if let browser = selectedTab where browser.webView == webView {
-            webView.reload()
-        }
+        webView.reload()
     }
 }
 

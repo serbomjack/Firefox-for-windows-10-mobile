@@ -20,7 +20,7 @@ class TrayToBrowserAnimator: NSObject, UIViewControllerAnimatedTransitioning {
 private extension TrayToBrowserAnimator {
     func transitionFromTray(tabTray: TabTrayController, toBrowser bvc: BrowserViewController, usingContext transitionContext: UIViewControllerContextTransitioning) {
         guard let container = transitionContext.containerView() else { return }
-        guard let selectedTab = bvc.tabManager.selectedTab else { return }
+        guard let selectedTab = bvc.tab else { return }
 
         // Bug 1205464 - Top Sites tiles blow up or shrink after rotating
         // Force the BVC's frame to match the tab trays since for some reason on iOS 9 the UILayoutContainer in
@@ -51,7 +51,7 @@ private extension TrayToBrowserAnimator {
 
         // Create a fake cell to use for the upscaling animation
         let startingFrame = calculateCollapsedCellFrameUsingCollectionView(tabTray.collectionView, atIndex: expandFromIndex)
-        let cell = createTransitionCellFromBrowser(bvc.tabManager.selectedTab, withFrame: startingFrame)
+        let cell = createTransitionCellFromBrowser(bvc.tab, withFrame: startingFrame)
         cell.backgroundHolder.layer.cornerRadius = 0
 
         container.insertSubview(bvc.view, aboveSubview: tabCollectionViewSnapshot)
@@ -125,7 +125,7 @@ private extension BrowserToTrayAnimator {
     func transitionFromBrowser(bvc: BrowserViewController, toTabTray tabTray: TabTrayController, usingContext transitionContext: UIViewControllerContextTransitioning) {
 
         guard let container = transitionContext.containerView() else { return }
-        guard let selectedTab = bvc.tabManager.selectedTab else { return }
+        guard let selectedTab = bvc.tab else { return }
 
         let tabManager = bvc.tabManager
         let displayedTabs = selectedTab.isPrivate ? tabManager.privateTabs : tabManager.normalTabs
@@ -141,7 +141,7 @@ private extension BrowserToTrayAnimator {
 
         // Build a tab cell that we will use to animate the scaling of the browser to the tab
         let expandedFrame = calculateExpandedCellFrameFromBVC(bvc)
-        let cell = createTransitionCellFromBrowser(bvc.tabManager.selectedTab, withFrame: expandedFrame)
+        let cell = createTransitionCellFromBrowser(bvc.tab, withFrame: expandedFrame)
         cell.backgroundHolder.layer.cornerRadius = TabTrayControllerUX.CornerRadius
         cell.innerStroke.hidden = true
 
@@ -263,7 +263,7 @@ private func calculateExpandedCellFrameFromBVC(bvc: BrowserViewController) -> CG
     // there is no toolbar for home panels
     if !bvc.shouldShowFooterForTraitCollection(bvc.traitCollection) {
         return frame
-    } else if AboutUtils.isAboutURL(bvc.tabManager.selectedTab?.url) && bvc.toolbar == nil {
+    } else if AboutUtils.isAboutURL(bvc.tab?.url) && bvc.toolbar == nil {
         frame.size.height += UIConstants.ToolbarHeight
     }
 
@@ -271,7 +271,7 @@ private func calculateExpandedCellFrameFromBVC(bvc: BrowserViewController) -> CG
 }
 
 private func shouldDisplayFooterForBVC(bvc: BrowserViewController) -> Bool {
-    return bvc.shouldShowFooterForTraitCollection(bvc.traitCollection) && !AboutUtils.isAboutURL(bvc.tabManager.selectedTab?.url)
+    return bvc.shouldShowFooterForTraitCollection(bvc.traitCollection) && !AboutUtils.isAboutURL(bvc.tab?.url)
 }
 
 private func toggleWebViewVisibility(show show: Bool, usingTabManager tabManager: TabManager) {

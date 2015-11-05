@@ -48,7 +48,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let imageStore = DiskImageStore(files: profile.files, namespace: "TabManagerScreenshots", quality: UIConstants.ScreenshotQuality)
         self.tabManager = TabManager(defaultNewTabRequest: defaultRequest, prefs: profile.prefs, imageStore: imageStore)
         self.tabManager.stateDelegate = self
-        browserViewController = BrowserViewController(profile: profile, tabManager: self.tabManager)
+
+        // Restore tabs and assign the first one for now for testing
+        self.tabManager.restoreTabs()
+        browserViewController = BrowserViewController(profile: profile, tabManager: tabManager, tab: tabManager.tabs.first)
 
         // Add restoration class, the factory that will return the ViewController we 
         // will restore with.

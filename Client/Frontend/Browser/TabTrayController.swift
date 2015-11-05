@@ -341,9 +341,10 @@ class TabTrayController: UIViewController {
                 make.edges.equalTo(self.view)
             }
 
-            if let tab = tabManager.selectedTab where tab.isPrivate {
-                privateMode = true
-            }
+            // TODO: Fix private mode state
+//            if let tab = tabManager.selectedTab where tab.isPrivate {
+//                privateMode = true
+//            }
         }
 
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELappWillResignActiveNotification", name: UIApplicationWillResignActiveNotification, object: nil)
@@ -498,16 +499,16 @@ class TabTrayController: UIViewController {
 
         // We're only doing one update here, but using a batch update lets us delay selecting the tab
         // until after its insert animation finishes.
+        var tab: Browser? = nil
         self.collectionView.performBatchUpdates({ _ in
-            var tab: Browser
             if #available(iOS 9, *) {
                 tab = self.tabManager.addTab(request, isPrivate: self.privateMode)
             } else {
                 tab = self.tabManager.addTab(request)
             }
-            self.tabManager.selectTab(tab)
         }, completion: { finished in
             if finished {
+                self.selectTab(tab!)
                 self.navigationController?.popViewControllerAnimated(true)
             }
         })
@@ -535,8 +536,7 @@ extension TabTrayController {
 extension TabTrayController: TabSelectionDelegate {
     func didSelectTabAtIndex(index: Int) {
         let tab = tabsToDisplay[index]
-        tabManager.selectTab(tab)
-        self.navigationController?.popViewControllerAnimated(true)
+        self.selectTab(tab)
     }
 }
 
@@ -547,8 +547,6 @@ extension TabTrayController: PresentingModalViewControllerDelegate {
 }
 
 extension TabTrayController: TabManagerDelegate {
-    func tabManager(tabManager: TabManager, didSelectedTabChange selected: Browser?, previous: Browser?) {
-    }
 
     func tabManager(tabManager: TabManager, didCreateTab tab: Browser, restoring: Bool) {
     }
@@ -563,10 +561,9 @@ extension TabTrayController: TabManagerDelegate {
             self.collectionView.insertItemsAtIndexPaths([NSIndexPath(forItem: index, inSection: 0)])
         }, completion: { finished in
             if finished {
-                tabManager.selectTab(tab)
                 // don't pop the tab tray view controller if it is not in the foreground
                 if self.presentedViewController == nil {
-                    self.navigationController?.popViewControllerAnimated(true)
+                    self.selectTab(tab)
                 }
             }
         })
@@ -894,6 +891,11 @@ private class EmptyPrivateTabsView: UIView {
 
 extension TabTrayController {
 
+    private func selectTab(tab: Browser, animated: Bool = true) {
+        let bvc = BrowserViewController(profile: profile, tabManager: tabManager, tab: tab)
+        self.navigationController?.pushViewController(bvc, animated: animated)
+    }
+
     private func checkForPreviousCrashes() {
         if activeCrashReporter?.previouslyCrashed ?? false {
             // Reset previous crash state
@@ -903,7 +905,8 @@ extension TabTrayController {
             guard let tabsToRestore = tabManager.tabsToRestore() else { return }
             let onlyNoHistoryTabs = !tabsToRestore.every { $0.sessionData?.urls.count > 1 }
             if onlyNoHistoryTabs {
-                tabManager.addTabAndSelect();
+                // TODO: Crash report add and select
+//                tabManager.addTabAndSelect();
                 return
             }
 
@@ -945,7 +948,8 @@ extension TabTrayController {
                 self.tabManager.restoreTabs()
             },
             noCallback: { _ in
-                self.tabManager.addTabAndSelect()
+                // TODO: Crash report add and select
+                //                tabManager.addTabAndSelect();
             }
         )
 
