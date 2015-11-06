@@ -21,8 +21,6 @@ protocol BrowserHelper {
 protocol BrowserDelegate {
     func browser(browser: Browser, didAddSnackbar bar: SnackBar)
     func browser(browser: Browser, didRemoveSnackbar bar: SnackBar)
-    optional func browser(browser: Browser, didCreateWebView webView: WKWebView)
-    optional func browser(browser: Browser, willDeleteWebView webView: WKWebView)
 }
 
 class Browser: NSObject {
@@ -49,6 +47,35 @@ class Browser: NSObject {
     var lastRequest: NSURLRequest? = nil
     var restoring: Bool = false
     var pendingScreenshot = false
+
+    // WKScriptMessageHelpers
+    private var contextMenuHelper: ContextMenuHelper? {
+        return self.helperManager?.getHelper(name: ContextMenuHelper.name()) as? ContextMenuHelper
+    }
+
+    private var sessionRestoreHelper: SessionRestoreHelper? {
+        return self.helperManager?.getHelper(name: SessionRestoreHelper.name()) as? SessionRestoreHelper
+    }
+
+    private var windowCloseHelper: WindowCloseHelper? {
+        return self.helperManager?.getHelper(name: WindowCloseHelper.name()) as? WindowCloseHelper
+    }
+
+    private var readerModeHelper: ReaderMode? {
+        return self.helperManager?.getHelper(name: ReaderMode.name()) as? ReaderMode
+    }
+
+    private var errorPageHelper: ErrorPageHelper? {
+        return self.helperManager?.getHelper(name: ErrorPageHelper.name()) as? ErrorPageHelper
+    }
+
+    private var loginsHelper: LoginsHelper? {
+        return self.helperManager?.getHelper(name: LoginsHelper.name()) as? LoginsHelper
+    }
+
+    private var faviconsHelper: FaviconManager? {
+        return self.helperManager?.getHelper(name: FaviconManager.name()) as? FaviconManager
+    }
 
     /// The last title shown by this tab. Used by the tab tray to show titles for zombie tabs.
     var lastTitle: String?
@@ -119,15 +146,56 @@ class Browser: NSObject {
             webView.navigationDelegate = navigationDelegate
             helperManager = HelperManager(webView: webView)
 
-            restore(webView)
-
             self.webView = webView
-            browserDelegate?.browser?(self, didCreateWebView: webView)
+
+            let contextMenuHelper = ContextMenuHelper(browser: self)
+            helperManager?.addHelper(contextMenuHelper, name: ContextMenuHelper.name())
+
+            let errorHelper = ErrorPageHelper()
+            helperManager?.addHelper(errorHelper, name: ErrorPageHelper.name())
+
+            let windowCloseHelper = WindowCloseHelper(browser: self)
+            helperManager?.addHelper(windowCloseHelper, name: WindowCloseHelper.name())
+
+            let sessionRestoreHelper = SessionRestoreHelper(browser: self)
+            helperManager?.addHelper(sessionRestoreHelper, name: SessionRestoreHelper.name())
+
+            let readerModeHelper = ReaderMode(browser: self)
+            helperManager?.addHelper(readerModeHelper, name: ReaderMode.name())
+            
+            let logins = LoginsHelper(browser: self)
+            helperManager?.addHelper(logins, name: LoginsHelper.name())
+
+            let favicons = FaviconManager(browser: self)
+            helperManager?.addHelper(favicons, name: FaviconManager.name())
 
             // lastTitle is used only when showing zombie tabs after a session restore.
             // Since we now have a web view, lastTitle is no longer useful.
             lastTitle = nil
+
+            restore(webView)
         }
+    }
+
+    func attachToTabController(tabController: TabController) {
+        contextMenuHelper?.delegate = tabController
+        sessionRestoreHelper?.delegate = tabController
+        windowCloseHelper?.delegate = tabController
+        readerModeHelper?.delegate = tabController
+
+        loginsHelper?.profile = tabController.profile
+        faviconsHelper?.profile = tabController.profile
+    }
+
+    func detachFromTabController(tabController: TabController) {
+        // Reset delegates for helpers
+        contextMenuHelper?.delegate = nil
+        sessionRestoreHelper?.delegate = nil
+        windowCloseHelper?.delegate = nil
+        readerModeHelper?.delegate = nil
+
+        loginsHelper?.profile = nil
+        faviconsHelper?.profile = nil
     }
 
     func restore(webView: WKWebView) {
@@ -156,12 +224,6 @@ class Browser: NSObject {
             webView.loadRequest(request)
         } else {
             log.error("creating webview with no lastRequest and no session data: \(self.url)")
-        }
-    }
-
-    deinit {
-        if let webView = webView {
-            browserDelegate?.browser?(self, willDeleteWebView: webView)
         }
     }
 

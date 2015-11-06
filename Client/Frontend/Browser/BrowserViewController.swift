@@ -13,6 +13,15 @@ import XCGLogger
 import Alamofire
 import Account
 
+protocol TabController :
+    ReaderModeDelegate,
+    ContextMenuHelperDelegate,
+    WindowCloseHelperDelegate,
+    SessionRestoreHelperDelegate {
+
+    var profile: Profile { get }
+}
+
 private let log = Logger.browserLogger
 
 private let OKString = NSLocalizedString("OK", comment: "OK button")
@@ -32,6 +41,9 @@ private struct BrowserViewControllerUX {
     private static let ShowHeaderTapAreaHeight: CGFloat = 32
     private static let BookmarkStarAnimationDuration: Double = 0.5
     private static let BookmarkStarAnimationOffset: CGFloat = 80
+}
+
+extension BrowserViewController: TabController {
 }
 
 class BrowserViewController: UIViewController {
@@ -60,7 +72,7 @@ class BrowserViewController: UIViewController {
 
     var tab: Browser?
 
-    private let profile: Profile
+    let profile: Profile
     let tabManager: TabManager
 
     // These views wrap the urlbar and toolbar to provide background effects on them
@@ -231,6 +243,8 @@ class BrowserViewController: UIViewController {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: BookmarkStatusChangedNotification, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIApplicationWillResignActiveNotification, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIApplicationWillEnterForegroundNotification, object: nil)
+
+        tab?.detachFromTabController(self)
     }
 
     override func viewDidLoad() {
@@ -312,6 +326,11 @@ class BrowserViewController: UIViewController {
 
         self.updateToolbarStateForTraitCollection(self.traitCollection)
 
+        if (tab?.webView ?? nil) == nil {
+            tab?.createWebview()
+        }
+
+        setupWebView((tab?.webView)!, forTab: tab!)
         setupConstraints()
     }
 
@@ -367,11 +386,6 @@ class BrowserViewController: UIViewController {
             self.view.alpha = (profile.prefs.intForKey(IntroViewControllerSeenProfileKey) != nil) ? 1.0 : 0.0
         }
 
-        if (tab?.webView ?? nil) == nil {
-            tab?.createWebview()
-        }
-
-        setupWebView((tab?.webView)!, forTab: tab!)
         setup()
 
         updateTabCountUsingTabManager(tabManager, animated: false)
@@ -395,6 +409,8 @@ class BrowserViewController: UIViewController {
 
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
+
+        tab?.detachFromTabController(self)
 
         guard let webView = tab?.webView else { return }
 
@@ -1030,13 +1046,6 @@ extension BrowserViewController: WindowCloseHelperDelegate {
 
 extension BrowserViewController: BrowserDelegate {
 
-    func browser(browser: Browser, didCreateWebView webView: WKWebView) {
-    }
-
-    func browser(browser: Browser, willDeleteWebView webView: WKWebView) {
-
-    }
-
     private func findSnackbar(barToFind: SnackBar) -> Int? {
         let bars = snackBars.subviews
         for (index, bar) in bars.enumerate() {
@@ -1187,14 +1196,12 @@ extension BrowserViewController: HomePanelViewControllerDelegate {
 
 extension BrowserViewController {
     func setupWebView(webView: WKWebView, forTab browser: Browser) {
-        webViewContainer.insertSubview(webView, atIndex: 0)
+        webViewContainer.addSubview(webView)
         webView.snp_makeConstraints { make in
             make.top.equalTo(webViewContainerToolbar.snp_bottom)
             make.left.right.bottom.equalTo(self.webViewContainer)
         }
 
-        // Observers that live as long as the tab. Make sure these are all cleared
-        // in willDeleteWebView below!
         webView.addObserver(self, forKeyPath: KVOEstimatedProgress, options: .New, context: nil)
         webView.addObserver(self, forKeyPath: KVOLoading, options: .New, context: nil)
         webView.addObserver(self, forKeyPath: KVOCanGoBack, options: .New, context: nil)
@@ -1205,33 +1212,11 @@ extension BrowserViewController {
 
         webView.UIDelegate = self
 
-        let readerMode = ReaderMode(browser: browser)
-        readerMode.delegate = self
-        browser.addHelper(readerMode, name: ReaderMode.name())
+        webView.accessibilityLabel = NSLocalizedString("Web content", comment: "Accessibility label for the main web content view")
+        webView.accessibilityIdentifier = "contentView"
+        webView.accessibilityElementsHidden = false
 
-        let favicons = FaviconManager(browser: browser, profile: profile)
-        browser.addHelper(favicons, name: FaviconManager.name())
-        
-        // only add the logins helper if the tab is not a private browsing tab
-        if !browser.isPrivate {
-            let logins = LoginsHelper(browser: browser, profile: profile)
-            browser.addHelper(logins, name: LoginsHelper.name())
-        }
-
-        let contextMenuHelper = ContextMenuHelper(browser: browser)
-        contextMenuHelper.delegate = self
-        browser.addHelper(contextMenuHelper, name: ContextMenuHelper.name())
-
-        let errorHelper = ErrorPageHelper()
-        browser.addHelper(errorHelper, name: ErrorPageHelper.name())
-
-        let windowCloseHelper = WindowCloseHelper(browser: browser)
-        windowCloseHelper.delegate = self
-        browser.addHelper(windowCloseHelper, name: WindowCloseHelper.name())
-
-        let sessionRestoreHelper = SessionRestoreHelper(browser: browser)
-        sessionRestoreHelper.delegate = self
-        browser.addHelper(sessionRestoreHelper, name: SessionRestoreHelper.name())
+        browser.attachToTabController(self)
     }
 
     func setup() {
@@ -1269,10 +1254,6 @@ extension BrowserViewController {
             ReaderModeHandlers.readerModeCache = readerModeCache
 
             scrollController.browser = tab
-            webViewContainer.addSubview(webView)
-            webView.accessibilityLabel = NSLocalizedString("Web content", comment: "Accessibility label for the main web content view")
-            webView.accessibilityIdentifier = "contentView"
-            webView.accessibilityElementsHidden = false
 
             addOpenInViewIfNeccessary(webView.URL)
 

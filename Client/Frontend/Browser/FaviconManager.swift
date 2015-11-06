@@ -7,11 +7,11 @@ import WebKit
 import Storage
 
 class FaviconManager : BrowserHelper {
-    let profile: Profile!
+    var profile: Profile?
+
     weak var browser: Browser?
 
-    init(browser: Browser, profile: Profile) {
-        self.profile = profile
+    init(browser: Browser) {
         self.browser = browser
 
         if let path = NSBundle.mainBundle().pathForResource("Favicons", ofType: "js") {
@@ -53,7 +53,7 @@ class FaviconManager : BrowserHelper {
 
                             browser.favicons.append(fav)
                             if !browser.isPrivate {
-                                self.profile.favicons.addFavicon(fav, forSite: site)
+                                self.profile?.favicons.addFavicon(fav, forSite: site)
                             }
                         })
                     }

@@ -20,8 +20,10 @@ private let LogInButtonTitle  = NSLocalizedString("Log in", comment: "Authentica
 private let PromptYes = NSLocalizedString("Yes", tableName: "Search", comment: "For search suggestions prompt. This string should be short so it fits nicely on the prompt row.")
 
 class LoginsHelper: BrowserHelper {
+
+    var profile: Profile?
+
     private weak var browser: Browser?
-    private let profile: Profile
     private var snackBar: SnackBar?
     private static let MaxAuthenticationAttempts = 3
 
@@ -29,9 +31,8 @@ class LoginsHelper: BrowserHelper {
         return "LoginsHelper"
     }
 
-    required init(browser: Browser, profile: Profile) {
+    required init(browser: Browser) {
         self.browser = browser
-        self.profile = profile
 
         if let path = NSBundle.mainBundle().pathForResource("LoginsHelper", ofType: "js"), source = try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String {
             let userScript = WKUserScript(source: source, injectionTime: WKUserScriptInjectionTime.AtDocumentEnd, forMainFrameOnly: false)
@@ -99,15 +100,15 @@ class LoginsHelper: BrowserHelper {
             return
         }
 
-        profile.logins
-               .getLoginsForProtectionSpace(login.protectionSpace, withUsername: login.username)
-               .uponQueue(dispatch_get_main_queue()) { res in
+        profile?.logins
+                .getLoginsForProtectionSpace(login.protectionSpace, withUsername: login.username)
+                .uponQueue(dispatch_get_main_queue()) { res in
             if let data = res.successValue {
                 log.debug("Found \(data.count) logins.")
                 for saved in data {
                     if let saved = saved {
                         if saved.password == login.password {
-                            self.profile.logins.addUseOfLoginByGUID(saved.guid)
+                            self.profile?.logins.addUseOfLoginByGUID(saved.guid)
                             return
                         }
 
@@ -147,7 +148,7 @@ class LoginsHelper: BrowserHelper {
                 SnackButton(title: PromptYes, callback: { (bar: SnackBar) -> Void in
                     self.browser?.removeSnackbar(bar)
                     self.snackBar = nil
-                    self.profile.logins.addLogin(login)
+                    self.profile?.logins.addLogin(login)
                 })
 
             ])
@@ -183,7 +184,7 @@ class LoginsHelper: BrowserHelper {
                 SnackButton(title: UpdateButtonTitle, callback: { (bar: SnackBar) -> Void in
                     self.browser?.removeSnackbar(bar)
                     self.snackBar = nil
-                    self.profile.logins.updateLoginByGUID(guid, new: new,
+                    self.profile?.logins.updateLoginByGUID(guid, new: new,
                                                           significant: new.isSignificantlyDifferentFrom(old))
                 })
             ])
@@ -191,7 +192,7 @@ class LoginsHelper: BrowserHelper {
     }
 
     private func requestLogins(login: LoginData, requestId: String) {
-        profile.logins.getLoginsForProtectionSpace(login.protectionSpace).uponQueue(dispatch_get_main_queue()) { res in
+        profile?.logins.getLoginsForProtectionSpace(login.protectionSpace).uponQueue(dispatch_get_main_queue()) { res in
             var jsonObj = [String: AnyObject]()
             if let cursor = res.successValue {
                 log.debug("Found \(cursor.count) logins.")
@@ -229,6 +230,10 @@ class LoginsHelper: BrowserHelper {
         if let credential = credential {
             // If we have some credentials, we'll show a prompt with them.
             return promptForUsernamePassword(viewController, credentials: credential, protectionSpace: challenge.protectionSpace)
+        }
+
+        guard let profile = profile else {
+            return deferMaybe(LoginDataError(description: "No profile found in login helper"))
         }
 
         // Otherwise, try to look one up
