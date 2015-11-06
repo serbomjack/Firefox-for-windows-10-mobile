@@ -424,6 +424,7 @@ class BrowserViewController: UIViewController {
 
         webView.UIDelegate = nil
         webView.scrollView.delegate = nil
+        scrollController.browser = nil
         webView.removeFromSuperview()
     }
 
