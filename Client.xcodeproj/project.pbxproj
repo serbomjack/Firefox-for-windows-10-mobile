@@ -22,7 +22,6 @@
 		0B5A93081B1E64F3004F47A2 /* TestDeferredSqlite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B5A93071B1E64F3004F47A2 /* TestDeferredSqlite.swift */; };
 		0B5A93221B1EB4C8004F47A2 /* ReadingListTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B5A93211B1EB4C8004F47A2 /* ReadingListTest.swift */; };
 		0B5A93421B1EB572004F47A2 /* readablePage.html in Resources */ = {isa = PBXBuildFile; fileRef = 0B5A93411B1EB572004F47A2 /* readablePage.html */; };
-		0B5B51AF1B4CDB9E00E3B6E9 /* RXMLElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B5B51AE1B4CDB9E00E3B6E9 /* RXMLElement.m */; };
 		0B62EFD21AD63CD100ACB9CD /* Clearables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B62EFD11AD63CD100ACB9CD /* Clearables.swift */; };
 		0B6544D31A96C5F0000DD202 /* libSDWebImage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B6544C21A96C59E000DD202 /* libSDWebImage.a */; };
 		0B6FBAB21AC1F830007EC669 /* numberedPage.html in Resources */ = {isa = PBXBuildFile; fileRef = 0B6FBAB11AC1F830007EC669 /* numberedPage.html */; };
@@ -335,6 +334,17 @@
 		74E36D781B71323500D69DA1 /* SettingsContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74E36D771B71323500D69DA1 /* SettingsContentViewController.swift */; };
 		74E36E151B716BAF00D69DA1 /* SettingsContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74E36D771B71323500D69DA1 /* SettingsContentViewController.swift */; };
 		7B24DC9C1B67B3590005766B /* ClearPrivateDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B24DC9B1B67B3590005766B /* ClearPrivateDataTests.swift */; };
+		7B35B7881BED0727008FF2D9 /* check@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7B35B75B1BED0726008FF2D9 /* check@2x.png */; };
+		7B35B7891BED0727008FF2D9 /* clock@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7B35B75C1BED0726008FF2D9 /* clock@2x.png */; };
+		7B35B78A1BED0727008FF2D9 /* cross@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7B35B75D1BED0726008FF2D9 /* cross@2x.png */; };
+		7B35B78F1BED0727008FF2D9 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B35B7631BED0726008FF2D9 /* MainStoryboard.storyboard */; };
+		7B35B7901BED0727008FF2D9 /* list@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7B35B7651BED0726008FF2D9 /* list@2x.png */; };
+		7B35B7961BED0727008FF2D9 /* SWTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B35B7701BED0726008FF2D9 /* SWTableViewCell.m */; };
+		7B35B7A11BED087B008FF2D9 /* NSMutableArray+SWUtilityButtons.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B35B76A1BED0726008FF2D9 /* NSMutableArray+SWUtilityButtons.m */; };
+		7B35B7A21BED087B008FF2D9 /* SWCellScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B35B76C1BED0726008FF2D9 /* SWCellScrollView.m */; };
+		7B35B7A31BED087B008FF2D9 /* SWLongPressGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B35B76E1BED0726008FF2D9 /* SWLongPressGestureRecognizer.m */; };
+		7B35B7A41BED087B008FF2D9 /* SWUtilityButtonTapGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B35B7721BED0726008FF2D9 /* SWUtilityButtonTapGestureRecognizer.m */; };
+		7B35B7A51BED087B008FF2D9 /* SWUtilityButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B35B7741BED0726008FF2D9 /* SWUtilityButtonView.m */; };
 		7B844E3D1BBDDB9D00E733A2 /* ChevronView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B844E3C1BBDDB9D00E733A2 /* ChevronView.swift */; };
 		7BA8D1C71BA037F500C8AE9E /* OpenPdfHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA8D1C61BA037F500C8AE9E /* OpenPdfHelper.swift */; };
 		7BB20B6D1B71160200F1657F /* TopSitesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB20B6C1B71160200F1657F /* TopSitesTests.swift */; };
@@ -462,21 +472,6 @@
 		E41F0D991ADFFB5400FC7387 /* ReadingListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41F0D971ADFFB5400FC7387 /* ReadingListService.swift */; };
 		E41F0D9B1ADFFC5600FC7387 /* ReadingListError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41F0D9A1ADFFC5600FC7387 /* ReadingListError.swift */; };
 		E41F0D9C1ADFFC5600FC7387 /* ReadingListError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41F0D9A1ADFFC5600FC7387 /* ReadingListError.swift */; };
-		E42475DC1AB73B9B00B23D33 /* SWCellScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D01AB73B9B00B23D33 /* SWCellScrollView.m */; };
-		E42475DD1AB73B9B00B23D33 /* SWCellScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D01AB73B9B00B23D33 /* SWCellScrollView.m */; };
-		E42475DE1AB73B9B00B23D33 /* SWCellScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D01AB73B9B00B23D33 /* SWCellScrollView.m */; };
-		E42475DF1AB73B9B00B23D33 /* SWLongPressGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D21AB73B9B00B23D33 /* SWLongPressGestureRecognizer.m */; };
-		E42475E01AB73B9B00B23D33 /* SWLongPressGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D21AB73B9B00B23D33 /* SWLongPressGestureRecognizer.m */; };
-		E42475E11AB73B9B00B23D33 /* SWLongPressGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D21AB73B9B00B23D33 /* SWLongPressGestureRecognizer.m */; };
-		E42475E21AB73B9B00B23D33 /* SWTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D41AB73B9B00B23D33 /* SWTableViewCell.m */; };
-		E42475E31AB73B9B00B23D33 /* SWTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D41AB73B9B00B23D33 /* SWTableViewCell.m */; };
-		E42475E41AB73B9B00B23D33 /* SWTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D41AB73B9B00B23D33 /* SWTableViewCell.m */; };
-		E42475E51AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D61AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.m */; };
-		E42475E61AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D61AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.m */; };
-		E42475E71AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D61AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.m */; };
-		E42475E81AB73B9B00B23D33 /* SWUtilityButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D81AB73B9B00B23D33 /* SWUtilityButtonView.m */; };
-		E42475E91AB73B9B00B23D33 /* SWUtilityButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D81AB73B9B00B23D33 /* SWUtilityButtonView.m */; };
-		E42475EA1AB73B9B00B23D33 /* SWUtilityButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = E42475D81AB73B9B00B23D33 /* SWUtilityButtonView.m */; };
 		E4252A0E1AF01AE40028C684 /* Swizzling.m in Sources */ = {isa = PBXBuildFile; fileRef = E4252A0D1AF01AE40028C684 /* Swizzling.m */; };
 		E42CCDE81A23A73D00B794D3 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34DC84D1A16C40C00D49B7B /* Profile.swift */; };
 		E43A4E551A96B88100E25676 /* GCDWebServerDataRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = D38B2D1E1A8D96D00040E6B5 /* GCDWebServerDataRequest.m */; };
@@ -1008,6 +1003,13 @@
 			remoteGlobalIDString = 55E3EE4419D76F280068C3A7;
 			remoteInfo = "XCGLogger (iOS)";
 		};
+		7B35B79F1BED0727008FF2D9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7B35B77D1BED0726008FF2D9 /* SWTableViewCell.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = AF34B76517DEE2B200BD9082;
+			remoteInfo = SWTableViewCell;
+		};
 		7B7692941B7CCBD100188277 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D31FC2291A8D908800BAF7EC /* Alamofire.xcodeproj */;
@@ -1355,8 +1357,6 @@
 		0B5A93071B1E64F3004F47A2 /* TestDeferredSqlite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestDeferredSqlite.swift; sourceTree = "<group>"; };
 		0B5A93211B1EB4C8004F47A2 /* ReadingListTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadingListTest.swift; sourceTree = "<group>"; };
 		0B5A93411B1EB572004F47A2 /* readablePage.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = readablePage.html; sourceTree = "<group>"; };
-		0B5B51AD1B4CDB9E00E3B6E9 /* RXMLElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RXMLElement.h; sourceTree = "<group>"; };
-		0B5B51AE1B4CDB9E00E3B6E9 /* RXMLElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RXMLElement.m; sourceTree = "<group>"; };
 		0B62EFD11AD63CD100ACB9CD /* Clearables.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Clearables.swift; sourceTree = "<group>"; };
 		0B6544B01A96C59E000DD202 /* SDWebImage.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SDWebImage.xcodeproj; path = Carthage/Checkouts/SDWebImage/SDWebImage.xcodeproj; sourceTree = "<group>"; };
 		0B6FBAB11AC1F830007EC669 /* numberedPage.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = numberedPage.html; sourceTree = "<group>"; };
@@ -1555,6 +1555,47 @@
 		74C027441B2A348C001B1E88 /* SessionData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionData.swift; sourceTree = "<group>"; };
 		74E36D771B71323500D69DA1 /* SettingsContentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsContentViewController.swift; sourceTree = "<group>"; };
 		7B24DC9B1B67B3590005766B /* ClearPrivateDataTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClearPrivateDataTests.swift; sourceTree = "<group>"; };
+		7B35B7501BED0726008FF2D9 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		7B35B7521BED0726008FF2D9 /* example1.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = example1.gif; sourceTree = "<group>"; };
+		7B35B7531BED0726008FF2D9 /* example2.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = example2.gif; sourceTree = "<group>"; };
+		7B35B7541BED0726008FF2D9 /* example3.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = example3.gif; sourceTree = "<group>"; };
+		7B35B7551BED0726008FF2D9 /* example4.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = example4.gif; sourceTree = "<group>"; };
+		7B35B7561BED0726008FF2D9 /* LICENCE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENCE; sourceTree = "<group>"; };
+		7B35B7571BED0726008FF2D9 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		7B35B7591BED0726008FF2D9 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		7B35B75A1BED0726008FF2D9 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		7B35B75B1BED0726008FF2D9 /* check@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "check@2x.png"; sourceTree = "<group>"; };
+		7B35B75C1BED0726008FF2D9 /* clock@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "clock@2x.png"; sourceTree = "<group>"; };
+		7B35B75D1BED0726008FF2D9 /* cross@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cross@2x.png"; sourceTree = "<group>"; };
+		7B35B75E1BED0726008FF2D9 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		7B35B75F1BED0726008FF2D9 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		7B35B7601BED0726008FF2D9 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
+		7B35B7621BED0726008FF2D9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		7B35B7641BED0726008FF2D9 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
+		7B35B7651BED0726008FF2D9 /* list@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "list@2x.png"; sourceTree = "<group>"; };
+		7B35B7661BED0726008FF2D9 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		7B35B7671BED0726008FF2D9 /* MI.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MI.png; sourceTree = "<group>"; };
+		7B35B7691BED0726008FF2D9 /* NSMutableArray+SWUtilityButtons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+SWUtilityButtons.h"; sourceTree = "<group>"; };
+		7B35B76A1BED0726008FF2D9 /* NSMutableArray+SWUtilityButtons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+SWUtilityButtons.m"; sourceTree = "<group>"; };
+		7B35B76B1BED0726008FF2D9 /* SWCellScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWCellScrollView.h; sourceTree = "<group>"; };
+		7B35B76C1BED0726008FF2D9 /* SWCellScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWCellScrollView.m; sourceTree = "<group>"; };
+		7B35B76D1BED0726008FF2D9 /* SWLongPressGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWLongPressGestureRecognizer.h; sourceTree = "<group>"; };
+		7B35B76E1BED0726008FF2D9 /* SWLongPressGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWLongPressGestureRecognizer.m; sourceTree = "<group>"; };
+		7B35B76F1BED0726008FF2D9 /* SWTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWTableViewCell.h; sourceTree = "<group>"; };
+		7B35B7701BED0726008FF2D9 /* SWTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWTableViewCell.m; sourceTree = "<group>"; };
+		7B35B7711BED0726008FF2D9 /* SWUtilityButtonTapGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWUtilityButtonTapGestureRecognizer.h; sourceTree = "<group>"; };
+		7B35B7721BED0726008FF2D9 /* SWUtilityButtonTapGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWUtilityButtonTapGestureRecognizer.m; sourceTree = "<group>"; };
+		7B35B7731BED0726008FF2D9 /* SWUtilityButtonView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SWUtilityButtonView.h; sourceTree = "<group>"; };
+		7B35B7741BED0726008FF2D9 /* SWUtilityButtonView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SWUtilityButtonView.m; sourceTree = "<group>"; };
+		7B35B7751BED0726008FF2D9 /* SWTableViewCell-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SWTableViewCell-Info.plist"; sourceTree = "<group>"; };
+		7B35B7761BED0726008FF2D9 /* SWTableViewCell-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SWTableViewCell-Prefix.pch"; sourceTree = "<group>"; };
+		7B35B7771BED0726008FF2D9 /* um.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = um.png; sourceTree = "<group>"; };
+		7B35B7781BED0726008FF2D9 /* UMTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UMTableViewCell.h; sourceTree = "<group>"; };
+		7B35B7791BED0726008FF2D9 /* UMTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UMTableViewCell.m; sourceTree = "<group>"; };
+		7B35B77A1BED0726008FF2D9 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		7B35B77B1BED0726008FF2D9 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		7B35B77C1BED0726008FF2D9 /* SWTableViewCell.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SWTableViewCell.podspec; sourceTree = "<group>"; };
+		7B35B77D1BED0726008FF2D9 /* SWTableViewCell.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = SWTableViewCell.xcodeproj; sourceTree = "<group>"; };
 		7B844E3C1BBDDB9D00E733A2 /* ChevronView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChevronView.swift; sourceTree = "<group>"; };
 		7BA8D1C61BA037F500C8AE9E /* OpenPdfHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenPdfHelper.swift; sourceTree = "<group>"; };
 		7BB20B6C1B71160200F1657F /* TopSitesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TopSitesTests.swift; sourceTree = "<group>"; };
@@ -1648,16 +1689,6 @@
 		E41A7D4A1A1BE04500245963 /* InitialViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitialViewController.swift; sourceTree = "<group>"; };
 		E41F0D971ADFFB5400FC7387 /* ReadingListService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ReadingListService.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E41F0D9A1ADFFC5600FC7387 /* ReadingListError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadingListError.swift; sourceTree = "<group>"; };
-		E42475CF1AB73B9B00B23D33 /* SWCellScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SWCellScrollView.h; path = Carthage/Checkouts/SWTableViewCell/SWTableViewCell/PodFiles/SWCellScrollView.h; sourceTree = "<group>"; };
-		E42475D01AB73B9B00B23D33 /* SWCellScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SWCellScrollView.m; path = Carthage/Checkouts/SWTableViewCell/SWTableViewCell/PodFiles/SWCellScrollView.m; sourceTree = "<group>"; };
-		E42475D11AB73B9B00B23D33 /* SWLongPressGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SWLongPressGestureRecognizer.h; path = Carthage/Checkouts/SWTableViewCell/SWTableViewCell/PodFiles/SWLongPressGestureRecognizer.h; sourceTree = "<group>"; };
-		E42475D21AB73B9B00B23D33 /* SWLongPressGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SWLongPressGestureRecognizer.m; path = Carthage/Checkouts/SWTableViewCell/SWTableViewCell/PodFiles/SWLongPressGestureRecognizer.m; sourceTree = "<group>"; };
-		E42475D31AB73B9B00B23D33 /* SWTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SWTableViewCell.h; path = Carthage/Checkouts/SWTableViewCell/SWTableViewCell/PodFiles/SWTableViewCell.h; sourceTree = "<group>"; };
-		E42475D41AB73B9B00B23D33 /* SWTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SWTableViewCell.m; path = Carthage/Checkouts/SWTableViewCell/SWTableViewCell/PodFiles/SWTableViewCell.m; sourceTree = "<group>"; };
-		E42475D51AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SWUtilityButtonTapGestureRecognizer.h; path = Carthage/Checkouts/SWTableViewCell/SWTableViewCell/PodFiles/SWUtilityButtonTapGestureRecognizer.h; sourceTree = "<group>"; };
-		E42475D61AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SWUtilityButtonTapGestureRecognizer.m; path = Carthage/Checkouts/SWTableViewCell/SWTableViewCell/PodFiles/SWUtilityButtonTapGestureRecognizer.m; sourceTree = "<group>"; };
-		E42475D71AB73B9B00B23D33 /* SWUtilityButtonView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SWUtilityButtonView.h; path = Carthage/Checkouts/SWTableViewCell/SWTableViewCell/PodFiles/SWUtilityButtonView.h; sourceTree = "<group>"; };
-		E42475D81AB73B9B00B23D33 /* SWUtilityButtonView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SWUtilityButtonView.m; path = Carthage/Checkouts/SWTableViewCell/SWTableViewCell/PodFiles/SWUtilityButtonView.m; sourceTree = "<group>"; };
 		E4252A0D1AF01AE40028C684 /* Swizzling.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Swizzling.m; sourceTree = "<group>"; };
 		E42CCE001A24C4E300B794D3 /* ExtensionUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ExtensionUtils.swift; path = ../Utils/ExtensionUtils.swift; sourceTree = "<group>"; };
 		E4424B1F1AC6EBE100F44C38 /* ReaderSettings.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = ReaderSettings.xcassets; sourceTree = "<group>"; };
@@ -2036,16 +2067,6 @@
 			path = ThirdParty/UIImageViewAligned/UIImageViewAligned;
 			sourceTree = "<group>";
 		};
-		0B5B51AC1B4CDB9E00E3B6E9 /* RaptureXML */ = {
-			isa = PBXGroup;
-			children = (
-				0B5B51AD1B4CDB9E00E3B6E9 /* RXMLElement.h */,
-				0B5B51AE1B4CDB9E00E3B6E9 /* RXMLElement.m */,
-			);
-			name = RaptureXML;
-			path = Carthage/Checkouts/RaptureXML/RaptureXML;
-			sourceTree = "<group>";
-		};
 		0B6544B11A96C59E000DD202 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -2255,14 +2276,13 @@
 		28CE83EF1A1D246900576538 /* Third-Party Source */ = {
 			isa = PBXGroup;
 			children = (
+				7B35B74F1BED0726008FF2D9 /* SWTableViewCell */,
 				E4B334211BBF2393004E2BFF /* Adjust */,
 				E66C5B451BDA81050051AA93 /* Apple */,
 				E635D3FC1B73F03E0078962F /* NRFileManager */,
-				0B5B51AC1B4CDB9E00E3B6E9 /* RaptureXML */,
 				288A2D801AB8B2B90023ABC3 /* Deferred */,
 				288A2D7F1AB8B2B20023ABC3 /* Box */,
 				288A2D7E1AB8B2AD0023ABC3 /* Result */,
-				E42475CC1AB73B7500B23D33 /* SWTableViewCell */,
 				0B1C05D41A798B1F004C78B0 /* UIImageViewAligned */,
 				2F1BDF8C1A8523B000213B54 /* SwiftKeychainWrapper */,
 				D38B2D0E1A8D96D00040E6B5 /* GCDWebServer */,
@@ -2470,6 +2490,87 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		7B35B74F1BED0726008FF2D9 /* SWTableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				7B35B7501BED0726008FF2D9 /* .gitignore */,
+				7B35B7511BED0726008FF2D9 /* github-assets */,
+				7B35B7561BED0726008FF2D9 /* LICENCE */,
+				7B35B7571BED0726008FF2D9 /* README.md */,
+				7B35B7581BED0726008FF2D9 /* SWTableViewCell */,
+				7B35B77C1BED0726008FF2D9 /* SWTableViewCell.podspec */,
+				7B35B77D1BED0726008FF2D9 /* SWTableViewCell.xcodeproj */,
+			);
+			name = SWTableViewCell;
+			path = ThirdParty/SWTableViewCell;
+			sourceTree = "<group>";
+		};
+		7B35B7511BED0726008FF2D9 /* github-assets */ = {
+			isa = PBXGroup;
+			children = (
+				7B35B7521BED0726008FF2D9 /* example1.gif */,
+				7B35B7531BED0726008FF2D9 /* example2.gif */,
+				7B35B7541BED0726008FF2D9 /* example3.gif */,
+				7B35B7551BED0726008FF2D9 /* example4.gif */,
+			);
+			path = "github-assets";
+			sourceTree = "<group>";
+		};
+		7B35B7581BED0726008FF2D9 /* SWTableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				7B35B7591BED0726008FF2D9 /* AppDelegate.h */,
+				7B35B75A1BED0726008FF2D9 /* AppDelegate.m */,
+				7B35B75B1BED0726008FF2D9 /* check@2x.png */,
+				7B35B75C1BED0726008FF2D9 /* clock@2x.png */,
+				7B35B75D1BED0726008FF2D9 /* cross@2x.png */,
+				7B35B75E1BED0726008FF2D9 /* Default-568h@2x.png */,
+				7B35B75F1BED0726008FF2D9 /* Default.png */,
+				7B35B7601BED0726008FF2D9 /* Default@2x.png */,
+				7B35B7611BED0726008FF2D9 /* InfoPlist.strings */,
+				7B35B7631BED0726008FF2D9 /* MainStoryboard.storyboard */,
+				7B35B7651BED0726008FF2D9 /* list@2x.png */,
+				7B35B7661BED0726008FF2D9 /* main.m */,
+				7B35B7671BED0726008FF2D9 /* MI.png */,
+				7B35B7681BED0726008FF2D9 /* PodFiles */,
+				7B35B7751BED0726008FF2D9 /* SWTableViewCell-Info.plist */,
+				7B35B7761BED0726008FF2D9 /* SWTableViewCell-Prefix.pch */,
+				7B35B7771BED0726008FF2D9 /* um.png */,
+				7B35B7781BED0726008FF2D9 /* UMTableViewCell.h */,
+				7B35B7791BED0726008FF2D9 /* UMTableViewCell.m */,
+				7B35B77A1BED0726008FF2D9 /* ViewController.h */,
+				7B35B77B1BED0726008FF2D9 /* ViewController.m */,
+			);
+			path = SWTableViewCell;
+			sourceTree = "<group>";
+		};
+		7B35B7681BED0726008FF2D9 /* PodFiles */ = {
+			isa = PBXGroup;
+			children = (
+				7B35B7691BED0726008FF2D9 /* NSMutableArray+SWUtilityButtons.h */,
+				7B35B76A1BED0726008FF2D9 /* NSMutableArray+SWUtilityButtons.m */,
+				7B35B76B1BED0726008FF2D9 /* SWCellScrollView.h */,
+				7B35B76C1BED0726008FF2D9 /* SWCellScrollView.m */,
+				7B35B76D1BED0726008FF2D9 /* SWLongPressGestureRecognizer.h */,
+				7B35B76E1BED0726008FF2D9 /* SWLongPressGestureRecognizer.m */,
+				7B35B76F1BED0726008FF2D9 /* SWTableViewCell.h */,
+				7B35B7701BED0726008FF2D9 /* SWTableViewCell.m */,
+				7B35B7711BED0726008FF2D9 /* SWUtilityButtonTapGestureRecognizer.h */,
+				7B35B7721BED0726008FF2D9 /* SWUtilityButtonTapGestureRecognizer.m */,
+				7B35B7731BED0726008FF2D9 /* SWUtilityButtonView.h */,
+				7B35B7741BED0726008FF2D9 /* SWUtilityButtonView.m */,
+			);
+			path = PodFiles;
+			sourceTree = "<group>";
+		};
+		7B35B77E1BED0726008FF2D9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7B35B7A01BED0727008FF2D9 /* SWTableViewCell.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		D31FC22A1A8D908800BAF7EC /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -2668,23 +2769,6 @@
 				E4ECD0871B70FD4F00B90D22 /* WindowCloseHelper.swift */,
 			);
 			path = Browser;
-			sourceTree = "<group>";
-		};
-		E42475CC1AB73B7500B23D33 /* SWTableViewCell */ = {
-			isa = PBXGroup;
-			children = (
-				E42475CF1AB73B9B00B23D33 /* SWCellScrollView.h */,
-				E42475D01AB73B9B00B23D33 /* SWCellScrollView.m */,
-				E42475D11AB73B9B00B23D33 /* SWLongPressGestureRecognizer.h */,
-				E42475D21AB73B9B00B23D33 /* SWLongPressGestureRecognizer.m */,
-				E42475D31AB73B9B00B23D33 /* SWTableViewCell.h */,
-				E42475D41AB73B9B00B23D33 /* SWTableViewCell.m */,
-				E42475D51AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.h */,
-				E42475D61AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.m */,
-				E42475D71AB73B9B00B23D33 /* SWUtilityButtonView.h */,
-				E42475D81AB73B9B00B23D33 /* SWUtilityButtonView.m */,
-			);
-			name = SWTableViewCell;
 			sourceTree = "<group>";
 		};
 		E42CCDFF1A24C4E300B794D3 /* Utils */ = {
@@ -3746,6 +3830,10 @@
 					ProjectRef = E4D567AA1ADED44A00F1EFE7 /* SQLite.xcodeproj */;
 				},
 				{
+					ProductGroup = 7B35B77E1BED0726008FF2D9 /* Products */;
+					ProjectRef = 7B35B77D1BED0726008FF2D9 /* SWTableViewCell.xcodeproj */;
+				},
+				{
 					ProductGroup = D38B2D771A8D98380040E6B5 /* Products */;
 					ProjectRef = D38B2D761A8D98380040E6B5 /* SWXMLHash.xcodeproj */;
 				},
@@ -3901,6 +3989,13 @@
 			fileType = wrapper.cfbundle;
 			path = "XCGLoggerTests (iOS).xctest";
 			remoteRef = 39A362D71AAF5E2C00F47390 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		7B35B7A01BED0727008FF2D9 /* SWTableViewCell.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = SWTableViewCell.app;
+			remoteRef = 7B35B79F1BED0727008FF2D9 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		7B7692951B7CCBD100188277 /* Alamofire.framework */ = {
@@ -4194,6 +4289,7 @@
 				746B6A791B277C1800EA83E3 /* SessionRestore.html in Resources */,
 				2F44FB2C1A9D5D8500FD20CC /* Home.xcassets in Resources */,
 				E4ECCD8D1AB091470005E717 /* Reader.xcassets in Resources */,
+				7B35B78F1BED0727008FF2D9 /* MainStoryboard.storyboard in Resources */,
 				E4B7B77D1A793CF20022C5E0 /* FiraSans-Regular.ttf in Resources */,
 				0BDA568B1B26B1BE008C9B96 /* LoginsHelper.js in Resources */,
 				E4B7B7791A793CF20022C5E0 /* FiraSans-Light.ttf in Resources */,
@@ -4202,10 +4298,13 @@
 				E4CD9E9A1A68980A00318571 /* ReaderMode.js in Resources */,
 				E4424B201AC6EBE100F44C38 /* ReaderSettings.xcassets in Resources */,
 				E4B7B7641A793CF20022C5E0 /* CharisSILR.ttf in Resources */,
+				7B35B7891BED0727008FF2D9 /* clock@2x.png in Resources */,
 				2F834D161A80629A006A0B7B /* FxASignIn.js in Resources */,
 				D3BA7E0C1B0E902A00153782 /* ContextMenu.js in Resources */,
 				E4B7B7681A793CF20022C5E0 /* FiraSans-Bold.ttf in Resources */,
 				E4B7B7781A793CF20022C5E0 /* FiraSans-Italic.ttf in Resources */,
+				7B35B7901BED0727008FF2D9 /* list@2x.png in Resources */,
+				7B35B78A1BED0727008FF2D9 /* cross@2x.png in Resources */,
 				0BA1E00E1B03FB0B007675AF /* NetError.html in Resources */,
 				E4A961381AC06FA50069AD6F /* ReaderViewLoading.html in Resources */,
 				E4ECCDAE1AB131770005E717 /* FiraSans-Medium.ttf in Resources */,
@@ -4215,6 +4314,7 @@
 				E49C0EB11B46109C009092BB /* WindowCloseHelper.js in Resources */,
 				E4D8F3B01ACDD5150005A2E4 /* InfoPlist.strings in Resources */,
 				2F44FB2D1A9D5D8500FD20CC /* FiraSans-BoldItalic.ttf in Resources */,
+				7B35B7881BED0727008FF2D9 /* check@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4528,26 +4628,21 @@
 				D39FA1811A83E84900EE869C /* Global.swift in Sources */,
 				D33B5B7C1AF1AFC100F4DDE6 /* SearchTests.swift in Sources */,
 				4F514FD41ACD8F2C0022D7EA /* HistoryTests.swift in Sources */,
-				E42475E71AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.m in Sources */,
 				D375A9201AE71675001B30D5 /* ViewMemoryLeakTests.swift in Sources */,
-				E42475E41AB73B9B00B23D33 /* SWTableViewCell.m in Sources */,
 				D38B2D361A8D96D00040E6B5 /* GCDWebServerFunctions.m in Sources */,
 				D38B2D3F1A8D96D00040E6B5 /* GCDWebServerDataRequest.m in Sources */,
-				E42475DE1AB73B9B00B23D33 /* SWCellScrollView.m in Sources */,
 				D38B2D541A8D96D00040E6B5 /* GCDWebServerStreamedResponse.m in Sources */,
 				D313BE981B2F5096009EF241 /* DomainAutocompleteTests.swift in Sources */,
 				4F97573C1AFA6F37006ECC24 /* ReaderViewUITests.swift in Sources */,
 				7BB20B6D1B71160200F1657F /* TopSitesTests.swift in Sources */,
 				D38B2D511A8D96D00040E6B5 /* GCDWebServerFileResponse.m in Sources */,
 				D39FA1831A83E87900EE869C /* NavigationTests.swift in Sources */,
-				E42475EA1AB73B9B00B23D33 /* SWUtilityButtonView.m in Sources */,
 				D38B2D481A8D96D00040E6B5 /* GCDWebServerURLEncodedFormRequest.m in Sources */,
 				D38B2D331A8D96D00040E6B5 /* GCDWebServerConnection.m in Sources */,
 				D38B2D421A8D96D00040E6B5 /* GCDWebServerFileRequest.m in Sources */,
 				D3C3EB651B6FF44000388E9A /* SessionRestoreTests.swift in Sources */,
 				D38B2D3C1A8D96D00040E6B5 /* GCDWebServerResponse.m in Sources */,
 				7B24DC9C1B67B3590005766B /* ClearPrivateDataTests.swift in Sources */,
-				E42475E11AB73B9B00B23D33 /* SWLongPressGestureRecognizer.m in Sources */,
 				D38B2D391A8D96D00040E6B5 /* GCDWebServerRequest.m in Sources */,
 				D38B2D4E1A8D96D00040E6B5 /* GCDWebServerErrorResponse.m in Sources */,
 				D38B2D4B1A8D96D00040E6B5 /* GCDWebServerDataResponse.m in Sources */,
@@ -4645,16 +4740,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7B35B7A11BED087B008FF2D9 /* NSMutableArray+SWUtilityButtons.m in Sources */,
+				7B35B7A21BED087B008FF2D9 /* SWCellScrollView.m in Sources */,
+				7B35B7A31BED087B008FF2D9 /* SWLongPressGestureRecognizer.m in Sources */,
+				7B35B7A41BED087B008FF2D9 /* SWUtilityButtonTapGestureRecognizer.m in Sources */,
+				7B35B7A51BED087B008FF2D9 /* SWUtilityButtonView.m in Sources */,
+				7B35B7961BED0727008FF2D9 /* SWTableViewCell.m in Sources */,
 				E66C5B481BDA81050051AA93 /* UIImage+ImageEffects.m in Sources */,
 				E4CD9F6D1A77DD2800318571 /* ReaderModeStyleViewController.swift in Sources */,
 				E4A960061ABB9C450069AD6F /* ReaderModeUtils.swift in Sources */,
 				E4B423DD1ABA0318007E66C8 /* ReaderModeHandlers.swift in Sources */,
 				D308E4E41A5306F500842685 /* SearchEngines.swift in Sources */,
 				0BF0DB941A8545800039F300 /* URLBarView.swift in Sources */,
-				E42475E51AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.m in Sources */,
 				D38B2D2E1A8D96D00040E6B5 /* GCDWebServer.m in Sources */,
 				E4B334601BBF2393004E2BFF /* Adjust.m in Sources */,
-				E42475E81AB73B9B00B23D33 /* SWUtilityButtonView.m in Sources */,
 				0B3E7DB81B27A7F600E2E84D /* AboutUtils.swift in Sources */,
 				E4B3345C1BBF2393004E2BFF /* ADJPackageHandler.m in Sources */,
 				D301AAEE1A3A55B70078DD1D /* TabTrayController.swift in Sources */,
@@ -4722,7 +4821,6 @@
 				E4B334581BBF2393004E2BFF /* ADJDeviceInfo.m in Sources */,
 				E6D8D5E71B569D70009E5A58 /* BrowserTrayAnimators.swift in Sources */,
 				F84B22241A09122500AAB793 /* HomePanelViewController.swift in Sources */,
-				E42475DC1AB73B9B00B23D33 /* SWCellScrollView.m in Sources */,
 				0B5142CC1AE1BAF50014D0B3 /* UIViewExtensions.swift in Sources */,
 				E47616C71AB74CA600E7DD25 /* ReaderModeBarView.swift in Sources */,
 				E4B3344D1BBF2393004E2BFF /* ADJActivityHandler.m in Sources */,
@@ -4757,7 +4855,6 @@
 				59A68B280D62462B85CF57A4 /* HistoryPanel.swift in Sources */,
 				E4B334541BBF2393004E2BFF /* ADJAdjustFactory.m in Sources */,
 				59A68E0B4ABBF55E14819668 /* BookmarksPanel.swift in Sources */,
-				0B5B51AF1B4CDB9E00E3B6E9 /* RXMLElement.m in Sources */,
 				7B844E3D1BBDDB9D00E733A2 /* ChevronView.swift in Sources */,
 				D38B2D491A8D96D00040E6B5 /* GCDWebServerDataResponse.m in Sources */,
 				E4C358551AF144BA00299F7E /* FSReadingList.m in Sources */,
@@ -4768,10 +4865,8 @@
 				D3E8EF101B97BE69001900FB /* ClearPrivateDataTableViewController.swift in Sources */,
 				E4B334521BBF2393004E2BFF /* NSString+ADJAdditions.m in Sources */,
 				59A68FD5260B8D520F890F4A /* ReaderPanel.swift in Sources */,
-				E42475E21AB73B9B00B23D33 /* SWTableViewCell.m in Sources */,
 				E40FAB0C1A7ABB77009CB80D /* WebServer.swift in Sources */,
 				59A68D66379CFA85C4EAF00B /* TwoLineCell.swift in Sources */,
-				E42475DF1AB73B9B00B23D33 /* SWLongPressGestureRecognizer.m in Sources */,
 				E49943F51AE6879C00BF9DE4 /* IntroViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4780,7 +4875,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E42475E31AB73B9B00B23D33 /* SWTableViewCell.m in Sources */,
 				E4CD9F1D1A6D9C2800318571 /* WebServerTests.swift in Sources */,
 				D3D488591ABB54CD00A93597 /* FileAccessorTests.swift in Sources */,
 				0BA8964B1A250E6500C1010C /* ProfileTest.swift in Sources */,
@@ -4811,7 +4905,6 @@
 				D3BA41681BD82F2200DA5457 /* XCTestCaseExtensions.swift in Sources */,
 				7BBFEEA11BB40A0800A305AA /* ReaderModeCache.swift in Sources */,
 				D38B2D441A8D96D00040E6B5 /* GCDWebServerMultiPartFormRequest.m in Sources */,
-				E42475DD1AB73B9B00B23D33 /* SWCellScrollView.m in Sources */,
 				D3C744CE1A687D6C004CE85D /* URIFixup.swift in Sources */,
 				2816F0011B33E05400522243 /* UIConstants.swift in Sources */,
 				D38B2D3E1A8D96D00040E6B5 /* GCDWebServerDataRequest.m in Sources */,
@@ -4824,7 +4917,6 @@
 				0BF42D4F1A7CD09600889E28 /* TestFavicons.swift in Sources */,
 				7BBFEE741BB405D900A305AA /* TabManagerTests.swift in Sources */,
 				E65072A41B273824001A0AC6 /* GeometryExtensions.swift in Sources */,
-				E42475E01AB73B9B00B23D33 /* SWLongPressGestureRecognizer.m in Sources */,
 				7BBFEEA31BB40A5300A305AA /* ReaderMode.swift in Sources */,
 				D38A1BEF1A9FA2CA00F6A386 /* SiteTableViewController.swift in Sources */,
 				D38B2D381A8D96D00040E6B5 /* GCDWebServerRequest.m in Sources */,
@@ -4840,12 +4932,10 @@
 				7BBFEE9E1BB409E300A305AA /* ReaderModeUtils.swift in Sources */,
 				2FDB10931A9FBEC5006CF312 /* PrefsTests.swift in Sources */,
 				7BBFEE9A1BB409B200A305AA /* TabManager.swift in Sources */,
-				E42475E91AB73B9B00B23D33 /* SWUtilityButtonView.m in Sources */,
 				0BE1083A1A1B1ED200D4B712 /* Locking.swift in Sources */,
 				59A6897152D30C846676DA34 /* TwoLineCell.swift in Sources */,
 				4A59B58AD11B5EE1F80BBDEB /* TestHistory.swift in Sources */,
 				28D52E2F1BCDF53900187A1D /* ResetTests.swift in Sources */,
-				E42475E61AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.m in Sources */,
 				E4ECCDC31AB1EAC70005E717 /* WebServer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5121,6 +5211,22 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		7B35B7611BED0726008FF2D9 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7B35B7621BED0726008FF2D9 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		7B35B7631BED0726008FF2D9 /* MainStoryboard.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7B35B7641BED0726008FF2D9 /* en */,
+			);
+			name = MainStoryboard.storyboard;
+			sourceTree = "<group>";
+		};
 		E4D8F3B21ACDD5150005A2E4 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
