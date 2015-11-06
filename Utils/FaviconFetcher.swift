@@ -6,6 +6,7 @@ import Storage
 import Shared
 import Alamofire
 import XCGLogger
+import SWXMLHash
 
 private let log = Logger.browserLogger
 private let queue = dispatch_queue_create("FaviconFetcher", DISPATCH_QUEUE_CONCURRENT)
@@ -95,12 +96,16 @@ public class FaviconFetcher : NSObject, NSXMLParserDelegate {
         return fetchDataForURL(url).bind({ result -> Deferred<Maybe<[Favicon]>> in
             var icons = [Favicon]()
 
-            if let data = result.successValue where result.isSuccess,
-               let element = RXMLElement(fromHTMLData: data) where element.isValid {
+            if let data = result.successValue where result.isSuccess {
+                let document = SWXMLHash.config {
+                    config in
+                    config.shouldProcessLazily = true
+                    }.parse(data)
+
                 var reloadUrl: NSURL? = nil
-                element.iterate("head.meta") { meta in
-                    if let refresh = meta.attribute("http-equiv") where refresh == "Refresh",
-                        let content = meta.attribute("content"),
+                document["html"]["head"]["meta"].all.forEach { meta in
+                    if let refresh = meta.element?.attributes["http-equiv"] where refresh == "Refresh",
+                        let content = meta.element?.attributes["content"],
                         let index = content.rangeOfString("URL="),
                         let url = NSURL(string: content.substringFromIndex(index.startIndex.advancedBy(4))) {
                             reloadUrl = url
@@ -111,9 +116,9 @@ public class FaviconFetcher : NSObject, NSXMLParserDelegate {
                     return self.parseHTMLForFavicons(url)
                 }
 
-                element.iterate("head.link") { link in
-                    if let rel = link.attribute("rel") where (rel == "shortcut icon" || rel == "icon" || rel == "apple-touch-icon"),
-                        let href = link.attribute("href"),
+                document["html"]["head"]["link"].all.forEach { link in
+                    if let rel = link.element?.attributes["rel"] where (rel == "shortcut icon" || rel == "icon" || rel == "apple-touch-icon"),
+                        let href = link.element?.attributes["href"],
                         let url = NSURL(string: href, relativeToURL: url) {
                             let icon = Favicon(url: url.absoluteString, date: NSDate(), type: IconType.Icon)
                             icons.append(icon)
