@@ -421,7 +421,9 @@ class BrowserViewController: UIViewController {
                 showRestoreTabsAlert()
             }
         } else {
-            tabManager.restoreTabs()
+            if AppConfiguration.shouldRestoreTabs() {
+                tabManager.restoreTabs()
+            }
         }
 
         updateTabCountUsingTabManager(tabManager, animated: false)
@@ -457,7 +459,11 @@ class BrowserViewController: UIViewController {
             }
         )
 
-        self.presentViewController(alert, animated: true, completion: nil)
+        if AppConfiguration.shouldRestoreTabs() {
+            self.presentViewController(alert, animated: true, completion: nil)
+        } else {
+            self.tabManager.addTabAndSelect()
+        }
     }
 
     override func viewDidAppear(animated: Bool) {

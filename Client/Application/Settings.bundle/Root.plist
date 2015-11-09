@@ -12,6 +12,16 @@
 			<key>Title</key>
 			<string>Debug Settings</string>
 		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Tab Restoration</string>
+			<key>Key</key>
+			<string>SettingsBundleTabRestoration</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
 	</array>
 </dict>
 </plist>
