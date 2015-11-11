@@ -335,6 +335,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
+    func application(application: UIApplication, continueUserActivity userActivity: NSUserActivity, restorationHandler: ([AnyObject]?) -> Void) -> Bool {
+        if let url = userActivity.webpageURL {
+            browserViewController.switchToTabForURLOrOpen(url)
+        }
+        return true
+    }
+
     private func viewURLInNewTab(notification: UILocalNotification) {
         if let alertURL = notification.userInfo?[TabSendURLKey] as? String {
             if let urlToOpen = NSURL(string: alertURL) {

@@ -1281,6 +1281,12 @@ extension BrowserViewController: BrowserDelegate {
         let sessionRestoreHelper = SessionRestoreHelper(browser: browser)
         sessionRestoreHelper.delegate = self
         browser.addHelper(sessionRestoreHelper, name: SessionRestoreHelper.name())
+
+        let openURL = {(url: NSURL) -> Void in
+            self.tabManager.addTab(NSURLRequest(URL: url))
+        }
+        let spotlightHelper = SpotlightHelper(browser: browser, profile: profile, openURL: openURL)
+        browser.addHelper(spotlightHelper, name: SpotlightHelper.name())
     }
 
     func browser(browser: Browser, willDeleteWebView webView: WKWebView) {
