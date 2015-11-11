@@ -16,10 +16,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var rootViewController: UINavigationController!
     weak var profile: BrowserProfile?
     var tabManager: TabManager!
+    var configuration: AppConfiguration!
 
     let appVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as! String
 
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        // Load app configuration including options from settings bundle if available
+        configuration = AppConfiguration(userDefaults: NSUserDefaults.standardUserDefaults())
+        configuration.registerDefaultsFromSettingsBundleIfAvailable()
+
         // Set the Firefox UA for browsing.
         setUserAgent()
 

@@ -635,7 +635,10 @@
 		E65AB12C1B7CDADF00C2B47A /* SessionRestoreHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65AB12B1B7CDADF00C2B47A /* SessionRestoreHelper.swift */; };
 		E660BDD91BB06521009AC090 /* TabsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E660BDD81BB06521009AC090 /* TabsButton.swift */; };
 		E660BE061BB0666D009AC090 /* InnerStrokedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E660BE051BB0666D009AC090 /* InnerStrokedView.swift */; };
-		E6639F1B1BF12CDF002D0853 /* SettingsBundleKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6639F1A1BF12CDF002D0853 /* SettingsBundleKeys.swift */; };
+		E66115301BF3DA93002ED7D1 /* AppConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E661152F1BF3DA93002ED7D1 /* AppConfigurationTests.swift */; };
+		E66115581BF3DEA2002ED7D1 /* SettingsBundleParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66115571BF3DEA2002ED7D1 /* SettingsBundleParser.swift */; };
+		E661155A1BF3E00C002ED7D1 /* Debug.plist in Resources */ = {isa = PBXBuildFile; fileRef = E66115591BF3E00C002ED7D1 /* Debug.plist */; };
+		E6639F1B1BF12CDF002D0853 /* SettingsBundlePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6639F1A1BF12CDF002D0853 /* SettingsBundlePage.swift */; };
 		E6639F1D1BF12E34002D0853 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6639F1C1BF12E34002D0853 /* AppConfiguration.swift */; };
 		E663D5781BB341C4001EF30E /* ToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E663D5771BB341C4001EF30E /* ToggleButton.swift */; };
 		E66C5B481BDA81050051AA93 /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = E66C5B471BDA81050051AA93 /* UIImage+ImageEffects.m */; };
@@ -1817,9 +1820,12 @@
 		E65AB12B1B7CDADF00C2B47A /* SessionRestoreHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionRestoreHelper.swift; sourceTree = "<group>"; };
 		E660BDD81BB06521009AC090 /* TabsButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsButton.swift; sourceTree = "<group>"; };
 		E660BE051BB0666D009AC090 /* InnerStrokedView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InnerStrokedView.swift; sourceTree = "<group>"; };
-		E6639F171BF11E17002D0853 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
-		E6639F1A1BF12CDF002D0853 /* SettingsBundleKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsBundleKeys.swift; sourceTree = "<group>"; };
-		E6639F1C1BF12E34002D0853 /* AppConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
+		E661152F1BF3DA93002ED7D1 /* AppConfigurationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConfigurationTests.swift; sourceTree = "<group>"; };
+		E66115571BF3DEA2002ED7D1 /* SettingsBundleParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SettingsBundleParser.swift; path = Application/SettingsBundleParser.swift; sourceTree = "<group>"; };
+		E66115591BF3E00C002ED7D1 /* Debug.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Debug.plist; path = Application/Debug.plist; sourceTree = "<group>"; };
+		E6639F171BF11E17002D0853 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Settings.bundle; path = Application/Settings.bundle; sourceTree = "<group>"; };
+		E6639F1A1BF12CDF002D0853 /* SettingsBundlePage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SettingsBundlePage.swift; path = Application/SettingsBundlePage.swift; sourceTree = "<group>"; };
+		E6639F1C1BF12E34002D0853 /* AppConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppConfiguration.swift; path = Application/AppConfiguration.swift; sourceTree = "<group>"; };
 		E663D5771BB341C4001EF30E /* ToggleButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToggleButton.swift; sourceTree = "<group>"; };
 		E66C5B461BDA81050051AA93 /* UIImage+ImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageEffects.h"; sourceTree = "<group>"; };
 		E66C5B471BDA81050051AA93 /* UIImage+ImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageEffects.m"; sourceTree = "<group>"; };
@@ -2902,6 +2908,10 @@
 				E60961871B62B8B300DD640F /* FennecAurora.xcconfig */,
 				E60961881B62B8BE00DD640F /* FennecNightly.xcconfig */,
 				E60961891B62B8C800DD640F /* Firefox.xcconfig */,
+				E6639F1C1BF12E34002D0853 /* AppConfiguration.swift */,
+				E6639F1A1BF12CDF002D0853 /* SettingsBundlePage.swift */,
+				E66115571BF3DEA2002ED7D1 /* SettingsBundleParser.swift */,
+				E6639F171BF11E17002D0853 /* Settings.bundle */,
 			);
 			name = Configuration;
 			sourceTree = "<group>";
@@ -3050,6 +3060,7 @@
 				F84B21E41A0910F600AAB793 /* Application */,
 				28EADE5C1AFC3A6D007FB2FB /* Extensions */,
 				F84B21F11A0910F600AAB793 /* Frontend */,
+				E66115591BF3E00C002ED7D1 /* Debug.plist */,
 			);
 			path = Client;
 			sourceTree = "<group>";
@@ -3057,6 +3068,7 @@
 		F84B21D61A090F8100AAB793 /* ClientTests */ = {
 			isa = PBXGroup;
 			children = (
+				E661152F1BF3DA93002ED7D1 /* AppConfigurationTests.swift */,
 				F84B21D91A090F8100AAB793 /* ClientTests.swift */,
 				E60A60A01B6BFDDC00F850D4 /* CrashReporterTests.swift */,
 				D3D488581ABB54CD00A93597 /* FileAccessorTests.swift */,
@@ -3101,9 +3113,6 @@
 				D3BE7B471B05596800641031 /* AuroraAppDelegate.swift */,
 				E60A60811B6BFC0B00F850D4 /* CrashReporter.swift */,
 				E4B3348B1BC01D8F004E2BFF /* AdjustIntegration.swift */,
-				E6639F1A1BF12CDF002D0853 /* SettingsBundleKeys.swift */,
-				E6639F171BF11E17002D0853 /* Settings.bundle */,
-				E6639F1C1BF12E34002D0853 /* AppConfiguration.swift */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -4221,6 +4230,7 @@
 				E4424B3C1AC71FB400F44C38 /* FiraSans-Book.ttf in Resources */,
 				0BF42D391A7C0E8900889E28 /* Favicons.js in Resources */,
 				E4D6BEB91A0930EC00F538BD /* LaunchScreen.xib in Resources */,
+				E661155A1BF3E00C002ED7D1 /* Debug.plist in Resources */,
 				E49C0EB11B46109C009092BB /* WindowCloseHelper.js in Resources */,
 				E4D8F3B01ACDD5150005A2E4 /* InfoPlist.strings in Resources */,
 				2F44FB2D1A9D5D8500FD20CC /* FiraSans-BoldItalic.ttf in Resources */,
@@ -4686,6 +4696,7 @@
 				D301AAEE1A3A55B70078DD1D /* TabTrayController.swift in Sources */,
 				D38B2D431A8D96D00040E6B5 /* GCDWebServerMultiPartFormRequest.m in Sources */,
 				0B3E7D951B27A7CE00E2E84D /* AboutHomeHandler.swift in Sources */,
+				E66115581BF3DEA2002ED7D1 /* SettingsBundleParser.swift in Sources */,
 				D3BE7B461B054F8600641031 /* TestAppDelegate.swift in Sources */,
 				E6639F1D1BF12E34002D0853 /* AppConfiguration.swift in Sources */,
 				0B62EFD21AD63CD100ACB9CD /* Clearables.swift in Sources */,
@@ -4709,7 +4720,7 @@
 				E4B3344F1BBF2393004E2BFF /* ADJActivityPackage.m in Sources */,
 				2F44FC721A9E840300FD20CC /* SettingsNavigationController.swift in Sources */,
 				D3BA7E0E1B0E934F00153782 /* ContextMenuHelper.swift in Sources */,
-				E6639F1B1BF12CDF002D0853 /* SettingsBundleKeys.swift in Sources */,
+				E6639F1B1BF12CDF002D0853 /* SettingsBundlePage.swift in Sources */,
 				0AE491A61A41C88C0046C724 /* BackForwardListViewController.swift in Sources */,
 				E660BE061BB0666D009AC090 /* InnerStrokedView.swift in Sources */,
 				0BF648111A9C54E900BA963C /* TopSitesPanel.swift in Sources */,
@@ -4858,6 +4869,7 @@
 				D38B2D381A8D96D00040E6B5 /* GCDWebServerRequest.m in Sources */,
 				0BA8964C1A250E6500C1010C /* TestBookmarks.swift in Sources */,
 				D38B2D321A8D96D00040E6B5 /* GCDWebServerConnection.m in Sources */,
+				E66115301BF3DA93002ED7D1 /* AppConfigurationTests.swift in Sources */,
 				7BBFEE9D1BB409D800A305AA /* SessionData.swift in Sources */,
 				7BBFEEA21BB40A1700A305AA /* ReaderModeStyleViewController.swift in Sources */,
 				0BE108361A1B1EC700D4B712 /* TestLocking.swift in Sources */,

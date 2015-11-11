@@ -3,102 +3,98 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
+import Shared
 
-/**
- *  App-wide configuration settings that pull in from Settings bundle if available.
- */
+private struct SettingsPListKeys {
+    static let DefaultValueKey      = "Default Value"
+    static let PreferenceItemsKey   = "Preference Items"
+    static let IdentifierKey        = "Identifier"
+}
+
+enum AppConfigurationError {
+    case FailedToLoadSettingsBundle
+}
+
+extension AppConfigurationError: MaybeErrorType {
+    var description: String {
+        switch (self) {
+        case .FailedToLoadSettingsBundle: return "Unable to load Settings bundle Root.plist file."
+        }
+    }
+}
+
 struct AppConfiguration {
 
-    private static var settingsDictionary: NSDictionary?
+    private let userDefaults: NSUserDefaults
 
-    private static var registrationCalled: Bool = false
+    private let ioQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
 
-    /**
-     Should be called on app startup to register default values from the Settings bundle if available.
-     */
-    static func registerDefaultsFromSettingsBundleIfAvailable() {
-        assert(!registrationCalled, "registerDefaultsFromSettingsBundleIfAvailable should only be called once.")
-
-        settingsDictionary = settingsBundleDictionary()
-
-        // Register defualts for toggle items with boolean value
-        SettingsBundleKey.allToggleKeys.forEach(assignDefaultBoolValueForSettingKey)
-
-        registrationCalled = true
+    init(userDefaults: NSUserDefaults) {
+        self.userDefaults = userDefaults
     }
+}
 
-    /**
-     Pulls out the default value key for a Settings item and assigns the boolean to NSUserDefaults.
+// MARK: - Settings Configuration Helpers
+extension AppConfiguration {
+    func registerDefaultsFromSettingsBundleIfAvailable() -> Success {
+        return loadSettingsBundleDictionary() >>== { settings in
 
-     - parameter key: Settings identifier key to use the default value for.
-     */
-    private static func assignDefaultBoolValueForSettingKey(key: String) {
-        if let item = findItemWithIdentifier(key) {
-            let defaultValue = (item["Default Value"] as? Bool) ?? false
-            NSUserDefaults.standardUserDefaults().setBool(defaultValue, forKey: key)
+            // Register defualts for toggle items with boolean value
+            //SettingsBundleKey.allToggleKeys.forEach { key in
+            //    self.assignDefaultBoolValueForSettingKey(key, fromSettings: settings)
+            //}
+
+            return succeed()
         }
     }
 
-    /**
-     Finds the settings item with the given identifier.
+    private func assignDefaultBoolValueForSettingKey(key: String, fromSettings settings: NSDictionary) {
+        if let item = findItemWithIdentifier(key, inSettings: settings) {
+            let defaultValue = (item[SettingsPListKeys.DefaultValueKey] as? Bool) ?? false
+            userDefaults.setBool(defaultValue, forKey: key)
+        }
+    }
 
-     - parameter identifier: Settings item identifier string.
-
-     - returns: NSDictionary containing item information from Root.plist
-     */
-    private static func findItemWithIdentifier(identifier: String) -> NSDictionary? {
-        if let preferenceItems = settingsDictionary?["Preference Items"] as? [NSDictionary] {
-            return preferenceItems.filter { ($0["Identifier"] as? String) == identifier } .first
+    private func findItemWithIdentifier(identifier: String, inSettings settings: NSDictionary) -> NSDictionary? {
+        if let preferenceItems = settings[SettingsPListKeys.PreferenceItemsKey] as? [NSDictionary] {
+            return preferenceItems.filter { ($0[SettingsPListKeys.IdentifierKey] as? String) == identifier } .first
         }
         return nil
     }
 
-    /**
-     Loads the Setting bundle's root plist file.
-
-     - returns: Root.plist data in a NSDictionary if found.
-     */
-    private static func settingsBundleDictionary() -> NSDictionary? {
-        let filename = NSBundle.mainBundle().pathForResource("Settings", ofType: "bundle")
-        if let filename = filename {
-           return NSDictionary(contentsOfFile: filename.stringByAppendingString("/Root.plist"))
-        } else {
-            return nil
+    private func loadSettingsBundleDictionary() -> Deferred<Maybe<NSDictionary>> {
+        return deferDispatchAsync(ioQueue) {
+            guard let filename = NSBundle.mainBundle().pathForResource("Settings", ofType: "bundle"),
+                let settings = NSDictionary(contentsOfFile: filename.stringByAppendingString("/Root.plist")) else {
+                    return deferMaybe(AppConfigurationError.FailedToLoadSettingsBundle)
+            }
+            return deferMaybe(settings)
         }
     }
 
-    /**
-     Checks to see if there is a Settings bundle available.
-
-     - returns: True if settings bundle exists, false otherwise.
-     */
-    private static func settingsBundleAvailable() -> Bool {
+    private func settingsBundleAvailable() -> Bool {
         return NSBundle.mainBundle().pathForResource("Settings", ofType: "bundle") != nil
-    }
-
-    /**
-     Assert that registration has been called.
-     */
-    private static func checkRegisterWasCalled() {
-        assert(registrationCalled, "registerDefaultsFromSettingsBundleIfAvailable MUST be called before asking for configuration settings.")
     }
 }
 
 // MARK: - Configuration Methods
 extension AppConfiguration {
 
-    /**
-     Determines if we should restore tabs on startup or not. Configurable by settings bundle.
+    var shouldRestoreTabs: Bool {
+        return true
+//        if settingsBundleAvailable() {
+//            return NSUserDefaults.standardUserDefaults().boolForKey(SettingsBundleKey.TabRestoration)
+//        } else {
+//            return true
+//        }
+    }
+}
 
-     - returns: True/false if tabs should be restored. Defualts to true if not configured.
-     */
-    static func shouldRestoreTabs() -> Bool {
-        checkRegisterWasCalled()
+// MARK: AppDelegate Singleton
+extension AppConfiguration {
 
-        if settingsBundleAvailable() {
-            return NSUserDefaults.standardUserDefaults().boolForKey(SettingsBundleKey.TabRestoration)
-        } else {
-            return true
-        }
+    static var sharedInstance: AppConfiguration {
+        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        return appDelegate.configuration
     }
 }

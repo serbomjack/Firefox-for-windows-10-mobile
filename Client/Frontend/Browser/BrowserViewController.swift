@@ -421,7 +421,7 @@ class BrowserViewController: UIViewController {
                 showRestoreTabsAlert()
             }
         } else {
-            if AppConfiguration.shouldRestoreTabs() {
+            if AppConfiguration.sharedInstance.shouldRestoreTabs {
                 tabManager.restoreTabs()
             }
         }
@@ -459,7 +459,7 @@ class BrowserViewController: UIViewController {
             }
         )
 
-        if AppConfiguration.shouldRestoreTabs() {
+        if AppConfiguration.sharedInstance.shouldRestoreTabs {
             self.presentViewController(alert, animated: true, completion: nil)
         } else {
             self.tabManager.addTabAndSelect()
