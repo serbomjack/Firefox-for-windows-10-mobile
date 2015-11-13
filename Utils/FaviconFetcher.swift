@@ -30,7 +30,7 @@ public class FaviconFetcher : NSObject, NSXMLParserDelegate {
         return f.loadFavicons(url, profile: profile)
     }
 
-    private func loadFavicons(url: NSURL, profile: Profile, var oldIcons: [Favicon] = [Favicon]()) -> Deferred<Maybe<[Favicon]>> {
+    func loadFavicons(url: NSURL, profile: Profile, var oldIcons: [Favicon] = [Favicon]()) -> Deferred<Maybe<[Favicon]>> {
         if isIgnoredURL(url) {
             return deferMaybe(FaviconFetcherErrorType(description: "Not fetching ignored URL to find favicons."))
         }
@@ -91,7 +91,7 @@ public class FaviconFetcher : NSObject, NSXMLParserDelegate {
     }
 
     // Loads and parses an html document and tries to find any known favicon-type tags for the page
-    private func parseHTMLForFavicons(url: NSURL) -> Deferred<Maybe<[Favicon]>> {
+    func parseHTMLForFavicons(url: NSURL) -> Deferred<Maybe<[Favicon]>> {
         return fetchDataForURL(url).bind({ result -> Deferred<Maybe<[Favicon]>> in
             var icons = [Favicon]()
 
@@ -115,6 +115,7 @@ public class FaviconFetcher : NSObject, NSXMLParserDelegate {
                     if let rel = link.attribute("rel") where (rel == "shortcut icon" || rel == "icon" || rel == "apple-touch-icon"),
                         let href = link.attribute("href"),
                         let url = NSURL(string: href, relativeToURL: url) {
+                            log.debug("Found icon \(href).")
                             let icon = Favicon(url: url.absoluteString, date: NSDate(), type: IconType.Icon)
                             icons.append(icon)
                     }
@@ -134,10 +135,12 @@ public class FaviconFetcher : NSObject, NSXMLParserDelegate {
         var fav = Favicon(url: url, type: icon.type)
         if let url = url.asURL {
             manager.downloadImageWithURL(url, options: SDWebImageOptions.LowPriority, progress: nil, completed: { (img, err, cacheType, success, url) -> Void in
+                log.debug("Downloading image from \(url): got image \(img), err \(err).")
                 fav = Favicon(url: url.absoluteString,
                     type: icon.type)
 
                 if let img = img {
+                    log.debug("Image is \(img.size.width) x \(img.size.height).")
                     fav.width = Int(img.size.width)
                     fav.height = Int(img.size.height)
                     profile.favicons.addFavicon(fav, forSite: site)

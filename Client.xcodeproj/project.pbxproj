@@ -96,6 +96,8 @@
 		282DA4731A68C1E700A406E2 /* OpenSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FA77831A43B2CE0010CD32 /* OpenSearch.swift */; };
 		28302E401AF0747800521E2E /* DatabaseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28302E3F1AF0747800521E2E /* DatabaseError.swift */; };
 		283A2AD91AF0794D003C0A26 /* DatabaseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28302E3F1AF0747800521E2E /* DatabaseError.swift */; };
+		2844153C1BF561CD00EA6970 /* FaviconFetcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284415151BF5617500EA6970 /* FaviconFetcherTests.swift */; };
+		2844153D1BF5639100EA6970 /* FaviconFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B71FFF41B4C49E50046AF87 /* FaviconFetcher.swift */; };
 		284AA3AD1AD4C386009041C5 /* Clients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C4AB711AD42D4300D9ACE3 /* Clients.swift */; };
 		2853C5411AD84C6800C4F31D /* TabsPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2853C5401AD84C6800C4F31D /* TabsPayload.swift */; };
 		2853C5421AD84C6800C4F31D /* TabsPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2853C5401AD84C6800C4F31D /* TabsPayload.swift */; };
@@ -1191,20 +1193,6 @@
 			remoteGlobalIDString = 2FA435FA1ABB83B4008031D1;
 			remoteInfo = Account;
 		};
-		E4A85D101BF2600D008BD381 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 39A362B21AAF5E2B00F47390 /* XCGLogger.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 70CB94201B99E728007802FF;
-			remoteInfo = "XCGLogger (watchOS)";
-		};
-		E4A85D121BF2600D008BD381 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 39A362B21AAF5E2B00F47390 /* XCGLogger.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5515A3DF1BA119FA0047BA31;
-			remoteInfo = "XCGLogger (tvOS)";
-		};
 		E4A888181A95679500CDC337 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 28CE83CA1A1D1D5100576538 /* FxA.xcodeproj */;
@@ -1416,6 +1404,7 @@
 		282915E51AF1A7920006EEB5 /* BrowserTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserTable.swift; sourceTree = "<group>"; };
 		28302E3F1AF0747800521E2E /* DatabaseError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseError.swift; sourceTree = "<group>"; };
 		283306E81AB3BB87008999AC /* Functions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Functions.swift; sourceTree = "<group>"; };
+		284415151BF5617500EA6970 /* FaviconFetcherTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FaviconFetcherTests.swift; sourceTree = "<group>"; };
 		2853C5401AD84C6800C4F31D /* TabsPayload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabsPayload.swift; sourceTree = "<group>"; };
 		2855611E1AEFFA1C00D5ED5B /* HistorySynchronizerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = HistorySynchronizerTests.swift; path = SyncTests/HistorySynchronizerTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		285D3B321B4332C00035FD22 /* NotificationConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationConstants.swift; sourceTree = "<group>"; };
@@ -2479,8 +2468,6 @@
 			children = (
 				39A362D41AAF5E2C00F47390 /* XCGLogger.framework */,
 				39A362D61AAF5E2C00F47390 /* XCGLogger.framework */,
-				E4A85D111BF2600D008BD381 /* XCGLogger.framework */,
-				E4A85D131BF2600D008BD381 /* XCGLogger.framework */,
 				39A362D81AAF5E2C00F47390 /* XCGLoggerTests (iOS).xctest */,
 				7B7692CD1B7CCBD100188277 /* XCGLoggerTests (OS X).xctest */,
 			);
@@ -3062,6 +3049,7 @@
 			children = (
 				F84B21D91A090F8100AAB793 /* ClientTests.swift */,
 				E60A60A01B6BFDDC00F850D4 /* CrashReporterTests.swift */,
+				284415151BF5617500EA6970 /* FaviconFetcherTests.swift */,
 				D3D488581ABB54CD00A93597 /* FileAccessorTests.swift */,
 				281B2BE91ADF4D90002917DC /* MockProfile.swift */,
 				2FDB10921A9FBEC5006CF312 /* PrefsTests.swift */,
@@ -4072,20 +4060,6 @@
 			remoteRef = D3B5A0E91B5459F600C15BCF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		E4A85D111BF2600D008BD381 /* XCGLogger.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = XCGLogger.framework;
-			remoteRef = E4A85D101BF2600D008BD381 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		E4A85D131BF2600D008BD381 /* XCGLogger.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = XCGLogger.framework;
-			remoteRef = E4A85D121BF2600D008BD381 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		E69E4E2A1B9F709A00646EDB /* Breakpad.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -4807,6 +4781,7 @@
 				E4CD9F1D1A6D9C2800318571 /* WebServerTests.swift in Sources */,
 				D3D488591ABB54CD00A93597 /* FileAccessorTests.swift in Sources */,
 				0BA8964B1A250E6500C1010C /* ProfileTest.swift in Sources */,
+				2844153D1BF5639100EA6970 /* FaviconFetcher.swift in Sources */,
 				0BB5B28D1AC0A6130052877D /* Toolbar.swift in Sources */,
 				03CCC9181AF05E7300DBF30D /* RelativeDatesTests.swift in Sources */,
 				F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */,
@@ -4841,6 +4816,7 @@
 				7BBFEEA01BB409F300A305AA /* AboutUtils.swift in Sources */,
 				0BD19A681A2530A40084FBA7 /* NSUserDefaultsPrefs.swift in Sources */,
 				7BBFEE9B1BB409C300A305AA /* Browser.swift in Sources */,
+				2844153C1BF561CD00EA6970 /* FaviconFetcherTests.swift in Sources */,
 				28EADE5E1AFC3B86007FB2FB /* UIImageViewExtensions.swift in Sources */,
 				D308E4EC1A530A8B00842685 /* SearchEngines.swift in Sources */,
 				0BF42D4F1A7CD09600889E28 /* TestFavicons.swift in Sources */,
