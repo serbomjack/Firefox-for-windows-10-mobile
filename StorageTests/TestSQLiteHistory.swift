@@ -12,6 +12,766 @@ extension Site {
     }
 }
 
+class HistoricalBrowserTable {
+    var supportsPartialIndices: Bool {
+        let v = sqlite3_libversion_number()
+        return v >= 3008000          // 3.8.0.
+    }
+
+    func run(db: SQLiteDBConnection, sql: String?, args: Args? = nil) -> Bool {
+        if let sql = sql {
+            let err = db.executeChange(sql, withArgs: args)
+            return err == nil
+        }
+        return true
+    }
+
+    func run(db: SQLiteDBConnection, queries: [String?]) -> Bool {
+        for sql in queries {
+            if let sql = sql {
+                if !run(db, sql: sql) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+}
+
+// Versions of BrowserTable that we care about:
+// v6, prior to 001c73ea1903c238be1340950770879b40c41732, July 2015.
+// This is when we first started caring about database versions.
+//
+// v7, 81e22fa6f7446e27526a5a9e8f4623df159936c3. History tiles.
+//
+// v8, 02c08ddc6d805d853bbe053884725dc971ef37d7. Favicons.
+//
+// v10, 4428c7d181ff4779ab1efb39e857e41bdbf4de67. Mirroring. We skipped v9.
+//
+// These tests snapshot the table creation code at each of these points.
+
+class BrowserTableV6: HistoricalBrowserTable {
+    let version = 6
+
+    func prepopulateRootFolders(db: SQLiteDBConnection) -> Bool {
+        let type = BookmarkNodeType.Folder.rawValue
+        let root = BookmarkRoots.RootID
+
+        let titleMobile = NSLocalizedString("Mobile Bookmarks", tableName: "Storage", comment: "The title of the folder that contains mobile bookmarks. This should match bookmarks.folder.mobile.label on Android.")
+        let titleMenu = NSLocalizedString("Bookmarks Menu", tableName: "Storage", comment: "The name of the folder that contains desktop bookmarks in the menu. This should match bookmarks.folder.menu.label on Android.")
+        let titleToolbar = NSLocalizedString("Bookmarks Toolbar", tableName: "Storage", comment: "The name of the folder that contains desktop bookmarks in the toolbar. This should match bookmarks.folder.toolbar.label on Android.")
+        let titleUnsorted = NSLocalizedString("Unsorted Bookmarks", tableName: "Storage", comment: "The name of the folder that contains unsorted desktop bookmarks. This should match bookmarks.folder.unfiled.label on Android.")
+
+        let args: Args = [
+            root, BookmarkRoots.RootGUID, type, "Root", root,
+            BookmarkRoots.MobileID, BookmarkRoots.MobileFolderGUID, type, titleMobile, root,
+            BookmarkRoots.MenuID, BookmarkRoots.MenuFolderGUID, type, titleMenu, root,
+            BookmarkRoots.ToolbarID, BookmarkRoots.ToolbarFolderGUID, type, titleToolbar, root,
+            BookmarkRoots.UnfiledID, BookmarkRoots.UnfiledFolderGUID, type, titleUnsorted, root,
+        ]
+
+        let sql =
+        "INSERT INTO bookmarks (id, guid, type, url, title, parent) VALUES " +
+            "(?, ?, ?, NULL, ?, ?), " +    // Root
+            "(?, ?, ?, NULL, ?, ?), " +    // Mobile
+            "(?, ?, ?, NULL, ?, ?), " +    // Menu
+            "(?, ?, ?, NULL, ?, ?), " +    // Toolbar
+        "(?, ?, ?, NULL, ?, ?)  "      // Unsorted
+
+        return self.run(db, sql: sql, args: args)
+    }
+
+    func CreateHistoryTable() -> String {
+        return "CREATE TABLE IF NOT EXISTS \(TableHistory) (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "guid TEXT NOT NULL UNIQUE, " +       // Not null, but the value might be replaced by the server's.
+            "url TEXT UNIQUE, " +                 // May only be null for deleted records.
+            "title TEXT NOT NULL, " +
+            "server_modified INTEGER, " +         // Can be null. Integer milliseconds.
+            "local_modified INTEGER, " +          // Can be null. Client clock. In extremis only.
+            "is_deleted TINYINT NOT NULL, " +     // Boolean. Locally deleted.
+            "should_upload TINYINT NOT NULL, " +  // Boolean. Set when changed or visits added.
+            (version > 5 ? "domainId INTEGER REFERENCES \(TableDomains)(id) ON DELETE CASCADE, " : "") +
+            "CONSTRAINT urlOrDeleted CHECK (url IS NOT NULL OR is_deleted = 1)" +
+        ")"
+    }
+
+    func CreateDomainsTable() -> String {
+        return "CREATE TABLE IF NOT EXISTS \(TableDomains) (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "domain TEXT NOT NULL UNIQUE, " +
+            "showOnTopSites TINYINT NOT NULL DEFAULT 1" +
+        ")"
+    }
+
+    func CreateQueueTable() -> String {
+        return "CREATE TABLE IF NOT EXISTS \(TableQueuedTabs) (" +
+            "url TEXT NOT NULL UNIQUE, " +
+            "title TEXT" +
+        ") "
+    }
+
+    func create(db: SQLiteDBConnection) -> Bool {
+        let visits =
+        "CREATE TABLE IF NOT EXISTS \(TableVisits) (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "siteID INTEGER NOT NULL REFERENCES \(TableHistory)(id) ON DELETE CASCADE, " +
+            "date REAL NOT NULL, " +           // Microseconds since epoch.
+            "type INTEGER NOT NULL, " +
+            "is_local TINYINT NOT NULL, " +    // Some visits are local. Some are remote ('mirrored'). This boolean flag is the split.
+            "UNIQUE (siteID, date, type) " +
+        ") "
+
+        let indexShouldUpload: String
+        if self.supportsPartialIndices {
+            // There's no point tracking rows that are not flagged for upload.
+            indexShouldUpload =
+                "CREATE INDEX IF NOT EXISTS \(IndexHistoryShouldUpload) " +
+            "ON \(TableHistory) (should_upload) WHERE should_upload = 1"
+        } else {
+            indexShouldUpload =
+                "CREATE INDEX IF NOT EXISTS \(IndexHistoryShouldUpload) " +
+            "ON \(TableHistory) (should_upload)"
+        }
+
+        let indexSiteIDDate =
+        "CREATE INDEX IF NOT EXISTS \(IndexVisitsSiteIDIsLocalDate) " +
+        "ON \(TableVisits) (siteID, is_local, date)"
+
+        let faviconSites =
+        "CREATE TABLE IF NOT EXISTS \(TableFaviconSites) (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "siteID INTEGER NOT NULL REFERENCES \(TableHistory)(id) ON DELETE CASCADE, " +
+            "faviconID INTEGER NOT NULL REFERENCES \(TableFavicons)(id) ON DELETE CASCADE, " +
+            "UNIQUE (siteID, faviconID) " +
+        ") "
+
+        let widestFavicons =
+        "CREATE VIEW IF NOT EXISTS \(ViewWidestFaviconsForSites) AS " +
+            "SELECT " +
+            "\(TableFaviconSites).siteID AS siteID, " +
+            "\(TableFavicons).id AS iconID, " +
+            "\(TableFavicons).url AS iconURL, " +
+            "\(TableFavicons).date AS iconDate, " +
+            "\(TableFavicons).type AS iconType, " +
+            "MAX(\(TableFavicons).width) AS iconWidth " +
+            "FROM \(TableFaviconSites), \(TableFavicons) WHERE " +
+            "\(TableFaviconSites).faviconID = \(TableFavicons).id " +
+        "GROUP BY siteID "
+
+        let historyIDsWithIcon =
+        "CREATE VIEW IF NOT EXISTS \(ViewHistoryIDsWithWidestFavicons) AS " +
+            "SELECT \(TableHistory).id AS id, " +
+            "iconID, iconURL, iconDate, iconType, iconWidth " +
+            "FROM \(TableHistory) " +
+            "LEFT OUTER JOIN " +
+        "\(ViewWidestFaviconsForSites) ON history.id = \(ViewWidestFaviconsForSites).siteID "
+
+        let iconForURL =
+        "CREATE VIEW IF NOT EXISTS \(ViewIconForURL) AS " +
+            "SELECT history.url AS url, icons.iconID AS iconID FROM " +
+            "\(TableHistory), \(ViewWidestFaviconsForSites) AS icons WHERE " +
+        "\(TableHistory).id = icons.siteID "
+
+        let bookmarks =
+        "CREATE TABLE IF NOT EXISTS bookmarks (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "guid TEXT NOT NULL UNIQUE, " +
+            "type TINYINT NOT NULL, " +
+            "url TEXT, " +
+            "parent INTEGER REFERENCES bookmarks(id) NOT NULL, " +
+            "faviconID INTEGER REFERENCES favicons(id) ON DELETE SET NULL, " +
+            "title TEXT" +
+        ") "
+
+        let queries = [
+            CreateDomainsTable(),
+            CreateHistoryTable(),
+            visits, bookmarks, faviconSites,
+            indexShouldUpload, indexSiteIDDate,
+            widestFavicons, historyIDsWithIcon, iconForURL,
+            CreateQueueTable(),
+        ]
+
+        log.debug("Creating \(queries.count) tables, views, and indices.")
+        return self.run(db, queries: queries) &&
+            self.prepopulateRootFolders(db)
+    }
+}
+
+class BrowserTableV7: HistoricalBrowserTable {
+    let version = 7
+
+    func prepopulateRootFolders(db: SQLiteDBConnection) -> Bool {
+        let type = BookmarkNodeType.Folder.rawValue
+        let root = BookmarkRoots.RootID
+
+        let titleMobile = NSLocalizedString("Mobile Bookmarks", tableName: "Storage", comment: "The title of the folder that contains mobile bookmarks. This should match bookmarks.folder.mobile.label on Android.")
+        let titleMenu = NSLocalizedString("Bookmarks Menu", tableName: "Storage", comment: "The name of the folder that contains desktop bookmarks in the menu. This should match bookmarks.folder.menu.label on Android.")
+        let titleToolbar = NSLocalizedString("Bookmarks Toolbar", tableName: "Storage", comment: "The name of the folder that contains desktop bookmarks in the toolbar. This should match bookmarks.folder.toolbar.label on Android.")
+        let titleUnsorted = NSLocalizedString("Unsorted Bookmarks", tableName: "Storage", comment: "The name of the folder that contains unsorted desktop bookmarks. This should match bookmarks.folder.unfiled.label on Android.")
+
+        let args: Args = [
+            root, BookmarkRoots.RootGUID, type, "Root", root,
+            BookmarkRoots.MobileID, BookmarkRoots.MobileFolderGUID, type, titleMobile, root,
+            BookmarkRoots.MenuID, BookmarkRoots.MenuFolderGUID, type, titleMenu, root,
+            BookmarkRoots.ToolbarID, BookmarkRoots.ToolbarFolderGUID, type, titleToolbar, root,
+            BookmarkRoots.UnfiledID, BookmarkRoots.UnfiledFolderGUID, type, titleUnsorted, root,
+        ]
+
+        let sql =
+        "INSERT INTO bookmarks (id, guid, type, url, title, parent) VALUES " +
+            "(?, ?, ?, NULL, ?, ?), " +    // Root
+            "(?, ?, ?, NULL, ?, ?), " +    // Mobile
+            "(?, ?, ?, NULL, ?, ?), " +    // Menu
+            "(?, ?, ?, NULL, ?, ?), " +    // Toolbar
+        "(?, ?, ?, NULL, ?, ?)  "      // Unsorted
+
+        return self.run(db, sql: sql, args: args)
+    }
+
+    func getHistoryTableCreationString() -> String {
+        return "CREATE TABLE IF NOT EXISTS history (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "guid TEXT NOT NULL UNIQUE, " +       // Not null, but the value might be replaced by the server's.
+            "url TEXT UNIQUE, " +                 // May only be null for deleted records.
+            "title TEXT NOT NULL, " +
+            "server_modified INTEGER, " +         // Can be null. Integer milliseconds.
+            "local_modified INTEGER, " +          // Can be null. Client clock. In extremis only.
+            "is_deleted TINYINT NOT NULL, " +     // Boolean. Locally deleted.
+            "should_upload TINYINT NOT NULL, " +  // Boolean. Set when changed or visits added.
+            "domain_id INTEGER REFERENCES \(TableDomains)(id) ON DELETE CASCADE, " +
+            "CONSTRAINT urlOrDeleted CHECK (url IS NOT NULL OR is_deleted = 1)" +
+        ")"
+    }
+
+    func getDomainsTableCreationString() -> String {
+        return "CREATE TABLE IF NOT EXISTS \(TableDomains) (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "domain TEXT NOT NULL UNIQUE, " +
+            "showOnTopSites TINYINT NOT NULL DEFAULT 1" +
+        ")"
+    }
+
+    func getQueueTableCreationString() -> String {
+        return "CREATE TABLE IF NOT EXISTS \(TableQueuedTabs) (" +
+            "url TEXT NOT NULL UNIQUE, " +
+            "title TEXT" +
+        ") "
+    }
+
+    func create(db: SQLiteDBConnection) -> Bool {
+        // Right now we don't need to track per-visit deletions: Sync can't
+        // represent them! See Bug 1157553 Comment 6.
+        // We flip the should_upload flag on the history item when we add a visit.
+        // If we ever want to support logic like not bothering to sync if we added
+        // and then rapidly removed a visit, then we need an 'is_new' flag on each visit.
+        let visits =
+        "CREATE TABLE IF NOT EXISTS \(TableVisits) (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "siteID INTEGER NOT NULL REFERENCES history(id) ON DELETE CASCADE, " +
+            "date REAL NOT NULL, " +           // Microseconds since epoch.
+            "type INTEGER NOT NULL, " +
+            "is_local TINYINT NOT NULL, " +    // Some visits are local. Some are remote ('mirrored'). This boolean flag is the split.
+            "UNIQUE (siteID, date, type) " +
+        ") "
+
+        let indexShouldUpload: String
+        if self.supportsPartialIndices {
+            // There's no point tracking rows that are not flagged for upload.
+            indexShouldUpload =
+                "CREATE INDEX IF NOT EXISTS \(IndexHistoryShouldUpload) " +
+            "ON history (should_upload) WHERE should_upload = 1"
+        } else {
+            indexShouldUpload =
+                "CREATE INDEX IF NOT EXISTS \(IndexHistoryShouldUpload) " +
+            "ON history (should_upload)"
+        }
+
+        let indexSiteIDDate =
+        "CREATE INDEX IF NOT EXISTS \(IndexVisitsSiteIDIsLocalDate) " +
+        "ON \(TableVisits) (siteID, is_local, date)"
+
+        let faviconSites =
+        "CREATE TABLE IF NOT EXISTS \(TableFaviconSites) (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "siteID INTEGER NOT NULL REFERENCES history(id) ON DELETE CASCADE, " +
+            "faviconID INTEGER NOT NULL REFERENCES favicons(id) ON DELETE CASCADE, " +
+            "UNIQUE (siteID, faviconID) " +
+        ") "
+
+        let widestFavicons =
+        "CREATE VIEW IF NOT EXISTS \(ViewWidestFaviconsForSites) AS " +
+            "SELECT " +
+            "\(TableFaviconSites).siteID AS siteID, " +
+            "favicons.id AS iconID, " +
+            "favicons.url AS iconURL, " +
+            "favicons.date AS iconDate, " +
+            "favicons.type AS iconType, " +
+            "MAX(favicons.width) AS iconWidth " +
+            "FROM \(TableFaviconSites), favicons WHERE " +
+            "\(TableFaviconSites).faviconID = favicons.id " +
+        "GROUP BY siteID "
+
+        let historyIDsWithIcon =
+        "CREATE VIEW IF NOT EXISTS \(ViewHistoryIDsWithWidestFavicons) AS " +
+            "SELECT history.id AS id, " +
+            "iconID, iconURL, iconDate, iconType, iconWidth " +
+            "FROM history " +
+            "LEFT OUTER JOIN " +
+        "\(ViewWidestFaviconsForSites) ON history.id = \(ViewWidestFaviconsForSites).siteID "
+
+        let iconForURL =
+        "CREATE VIEW IF NOT EXISTS \(ViewIconForURL) AS " +
+            "SELECT history.url AS url, icons.iconID AS iconID FROM " +
+            "\(TableHistory), \(ViewWidestFaviconsForSites) AS icons WHERE " +
+        "\(TableHistory).id = icons.siteID "
+
+        let bookmarks =
+        "CREATE TABLE IF NOT EXISTS bookmarks (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "guid TEXT NOT NULL UNIQUE, " +
+            "type TINYINT NOT NULL, " +
+            "url TEXT, " +
+            "parent INTEGER REFERENCES bookmarks(id) NOT NULL, " +
+            "faviconID INTEGER REFERENCES favicons(id) ON DELETE SET NULL, " +
+            "title TEXT" +
+        ") "
+
+        let queries = [
+            getDomainsTableCreationString(),
+            getHistoryTableCreationString(),
+            visits, bookmarks, faviconSites,
+            indexShouldUpload, indexSiteIDDate,
+            widestFavicons, historyIDsWithIcon, iconForURL,
+            getQueueTableCreationString(forVersion: version),
+        ]
+
+        log.debug("Creating \(queries.count) tables, views, and indices.")
+
+        return self.run(db, queries: queries.filter({ $0 != nil }).map({ $0! })) &&
+            self.prepopulateRootFolders(db)
+    }
+}
+
+class BrowserTableV8: HistoricalBrowserTable {
+    let version = 8
+
+    func runValidQueries(db: SQLiteDBConnection, queries: [(String?, Args?)]) -> Bool {
+        for (sql, args) in queries {
+            if let sql = sql {
+                if !run(db, sql: sql, args: args) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    func prepopulateRootFolders(db: SQLiteDBConnection) -> Bool {
+        let type = BookmarkNodeType.Folder.rawValue
+        let root = BookmarkRoots.RootID
+
+        let titleMobile = NSLocalizedString("Mobile Bookmarks", tableName: "Storage", comment: "The title of the folder that contains mobile bookmarks. This should match bookmarks.folder.mobile.label on Android.")
+        let titleMenu = NSLocalizedString("Bookmarks Menu", tableName: "Storage", comment: "The name of the folder that contains desktop bookmarks in the menu. This should match bookmarks.folder.menu.label on Android.")
+        let titleToolbar = NSLocalizedString("Bookmarks Toolbar", tableName: "Storage", comment: "The name of the folder that contains desktop bookmarks in the toolbar. This should match bookmarks.folder.toolbar.label on Android.")
+        let titleUnsorted = NSLocalizedString("Unsorted Bookmarks", tableName: "Storage", comment: "The name of the folder that contains unsorted desktop bookmarks. This should match bookmarks.folder.unfiled.label on Android.")
+
+        let args: Args = [
+            root, BookmarkRoots.RootGUID, type, "Root", root,
+            BookmarkRoots.MobileID, BookmarkRoots.MobileFolderGUID, type, titleMobile, root,
+            BookmarkRoots.MenuID, BookmarkRoots.MenuFolderGUID, type, titleMenu, root,
+            BookmarkRoots.ToolbarID, BookmarkRoots.ToolbarFolderGUID, type, titleToolbar, root,
+            BookmarkRoots.UnfiledID, BookmarkRoots.UnfiledFolderGUID, type, titleUnsorted, root,
+        ]
+
+        let sql =
+        "INSERT INTO bookmarks (id, guid, type, url, title, parent) VALUES " +
+            "(?, ?, ?, NULL, ?, ?), " +    // Root
+            "(?, ?, ?, NULL, ?, ?), " +    // Mobile
+            "(?, ?, ?, NULL, ?, ?), " +    // Menu
+            "(?, ?, ?, NULL, ?, ?), " +    // Toolbar
+        "(?, ?, ?, NULL, ?, ?)  "      // Unsorted
+
+        return self.run(db, sql: sql, args: args)
+    }
+
+    func getHistoryTableCreationString() -> String? {
+        return "CREATE TABLE IF NOT EXISTS \(TableHistory) (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "guid TEXT NOT NULL UNIQUE, " +       // Not null, but the value might be replaced by the server's.
+            "url TEXT UNIQUE, " +                 // May only be null for deleted records.
+            "title TEXT NOT NULL, " +
+            "server_modified INTEGER, " +         // Can be null. Integer milliseconds.
+            "local_modified INTEGER, " +          // Can be null. Client clock. In extremis only.
+            "is_deleted TINYINT NOT NULL, " +     // Boolean. Locally deleted.
+            "should_upload TINYINT NOT NULL, " +  // Boolean. Set when changed or visits added.
+            (version > 5 ? "domain_id INTEGER REFERENCES \(TableDomains)(id) ON DELETE CASCADE, " : "") +
+            "CONSTRAINT urlOrDeleted CHECK (url IS NOT NULL OR is_deleted = 1)" +
+        ")"
+    }
+
+    func getDomainsTableCreationString() -> String {
+        return "CREATE TABLE IF NOT EXISTS \(TableDomains) (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "domain TEXT NOT NULL UNIQUE, " +
+            "showOnTopSites TINYINT NOT NULL DEFAULT 1" +
+        ")"
+    }
+
+    func getQueueTableCreationString() -> String {
+        return "CREATE TABLE IF NOT EXISTS \(TableQueuedTabs) (" +
+            "url TEXT NOT NULL UNIQUE, " +
+            "title TEXT" +
+        ") "
+    }
+
+
+    func create(db: SQLiteDBConnection) -> Bool {
+        let favicons =
+        "CREATE TABLE IF NOT EXISTS favicons (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "url TEXT NOT NULL UNIQUE, " +
+            "width INTEGER, " +
+            "height INTEGER, " +
+            "type INTEGER NOT NULL, " +
+            "date REAL NOT NULL" +
+        ") "
+
+        // Right now we don't need to track per-visit deletions: Sync can't
+        // represent them! See Bug 1157553 Comment 6.
+        // We flip the should_upload flag on the history item when we add a visit.
+        // If we ever want to support logic like not bothering to sync if we added
+        // and then rapidly removed a visit, then we need an 'is_new' flag on each visit.
+        let visits =
+        "CREATE TABLE IF NOT EXISTS visits (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "siteID INTEGER NOT NULL REFERENCES history(id) ON DELETE CASCADE, " +
+            "date REAL NOT NULL, " +           // Microseconds since epoch.
+            "type INTEGER NOT NULL, " +
+            "is_local TINYINT NOT NULL, " +    // Some visits are local. Some are remote ('mirrored'). This boolean flag is the split.
+            "UNIQUE (siteID, date, type) " +
+        ") "
+
+        let indexShouldUpload: String
+        if self.supportsPartialIndices {
+            // There's no point tracking rows that are not flagged for upload.
+            indexShouldUpload =
+                "CREATE INDEX IF NOT EXISTS \(IndexHistoryShouldUpload) " +
+            "ON \(TableHistory) (should_upload) WHERE should_upload = 1"
+        } else {
+            indexShouldUpload =
+                "CREATE INDEX IF NOT EXISTS \(IndexHistoryShouldUpload) " +
+            "ON \(TableHistory) (should_upload)"
+        }
+
+        let indexSiteIDDate =
+        "CREATE INDEX IF NOT EXISTS \(IndexVisitsSiteIDIsLocalDate) " +
+        "ON \(TableVisits) (siteID, is_local, date)"
+
+        let faviconSites =
+        "CREATE TABLE IF NOT EXISTS \(TableFaviconSites) (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "siteID INTEGER NOT NULL REFERENCES history(id) ON DELETE CASCADE, " +
+            "faviconID INTEGER NOT NULL REFERENCES favicons(id) ON DELETE CASCADE, " +
+            "UNIQUE (siteID, faviconID) " +
+        ") "
+
+        let widestFavicons =
+        "CREATE VIEW IF NOT EXISTS \(ViewWidestFaviconsForSites) AS " +
+            "SELECT " +
+            "\(TableFaviconSites).siteID AS siteID, " +
+            "favicons.id AS iconID, " +
+            "favicons.url AS iconURL, " +
+            "favicons.date AS iconDate, " +
+            "favicons.type AS iconType, " +
+            "MAX(favicons.width) AS iconWidth " +
+            "FROM \(TableFaviconSites), favicons WHERE " +
+            "\(TableFaviconSites).faviconID = favicons.id " +
+        "GROUP BY siteID "
+
+        let historyIDsWithIcon =
+        "CREATE VIEW IF NOT EXISTS \(ViewHistoryIDsWithWidestFavicons) AS " +
+            "SELECT history.id AS id, " +
+            "iconID, iconURL, iconDate, iconType, iconWidth " +
+            "FROM history " +
+            "LEFT OUTER JOIN " +
+        "\(ViewWidestFaviconsForSites) ON history.id = \(ViewWidestFaviconsForSites).siteID "
+
+        let iconForURL =
+        "CREATE VIEW IF NOT EXISTS \(ViewIconForURL) AS " +
+            "SELECT history.url AS url, icons.iconID AS iconID FROM " +
+            "history, \(ViewWidestFaviconsForSites) AS icons WHERE " +
+        "history.id = icons.siteID "
+
+        let bookmarks =
+        "CREATE TABLE IF NOT EXISTS bookmarks (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "guid TEXT NOT NULL UNIQUE, " +
+            "type TINYINT NOT NULL, " +
+            "url TEXT, " +
+            "parent INTEGER REFERENCES bookmarks(id) NOT NULL, " +
+            "faviconID INTEGER REFERENCES favicons(id) ON DELETE SET NULL, " +
+            "title TEXT" +
+        ") "
+
+        let queries: [(String?, Args?)] = [
+            (getDomainsTableCreationString(), nil),
+            (getHistoryTableCreationString(), nil),
+            (favicons, nil),
+            (visits, nil),
+            (bookmarks, nil),
+            (faviconSites, nil),
+            (indexShouldUpload, nil),
+            (indexSiteIDDate, nil),
+            (widestFavicons, nil),
+            (historyIDsWithIcon, nil),
+            (iconForURL, nil),
+            (getQueueTableCreationString(forVersion: version), nil)
+        ]
+
+        return self.runValidQueries(db, queries: queries) &&
+            self.prepopulateRootFolders(db)
+    }
+}
+
+class BrowserTableV10: HistoricalBrowserTable {
+    let version = 10
+
+    func runValidQueries(db: SQLiteDBConnection, queries: [(String?, Args?)]) -> Bool {
+        for (sql, args) in queries {
+            if let sql = sql {
+                if !run(db, sql: sql, args: args) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    func prepopulateRootFolders(db: SQLiteDBConnection) -> Bool {
+        let type = BookmarkNodeType.Folder.rawValue
+        let root = BookmarkRoots.RootID
+
+        let titleMobile = NSLocalizedString("Mobile Bookmarks", tableName: "Storage", comment: "The title of the folder that contains mobile bookmarks. This should match bookmarks.folder.mobile.label on Android.")
+        let titleMenu = NSLocalizedString("Bookmarks Menu", tableName: "Storage", comment: "The name of the folder that contains desktop bookmarks in the menu. This should match bookmarks.folder.menu.label on Android.")
+        let titleToolbar = NSLocalizedString("Bookmarks Toolbar", tableName: "Storage", comment: "The name of the folder that contains desktop bookmarks in the toolbar. This should match bookmarks.folder.toolbar.label on Android.")
+        let titleUnsorted = NSLocalizedString("Unsorted Bookmarks", tableName: "Storage", comment: "The name of the folder that contains unsorted desktop bookmarks. This should match bookmarks.folder.unfiled.label on Android.")
+
+        let args: Args = [
+            root, BookmarkRoots.RootGUID, type, "Root", root,
+            BookmarkRoots.MobileID, BookmarkRoots.MobileFolderGUID, type, titleMobile, root,
+            BookmarkRoots.MenuID, BookmarkRoots.MenuFolderGUID, type, titleMenu, root,
+            BookmarkRoots.ToolbarID, BookmarkRoots.ToolbarFolderGUID, type, titleToolbar, root,
+            BookmarkRoots.UnfiledID, BookmarkRoots.UnfiledFolderGUID, type, titleUnsorted, root,
+        ]
+
+        let sql =
+        "INSERT INTO bookmarks (id, guid, type, url, title, parent) VALUES " +
+            "(?, ?, ?, NULL, ?, ?), " +    // Root
+            "(?, ?, ?, NULL, ?, ?), " +    // Mobile
+            "(?, ?, ?, NULL, ?, ?), " +    // Menu
+            "(?, ?, ?, NULL, ?, ?), " +    // Toolbar
+        "(?, ?, ?, NULL, ?, ?)  "      // Unsorted
+
+        return self.run(db, sql: sql, args: args)
+    }
+
+    func getHistoryTableCreationString(forVersion version: Int = BrowserTable.DefaultVersion) -> String? {
+        return "CREATE TABLE IF NOT EXISTS history (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "guid TEXT NOT NULL UNIQUE, " +       // Not null, but the value might be replaced by the server's.
+            "url TEXT UNIQUE, " +                 // May only be null for deleted records.
+            "title TEXT NOT NULL, " +
+            "server_modified INTEGER, " +         // Can be null. Integer milliseconds.
+            "local_modified INTEGER, " +          // Can be null. Client clock. In extremis only.
+            "is_deleted TINYINT NOT NULL, " +     // Boolean. Locally deleted.
+            "should_upload TINYINT NOT NULL, " +  // Boolean. Set when changed or visits added.
+            "domain_id INTEGER REFERENCES \(TableDomains)(id) ON DELETE CASCADE, " +
+            "CONSTRAINT urlOrDeleted CHECK (url IS NOT NULL OR is_deleted = 1)" +
+        ")"
+    }
+
+    func getDomainsTableCreationString() -> String {
+        return "CREATE TABLE IF NOT EXISTS \(TableDomains) (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "domain TEXT NOT NULL UNIQUE, " +
+            "showOnTopSites TINYINT NOT NULL DEFAULT 1" +
+        ")"
+    }
+
+    func getQueueTableCreationString() -> String {
+        return "CREATE TABLE IF NOT EXISTS \(TableQueuedTabs) (" +
+            "url TEXT NOT NULL UNIQUE, " +
+            "title TEXT" +
+        ") "
+    }
+
+    func getBookmarksMirrorTableCreationString() -> String {
+        // The stupid absence of naming conventions here is thanks to pre-Sync Weave. Sorry.
+        // For now we have the simplest possible schema: everything in one.
+        let sql =
+        "CREATE TABLE IF NOT EXISTS \(TableBookmarksMirror) " +
+
+            // Shared fields.
+            "( id INTEGER PRIMARY KEY AUTOINCREMENT" +
+            ", guid TEXT NOT NULL UNIQUE" +
+            ", type TINYINT NOT NULL" +                    // Type enum. TODO: BookmarkNodeType needs to be extended.
+
+            // Record/envelope metadata that'll allow us to do merges.
+            ", server_modified INTEGER NOT NULL" +         // Milliseconds.
+            ", is_deleted TINYINT NOT NULL DEFAULT 0" +    // Boolean
+
+            ", hasDupe TINYINT NOT NULL DEFAULT 0" +       // Boolean, 0 (false) if deleted.
+            ", parentid TEXT" +                            // GUID
+            ", parentName TEXT" +
+
+            // Type-specific fields. These should be NOT NULL in many cases, but we're going
+            // for a sparse schema, so this'll do for now. Enforce these in the application code.
+            ", feedUri TEXT, siteUri TEXT" +               // LIVEMARKS
+            ", pos INT" +                                  // SEPARATORS
+            ", title TEXT, description TEXT" +             // FOLDERS, BOOKMARKS, QUERIES
+            ", bmkUri TEXT, tags TEXT, keyword TEXT" +     // BOOKMARKS, QUERIES
+            ", folderName TEXT, queryId TEXT" +            // QUERIES
+            ", CONSTRAINT parentidOrDeleted CHECK (parentid IS NOT NULL OR is_deleted = 1)" +
+            ", CONSTRAINT parentNameOrDeleted CHECK (parentName IS NOT NULL OR is_deleted = 1)" +
+        ")"
+
+        return sql
+    }
+
+    /**
+     * We need to explicitly store what's provided by the server, because we can't rely on
+     * referenced child nodes to exist yet!
+     */
+    func getBookmarksMirrorStructureTableCreationString() -> String? {
+        let sql =
+        "CREATE TABLE IF NOT EXISTS \(TableBookmarksMirrorStructure) " +
+            "( parent TEXT NOT NULL REFERENCES \(TableBookmarksMirror)(guid) ON DELETE CASCADE" +
+            ", child TEXT NOT NULL" +      // Should be the GUID of a child.
+            ", idx INTEGER NOT NULL" +     // Should advance from 0.
+        ")"
+
+        return sql
+    }
+
+    func create(db: SQLiteDBConnection) -> Bool {
+        let favicons =
+        "CREATE TABLE IF NOT EXISTS favicons (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "url TEXT NOT NULL UNIQUE, " +
+            "width INTEGER, " +
+            "height INTEGER, " +
+            "type INTEGER NOT NULL, " +
+            "date REAL NOT NULL" +
+        ") "
+
+        // Right now we don't need to track per-visit deletions: Sync can't
+        // represent them! See Bug 1157553 Comment 6.
+        // We flip the should_upload flag on the history item when we add a visit.
+        // If we ever want to support logic like not bothering to sync if we added
+        // and then rapidly removed a visit, then we need an 'is_new' flag on each visit.
+        let visits =
+        "CREATE TABLE IF NOT EXISTS visits (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "siteID INTEGER NOT NULL REFERENCES history(id) ON DELETE CASCADE, " +
+            "date REAL NOT NULL, " +           // Microseconds since epoch.
+            "type INTEGER NOT NULL, " +
+            "is_local TINYINT NOT NULL, " +    // Some visits are local. Some are remote ('mirrored'). This boolean flag is the split.
+            "UNIQUE (siteID, date, type) " +
+        ") "
+
+        let indexShouldUpload: String
+        if self.supportsPartialIndices {
+            // There's no point tracking rows that are not flagged for upload.
+            indexShouldUpload =
+                "CREATE INDEX IF NOT EXISTS \(IndexHistoryShouldUpload) " +
+            "ON history (should_upload) WHERE should_upload = 1"
+        } else {
+            indexShouldUpload =
+                "CREATE INDEX IF NOT EXISTS \(IndexHistoryShouldUpload) " +
+            "ON history (should_upload)"
+        }
+
+        let indexSiteIDDate =
+        "CREATE INDEX IF NOT EXISTS \(IndexVisitsSiteIDIsLocalDate) " +
+        "ON visits (siteID, is_local, date)"
+
+        let faviconSites =
+        "CREATE TABLE IF NOT EXISTS \(TableFaviconSites) (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "siteID INTEGER NOT NULL REFERENCES history(id) ON DELETE CASCADE, " +
+            "faviconID INTEGER NOT NULL REFERENCES favicons(id) ON DELETE CASCADE, " +
+            "UNIQUE (siteID, faviconID) " +
+        ") "
+
+        let widestFavicons =
+        "CREATE VIEW IF NOT EXISTS \(ViewWidestFaviconsForSites) AS " +
+            "SELECT " +
+            "\(TableFaviconSites).siteID AS siteID, " +
+            "favicons.id AS iconID, " +
+            "favicons.url AS iconURL, " +
+            "favicons.date AS iconDate, " +
+            "favicons.type AS iconType, " +
+            "MAX(favicons.width) AS iconWidth " +
+            "FROM \(TableFaviconSites), favicons WHERE " +
+            "\(TableFaviconSites).faviconID = favicons.id " +
+        "GROUP BY siteID "
+
+        let historyIDsWithIcon =
+        "CREATE VIEW IF NOT EXISTS \(ViewHistoryIDsWithWidestFavicons) AS " +
+            "SELECT history.id AS id, " +
+            "iconID, iconURL, iconDate, iconType, iconWidth " +
+            "FROM history " +
+            "LEFT OUTER JOIN " +
+        "\(ViewWidestFaviconsForSites) ON history.id = \(ViewWidestFaviconsForSites).siteID "
+
+        let iconForURL =
+        "CREATE VIEW IF NOT EXISTS \(ViewIconForURL) AS " +
+            "SELECT history.url AS url, icons.iconID AS iconID FROM " +
+            "history, \(ViewWidestFaviconsForSites) AS icons WHERE " +
+        "history.id = icons.siteID "
+
+        let bookmarks =
+        "CREATE TABLE IF NOT EXISTS bookmarks (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "guid TEXT NOT NULL UNIQUE, " +
+            "type TINYINT NOT NULL, " +
+            "url TEXT, " +
+            "parent INTEGER REFERENCES bookmarks(id) NOT NULL, " +
+            "faviconID INTEGER REFERENCES favicons(id) ON DELETE SET NULL, " +
+            "title TEXT" +
+        ") "
+
+        let bookmarksMirror = getBookmarksMirrorTableCreationString()
+        let bookmarksMirrorStructure = getBookmarksMirrorStructureTableCreationString()
+
+        let indexStructureParentIdx = "CREATE INDEX IF NOT EXISTS \(IndexBookmarksMirrorStructureParentIdx) " +
+        "ON \(TableBookmarksMirrorStructure) (parent, idx)"
+
+        let queries: [(String?, Args?)] = [
+            (getDomainsTableCreationString(), nil),
+            (getHistoryTableCreationString(), nil),
+            (favicons, nil),
+            (visits, nil),
+            (bookmarks, nil),
+            (bookmarksMirror, nil),
+            (bookmarksMirrorStructure, nil),
+            (indexStructureParentIdx, nil),
+            (faviconSites, nil),
+            (indexShouldUpload, nil),
+            (indexSiteIDDate, nil),
+            (widestFavicons, nil),
+            (historyIDsWithIcon, nil),
+            (iconForURL, nil),
+            (getQueueTableCreationString(), nil)
+        ]
+
+        return self.runValidQueries(db, queries: queries) &&
+            self.prepopulateRootFolders(db)
+    }
+}
+
 class TestSQLiteHistory: XCTestCase {
     // Test that our visit partitioning for frecency is correct.
     func testHistoryLocalAndRemoteVisits() {
