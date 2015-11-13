@@ -12,7 +12,11 @@ extension Site {
     }
 }
 
-class HistoricalBrowserTable {
+protocol HistoricalBrowserTable {
+    func create(db: SQLiteDBConnection) -> Bool
+}
+
+class BaseHistoricalBrowserTable {
     var supportsPartialIndices: Bool {
         let v = sqlite3_libversion_number()
         return v >= 3008000          // 3.8.0.
@@ -36,6 +40,15 @@ class HistoricalBrowserTable {
         }
         return true
     }
+
+    func run(db: SQLiteDBConnection, queries: [String]) -> Bool {
+        for sql in queries {
+            if !run(db, sql: sql) {
+                return false
+            }
+        }
+        return true
+    }
 }
 
 // Versions of BrowserTable that we care about:
@@ -50,7 +63,7 @@ class HistoricalBrowserTable {
 //
 // These tests snapshot the table creation code at each of these points.
 
-class BrowserTableV6: HistoricalBrowserTable {
+class BrowserTableV6: BaseHistoricalBrowserTable {
     let version = 6
 
     func prepopulateRootFolders(db: SQLiteDBConnection) -> Bool {
@@ -110,7 +123,9 @@ class BrowserTableV6: HistoricalBrowserTable {
             "title TEXT" +
         ") "
     }
+}
 
+extension BrowserTableV6: HistoricalBrowserTable {
     func create(db: SQLiteDBConnection) -> Bool {
         let visits =
         "CREATE TABLE IF NOT EXISTS \(TableVisits) (" +
@@ -193,13 +208,12 @@ class BrowserTableV6: HistoricalBrowserTable {
             CreateQueueTable(),
         ]
 
-        log.debug("Creating \(queries.count) tables, views, and indices.")
         return self.run(db, queries: queries) &&
-            self.prepopulateRootFolders(db)
+               self.prepopulateRootFolders(db)
     }
 }
 
-class BrowserTableV7: HistoricalBrowserTable {
+class BrowserTableV7: BaseHistoricalBrowserTable {
     let version = 7
 
     func prepopulateRootFolders(db: SQLiteDBConnection) -> Bool {
@@ -259,7 +273,9 @@ class BrowserTableV7: HistoricalBrowserTable {
             "title TEXT" +
         ") "
     }
+}
 
+extension BrowserTableV7: HistoricalBrowserTable {
     func create(db: SQLiteDBConnection) -> Bool {
         // Right now we don't need to track per-visit deletions: Sync can't
         // represent them! See Bug 1157553 Comment 6.
@@ -344,29 +360,16 @@ class BrowserTableV7: HistoricalBrowserTable {
             visits, bookmarks, faviconSites,
             indexShouldUpload, indexSiteIDDate,
             widestFavicons, historyIDsWithIcon, iconForURL,
-            getQueueTableCreationString(forVersion: version),
+            getQueueTableCreationString(),
         ]
 
-        log.debug("Creating \(queries.count) tables, views, and indices.")
-
-        return self.run(db, queries: queries.filter({ $0 != nil }).map({ $0! })) &&
-            self.prepopulateRootFolders(db)
+        return self.run(db, queries: queries) &&
+               self.prepopulateRootFolders(db)
     }
 }
 
-class BrowserTableV8: HistoricalBrowserTable {
+class BrowserTableV8: BaseHistoricalBrowserTable {
     let version = 8
-
-    func runValidQueries(db: SQLiteDBConnection, queries: [(String?, Args?)]) -> Bool {
-        for (sql, args) in queries {
-            if let sql = sql {
-                if !run(db, sql: sql, args: args) {
-                    return false
-                }
-            }
-        }
-        return true
-    }
 
     func prepopulateRootFolders(db: SQLiteDBConnection) -> Bool {
         let type = BookmarkNodeType.Folder.rawValue
@@ -396,7 +399,7 @@ class BrowserTableV8: HistoricalBrowserTable {
         return self.run(db, sql: sql, args: args)
     }
 
-    func getHistoryTableCreationString() -> String? {
+    func getHistoryTableCreationString() -> String {
         return "CREATE TABLE IF NOT EXISTS \(TableHistory) (" +
             "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
             "guid TEXT NOT NULL UNIQUE, " +       // Not null, but the value might be replaced by the server's.
@@ -425,8 +428,9 @@ class BrowserTableV8: HistoricalBrowserTable {
             "title TEXT" +
         ") "
     }
+}
 
-
+extension BrowserTableV8: HistoricalBrowserTable {
     func create(db: SQLiteDBConnection) -> Bool {
         let favicons =
         "CREATE TABLE IF NOT EXISTS favicons (" +
@@ -515,39 +519,28 @@ class BrowserTableV8: HistoricalBrowserTable {
             "title TEXT" +
         ") "
 
-        let queries: [(String?, Args?)] = [
-            (getDomainsTableCreationString(), nil),
-            (getHistoryTableCreationString(), nil),
-            (favicons, nil),
-            (visits, nil),
-            (bookmarks, nil),
-            (faviconSites, nil),
-            (indexShouldUpload, nil),
-            (indexSiteIDDate, nil),
-            (widestFavicons, nil),
-            (historyIDsWithIcon, nil),
-            (iconForURL, nil),
-            (getQueueTableCreationString(forVersion: version), nil)
+        let queries: [String] = [
+            getDomainsTableCreationString(),
+            getHistoryTableCreationString(),
+            favicons,
+            visits,
+            bookmarks,
+            faviconSites,
+            indexShouldUpload,
+            indexSiteIDDate,
+            widestFavicons,
+            historyIDsWithIcon,
+            iconForURL,
+            getQueueTableCreationString(),
         ]
 
-        return self.runValidQueries(db, queries: queries) &&
-            self.prepopulateRootFolders(db)
+        return self.run(db, queries: queries) &&
+               self.prepopulateRootFolders(db)
     }
 }
 
-class BrowserTableV10: HistoricalBrowserTable {
+class BrowserTableV10: BaseHistoricalBrowserTable {
     let version = 10
-
-    func runValidQueries(db: SQLiteDBConnection, queries: [(String?, Args?)]) -> Bool {
-        for (sql, args) in queries {
-            if let sql = sql {
-                if !run(db, sql: sql, args: args) {
-                    return false
-                }
-            }
-        }
-        return true
-    }
 
     func prepopulateRootFolders(db: SQLiteDBConnection) -> Bool {
         let type = BookmarkNodeType.Folder.rawValue
@@ -577,7 +570,7 @@ class BrowserTableV10: HistoricalBrowserTable {
         return self.run(db, sql: sql, args: args)
     }
 
-    func getHistoryTableCreationString(forVersion version: Int = BrowserTable.DefaultVersion) -> String? {
+    func getHistoryTableCreationString(forVersion version: Int = BrowserTable.DefaultVersion) -> String {
         return "CREATE TABLE IF NOT EXISTS history (" +
             "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
             "guid TEXT NOT NULL UNIQUE, " +       // Not null, but the value might be replaced by the server's.
@@ -644,17 +637,17 @@ class BrowserTableV10: HistoricalBrowserTable {
      * We need to explicitly store what's provided by the server, because we can't rely on
      * referenced child nodes to exist yet!
      */
-    func getBookmarksMirrorStructureTableCreationString() -> String? {
-        let sql =
+    func getBookmarksMirrorStructureTableCreationString() -> String {
+        return
         "CREATE TABLE IF NOT EXISTS \(TableBookmarksMirrorStructure) " +
             "( parent TEXT NOT NULL REFERENCES \(TableBookmarksMirror)(guid) ON DELETE CASCADE" +
             ", child TEXT NOT NULL" +      // Should be the GUID of a child.
             ", idx INTEGER NOT NULL" +     // Should advance from 0.
         ")"
-
-        return sql
     }
+}
 
+extension BrowserTableV10: HistoricalBrowserTable
     func create(db: SQLiteDBConnection) -> Bool {
         let favicons =
         "CREATE TABLE IF NOT EXISTS favicons (" +
@@ -749,26 +742,26 @@ class BrowserTableV10: HistoricalBrowserTable {
         let indexStructureParentIdx = "CREATE INDEX IF NOT EXISTS \(IndexBookmarksMirrorStructureParentIdx) " +
         "ON \(TableBookmarksMirrorStructure) (parent, idx)"
 
-        let queries: [(String?, Args?)] = [
-            (getDomainsTableCreationString(), nil),
-            (getHistoryTableCreationString(), nil),
-            (favicons, nil),
-            (visits, nil),
-            (bookmarks, nil),
-            (bookmarksMirror, nil),
-            (bookmarksMirrorStructure, nil),
-            (indexStructureParentIdx, nil),
-            (faviconSites, nil),
-            (indexShouldUpload, nil),
-            (indexSiteIDDate, nil),
-            (widestFavicons, nil),
-            (historyIDsWithIcon, nil),
-            (iconForURL, nil),
-            (getQueueTableCreationString(), nil)
+        let queries: [String] = [
+            getDomainsTableCreationString(),
+            getHistoryTableCreationString(),
+            favicons,
+            visits,
+            bookmarks,
+            bookmarksMirror,
+            bookmarksMirrorStructure,
+            indexStructureParentIdx,
+            faviconSites,
+            indexShouldUpload,
+            indexSiteIDDate,
+            widestFavicons,
+            historyIDsWithIcon,
+            iconForURL,
+            getQueueTableCreationString(),
         ]
 
-        return self.runValidQueries(db, queries: queries) &&
-            self.prepopulateRootFolders(db)
+        return self.run(db, queries: queries) &&
+               self.prepopulateRootFolders(db)
     }
 }
 
