@@ -97,7 +97,7 @@ class TestSchemaTable: XCTestCase {
             return err == nil
         }
 
-        func create(db: SQLiteDBConnection, version: Int) -> Bool {
+        func create(db: SQLiteDBConnection) -> Bool {
             // BrowserDB uses a different query to determine if a table exists, so we need to ensure it actually happens
             db.executeChange("CREATE TABLE IF NOT EXISTS \(name) (ID INTEGER PRIMARY KEY AUTOINCREMENT)")
             return createCallback()
