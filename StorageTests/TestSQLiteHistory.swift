@@ -553,6 +553,7 @@ extension BrowserTableV8: SectionCreator, TableInfo {
 }
 
 class BrowserTableV10: BaseHistoricalBrowserTable {
+    var name: String { return "BROWSER" }
     var version: Int { return 10 }
 
     func prepopulateRootFolders(db: SQLiteDBConnection) -> Bool {
