@@ -18,6 +18,16 @@ class BaseHistoricalBrowserTable {
         return v >= 3008000          // 3.8.0.
     }
 
+    let oldFaviconsSQL =
+        "CREATE TABLE IF NOT EXISTS favicons (" +
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+        "url TEXT NOT NULL UNIQUE, " +
+        "width INTEGER, " +
+        "height INTEGER, " +
+        "type INTEGER NOT NULL, " +
+        "date REAL NOT NULL" +
+        ") "
+
     func run(db: SQLiteDBConnection, sql: String?, args: Args? = nil) -> Bool {
         if let sql = sql {
             let err = db.executeChange(sql, withArgs: args)
@@ -197,6 +207,8 @@ extension BrowserTableV6: SectionCreator, TableInfo {
         ") "
 
         let queries = [
+            // This used to be done by FaviconsTable.
+            self.oldFaviconsSQL,
             CreateDomainsTable(),
             CreateHistoryTable(),
             visits, bookmarks, faviconSites,
@@ -353,6 +365,8 @@ extension BrowserTableV7: SectionCreator, TableInfo {
         ") "
 
         let queries = [
+            // This used to be done by FaviconsTable.
+            self.oldFaviconsSQL,
             getDomainsTableCreationString(),
             getHistoryTableCreationString(),
             visits, bookmarks, faviconSites,
