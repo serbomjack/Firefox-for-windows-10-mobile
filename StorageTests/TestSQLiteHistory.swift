@@ -779,9 +779,18 @@ extension BrowserTableV10: SectionCreator, TableInfo {
 }
 
 class TestSQLiteHistory: XCTestCase {
+    let files = MockFiles()
+
+    override func tearDown() {
+        for v in ["6", "7", "8", "10", "6-data"] {
+            do { try
+                files.remove("browser-v\(v).db")
+            } catch {}
+        }
+    }
+
     // Test that our visit partitioning for frecency is correct.
     func testHistoryLocalAndRemoteVisits() {
-        let files = MockFiles()
         let db = BrowserDB(filename: "browser.db", files: files)
         let prefs = MockProfilePrefs()
         let history = SQLiteHistory(db: db, prefs: prefs)!
@@ -851,73 +860,74 @@ class TestSQLiteHistory: XCTestCase {
     }
 
     func testUpgrades() {
-        let files = MockFiles()
-
         let sources: [(Int, SectionCreator)] = [
             (6, BrowserTableV6()),
             (7, BrowserTableV7()),
             (8, BrowserTableV8()),
             (10, BrowserTableV10()),
         ]
+
         let destination = BrowserTable()
 
         for (version, table) in sources {
             let db = BrowserDB(filename: "browser-v\(version).db", files: files)
-            //db.createOrUpdate([table])
-            //XCTAssertTrue(table.create(db))
+            XCTAssertTrue(
+                db.runWithConnection { (conn, err) in
+                    XCTAssertTrue(table.create(conn), "Creating browser table version \(version)")
 
-            // And we can upgrade to the current version.
-            //db.
+                    // And we can upgrade to the current version.
+                    XCTAssertTrue(destination.updateTable(conn, from: table.version), "Upgrading browser table from version \(version)")
+                }.value.isSuccess
+            )
+            db.close()
         }
+    }
 
-        let db = BrowserDB(filename: "browser.db", files: files)
+    override func setUp() {
+        self.tearDown()
+    }
 
-        // This calls createOrUpdate. i.e. it may fail, but should not crash and should always return a valid SQLiteHistory object.
+    func testUpgradesWithData() {
+        let db = BrowserDB(filename: "browserdb-v6-data.db", files: files)
+
+        // v6.
+        XCTAssertTrue(
+            db.runWithConnection { (conn, err) in
+                let version = 6
+                let table = BrowserTableV6()
+                XCTAssertTrue(table.create(conn), "Creating browser table version \(version)")
+            }.value.isSuccess
+        )
+
+        // Insert some data.
+        let queries = [
+            "INSERT INTO history (guid, url, title, server_modified, local_modified, is_deleted, should_upload) VALUES ('guid', 'http://www.example.com', 'title', 5, 10, 0, 1)",
+            "INSERT INTO visits (siteID, date, type, is_local) VALUES (1, 15, 1, 1)",
+            "INSERT INTO favicons (url, width, height, type, date) VALUES ('http://www.example.com/favicon.ico', 10, 10, 1, 20)",
+            "INSERT INTO faviconSites (siteID, faviconID) VALUES (1, 1)",
+            "INSERT INTO bookmarks (guid, type, url, parent, faviconID, title) VALUES (guid, 1, 'http://www.example.com', 0, 1, 'title')"
+        ]
+
+        XCTAssertTrue(db.run(queries).value.isSuccess)
+
+        // And we can upgrade to the current version.
+        XCTAssertTrue(
+            db.runWithConnection { (conn, err) in
+                BrowserTable().updateTable(conn, from: 6)
+            }.value.isSuccess,
+            "Upgrading browser table from version 6"
+        )
+
         let prefs = MockProfilePrefs()
-        let history = SQLiteHistory(db: db, prefs: prefs)!
-        XCTAssertNotNil(history)
+        let history = SQLiteHistory(db: db, prefs: prefs)
+        let results = history?.getSitesByLastVisit(10).value.successValue
+        XCTAssertNotNil(results)
+        XCTAssertEqual(results![0]?.url, "http://www.example.com")
 
-        /*
-        // Insert some basic data that we'll have to upgrade
-        let expectation = self.expectationWithDescription("First.")
-        db.run([("INSERT INTO history (guid, url, title, server_modified, local_modified, is_deleted, should_upload) VALUES (guid, http://www.example.com, title, 5, 10, 0, 1)", nil),
-                ("INSERT INTO visits (siteID, date, type, is_local) VALUES (1, 15, 1, 1)", nil),
-                ("INSERT INTO favicons (url, width, height, type, date) VALUES (http://www.example.com/favicon.ico, 10, 10, 1, 20)", nil),
-                ("INSERT INTO faviconSites (siteID, faviconID) VALUES (1, 1)", nil),
-                ("INSERT INTO bookmarks (guid, type, url, parent, faviconID, title) VALUES (guid, 1, http://www.example.com, 0, 1, title)", nil)
-        ]).upon { result in
-            for i in 1...BrowserTable.DefaultVersion {
-                let history = SQLiteHistory(db: db, prefs: prefs, version: i)
-                XCTAssertNotNil(history)
-            }
-
-            // This checks to make sure updates actually work (or at least that they don't crash :))
-            var err: NSError? = nil
-            db.transaction(&err, callback: { (connection, err) -> Bool in
-                for i in 0...BrowserTable.DefaultVersion {
-                    let table = BrowserTable(version: i)
-                    switch db.updateTable(connection, table: table) {
-                    case .Updated:
-                        XCTAssertTrue(true, "Update to \(i) succeeded")
-                    default:
-                        XCTFail("Update to version \(i) failed")
-                        return false
-                    }
-                }
-                return true
-            })
-
-            if err != nil {
-                XCTFail("Error creating a transaction \(err)")
-            }
-            expectation.fulfill()
-        }
-        waitForExpectationsWithTimeout(10, handler: nil)
-*/
+        db.close()
     }
 
     func testDomainUpgrade() {
-        let files = MockFiles()
         let db = BrowserDB(filename: "browser.db", files: files)
         let prefs = MockProfilePrefs()
         let history = SQLiteHistory(db: db, prefs: prefs)!
@@ -947,7 +957,6 @@ class TestSQLiteHistory: XCTestCase {
     }
 
     func testDomains() {
-        let files = MockFiles()
         let db = BrowserDB(filename: "browser.db", files: files)
         let prefs = MockProfilePrefs()
         let history = SQLiteHistory(db: db, prefs: prefs)!
@@ -987,7 +996,6 @@ class TestSQLiteHistory: XCTestCase {
     // This is a very basic test. Adds an entry, retrieves it, updates it,
     // and then clears the database.
     func testHistoryTable() {
-        let files = MockFiles()
         let db = BrowserDB(filename: "browser.db", files: files)
         let prefs = MockProfilePrefs()
         let history = SQLiteHistory(db: db, prefs: prefs)!
@@ -1124,7 +1132,6 @@ class TestSQLiteHistory: XCTestCase {
     }
 
     func testFaviconTable() {
-        let files = MockFiles()
         let db = BrowserDB(filename: "browser.db", files: files)
         let prefs = MockProfilePrefs()
         let history = SQLiteHistory(db: db, prefs: prefs)!
@@ -1188,7 +1195,6 @@ class TestSQLiteHistory: XCTestCase {
     }
 
     func testTopSitesCache() {
-        let files = MockFiles()
         let db = BrowserDB(filename: "browser.db", files: files)
         let prefs = MockProfilePrefs()
         let history = SQLiteHistory(db: db, prefs: prefs)!
