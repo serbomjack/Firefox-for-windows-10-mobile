@@ -111,7 +111,7 @@ class BrowserTableV6: BaseHistoricalBrowserTable {
             "local_modified INTEGER, " +          // Can be null. Client clock. In extremis only.
             "is_deleted TINYINT NOT NULL, " +     // Boolean. Locally deleted.
             "should_upload TINYINT NOT NULL, " +  // Boolean. Set when changed or visits added.
-            (version > 5 ? "domainId INTEGER REFERENCES \(TableDomains)(id) ON DELETE CASCADE, " : "") +
+            "domainId INTEGER REFERENCES \(TableDomains)(id) ON DELETE CASCADE, " +
             "CONSTRAINT urlOrDeleted CHECK (url IS NOT NULL OR is_deleted = 1)" +
         ")"
     }
@@ -422,7 +422,7 @@ class BrowserTableV8: BaseHistoricalBrowserTable {
             "local_modified INTEGER, " +          // Can be null. Client clock. In extremis only.
             "is_deleted TINYINT NOT NULL, " +     // Boolean. Locally deleted.
             "should_upload TINYINT NOT NULL, " +  // Boolean. Set when changed or visits added.
-            (version > 5 ? "domain_id INTEGER REFERENCES \(TableDomains)(id) ON DELETE CASCADE, " : "") +
+            "domain_id INTEGER REFERENCES \(TableDomains)(id) ON DELETE CASCADE, " +
             "CONSTRAINT urlOrDeleted CHECK (url IS NOT NULL OR is_deleted = 1)" +
         ")"
     }
