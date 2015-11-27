@@ -14,13 +14,14 @@ private struct LoginListUX {
 
 class LoginListViewController: UIViewController {
 
-    private var loginDataSource: LoginCursorDataSource? = nil
+    private var loginDataSource: LoginCursorDataSource?
+
+    private var loginSearchController: LoginSearchController?
 
     private let profile: Profile
 
-    private let searchView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor.redColor()
+    private lazy var searchView: SearchInputView = {
+        let view = SearchInputView()
         return view
     }()
 
@@ -45,6 +46,7 @@ class LoginListViewController: UIViewController {
 
         self.title = NSLocalizedString("Logins", comment: "Title for Logins List View screen")
         loginDataSource = LoginCursorDataSource(tableView: self.tableView)
+        loginSearchController = LoginSearchController(profile: self.profile, dataSource: loginDataSource!)
 
         view.addSubview(searchView)
         view.addSubview(tableView)
@@ -81,14 +83,41 @@ extension LoginListViewController: UITableViewDelegate {
     }
 }
 
+/// Controller that handles interacts with the search widget and updating the data source for searching
+private class LoginSearchController: NSObject, SearchInputViewDelegate {
+
+    private let profile: Profile
+
+    unowned let dataSource: LoginCursorDataSource
+
+    init(profile: Profile, dataSource: LoginCursorDataSource) {
+        self.profile = profile
+        self.dataSource = dataSource
+        super.init()
+    }
+
+    @objc func searchInputView(searchView: SearchInputView, didChangeTextTo text: String) {
+        print("Search field changed to: \(text)")
+    }
+
+    @objc func searchInputViewDidClose(searchView: SearchInputView) {
+        print("Closed search mode")
+    }
+
+    private func searchLoginsWithText(text: String) {
+        profile.logins.getAllLogins().uponQueue(dispatch_get_main_queue()) { logins in
+        }
+    }
+}
+
 /// Data source for handling LoginData objects from a Cursor
 private class LoginCursorDataSource: NSObject, UITableViewDataSource {
 
-    unowned var tableView: UITableView
+    unowned let tableView: UITableView
 
     private let LoginCellIdentifier = "LoginCell"
 
-    private let data = [
+    var data = [
         Login.createWithHostname("alphabet.com", username: "A@mozilla.com", password: "password1"),
         Login.createWithHostname("amazon.com", username: "AB@mozilla.com", password: "password1"),
         Login.createWithHostname("canada.com", username: "ABC@mozilla.com", password: "password1"),
