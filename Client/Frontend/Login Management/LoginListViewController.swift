@@ -165,9 +165,11 @@ private class LoginCursorDataSource: NSObject, UITableViewDataSource {
     @objc func sectionIndexTitlesForTableView(tableView: UITableView) -> [String]? {
         var firstHostnameCharacters = [Character]()
         cursor?.forEach { login in
-            guard let login = login else { return }
+            guard let login = login, let host = login.hostname.asURL?.host else {
+                return
+            }
 
-            let firstChar = login.hostname.uppercaseString[login.hostname.startIndex]
+            let firstChar = host.uppercaseString[host.startIndex]
             if !firstHostnameCharacters.contains(firstChar) {
                 firstHostnameCharacters.append(firstChar)
             }
@@ -192,7 +194,7 @@ private class LoginCursorDataSource: NSObject, UITableViewDataSource {
         }
 
         let titleForSectionAtIndex = sectionTitles[section]
-        let logins = cursor?.filter { $0?.hostname.uppercaseString.startsWith(titleForSectionAtIndex) ?? false }
+        let logins = cursor?.filter { $0?.hostname.asURL?.host?.uppercaseString.startsWith(titleForSectionAtIndex) ?? false }
         return logins?.flatMap { $0 } ?? []
     }
 }
