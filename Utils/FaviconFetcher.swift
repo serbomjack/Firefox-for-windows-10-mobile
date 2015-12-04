@@ -114,7 +114,8 @@ public class FaviconFetcher : NSObject, NSXMLParserDelegate {
                 var bestType = IconType.NoneFound
                 element.iterate("head.link") { link in
                     var iconType: IconType? = nil
-                    switch (link.attribute("rel")) {
+                    let rel = link.attribute("rel") as String?
+                    switch (rel ?? "") {
                         case "shortcut icon":
                             iconType = .Icon
                         case "icon":
