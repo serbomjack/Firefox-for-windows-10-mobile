@@ -65,12 +65,19 @@ class FaviconManager : BrowserHelper {
 
                             if !tab.isPrivate {
                                 self.profile.favicons.addFavicon(fav, forSite: site)
+                                if tab.favicons.isEmpty {
+                                    self.makeFaviconAvailable(tab, atURL: tab.webView!.URL!, favicon: fav, withImage: img)
+                                }
                             }
                             tab.favicons.append(fav)
                         })
                     }
                 }
-                
         }
+    }
+
+    func makeFaviconAvailable(tab: Browser, atURL url: NSURL, favicon: Favicon, withImage image: UIImage) {
+        let helper = tab.getHelper(name: "SpotlightHelper") as? SpotlightHelper
+        helper?.updateImage(image, forURL: url)
     }
 }
